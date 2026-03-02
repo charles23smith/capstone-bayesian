@@ -186,13 +186,13 @@ SPLIT1_DISABLE_PEAK_ANCHOR_SHOTS = {27282, 27283}
 SPLIT1_FORCE_AT_PEAK_SHOTS = {27287, 27289, 27290, 27291, 27295, 27296, 27297, 27298}
 SPLIT1_SKIP_STRICT_FALLBACK_SHOTS = {27287}
 SPLIT1_POS_TO_NEG_SLOPE_SHOTS = set()
-SPLIT1_SHIFT_LEFT_NS_BY_SHOT = {27300: 12.0}
+SPLIT1_SHIFT_LEFT_NS_BY_SHOT = {27300: 12.0, 27307: -50.0}
 SPLIT1_FORCE_ABS_MIN_SHOTS = {27296}
 ONSET_FLUCT_START_WINDOWS_NS_BY_SHOT = {27297: (80.0, 130.0), 27299: (0.0, 180.0)}
 ONSET_SHIFT_NS_BY_SHOT = {27299: 20.0}
 ONSET_PREPEAK_WINDOW_NS_BY_SHOT = {27301: (0.0, 400.0)}
-SPLIT1_TARGET_V_BY_SHOT = {27297: 2.0}
-SPLIT1_TARGET_WINDOW_NS_BY_SHOT = {27297: (120.0, 155.0)}
+SPLIT1_TARGET_V_BY_SHOT = {27297: 2.0, 27306: -1.5, 27307: -1.45}
+SPLIT1_TARGET_WINDOW_NS_BY_SHOT = {27297: (120.0, 155.0), 27307: (500.0, 38000.0)}
 SPLIT1_FORCE_ABS_MAX_SHOTS = {27299}
 
 # Shot-specific stop override: choose next-cycle local peak in a bounded window.
@@ -218,20 +218,39 @@ STOP_AFTER_SPLIT_RAW_MAX_WINDOWS_NS = {27283: (60.0, 85.0), 27290: (70.0, 120.0)
 STOP_AFTER_SPLIT_LOCAL_MAX_WINDOWS_NS[27290] = (70.0, 120.0)
 STOP_AFTER_SPLIT_GLOBAL_MIN_SHOTS = {27289}
 STOP_AFTER_SPLIT_GLOBAL_MIN_WINDOWS_NS = {27289: (20.0, 240.0)}
-STOP_AFTER_SPLIT_ABS_MAX_WINDOWS_NS = {27291: (175.0, 300.0), 27295: (200.0, 300.0)}
+STOP_AFTER_SPLIT_ABS_MAX_WINDOWS_NS = {27291: (175.0, 300.0), 27295: (200.0, 300.0), 27307: (50000.0, 90000.0)}
 STOP_AFTER_SPLIT_ABS_MIN_WINDOWS_NS = {27297: (165.0, 190.0)}
 STOP_ABS_MIN_BEFORE_NS_BY_SHOT = {27299: 240.0}
-STOP_FIRST_ZERO_AFTER_NS_BY_SHOT = {27300: 240.0, 27301: 300.0, 27302: 300.0}
-STOP_FIRST_ZERO_SMOOTH_NS_BY_SHOT = {27300: 10.0, 27301: 10.0, 27302: 10.0}
+STOP_FIRST_ZERO_AFTER_NS_BY_SHOT = {27300: 240.0, 27301: 300.0, 27302: 300.0, 27306: 0.0}
+STOP_FIRST_ZERO_SMOOTH_NS_BY_SHOT = {27300: 10.0, 27301: 10.0, 27302: 10.0, 27306: 10.0}
 EXP2_TWO_STAGE_SHOTS = {27295}
 EXP2_TWO_STAGE_SPLIT_ABS_NS_BY_SHOT = {27295: 200.0}
-EXP2_LINEAR_THEN_EXP_SHOTS = {27300}
-EXP2_LINEAR_SPLIT_ABS_NS_BY_SHOT = {27300: 240.0}
+EXP2_SIGMOID_ONLY_SHOTS = set()
+SIGMOID_ONLY_FORCE_SPLIT1_NEAR_ONSET_SHOTS = set()
+EXP2_LINEAR_THEN_EXP_SHOTS = {27300, 27306, 27307}
+EXP2_LINEAR_SPLIT_ABS_NS_BY_SHOT = {27300: 240.0, 27306: -25000.0, 27307: 36000.0}
+EXP2_LINEAR_END_V_BY_SHOT = {27306: 1.275, 27307: 1.275}
+EXP2_LINEAR_END_DELAY_NS_BY_SHOT = {27306: 3800.0, 27307: 3800.0}
+EXP2_LINEAR_END_V_PICK_BY_SHOT = {27306: "first_cross", 27307: "first_cross"}
+EXP2_LINEAR_END_V_TOL_BY_SHOT = {27306: 0.03, 27307: 0.03}
+EXP2_LINEAR_END_V_NEAR_BACKOFF_BY_SHOT = {27306: 0, 27307: 0}
+EXP2_LINEAR_EXP_FIT_RAW_SHOTS = {27306, 27307}
+EXP2_LINEAR_EXP_TAU_MAX_MULT_BY_SHOT = {27306: 7.0, 27307: 2.5}
+EXP2_LINEAR_EXP_USE_ALL_POINTS_SHOTS = {27306, 27307}
+EXP2_LINEAR_END_USE_RAW_SHOTS = {27307}
 EXP2_LINEAR_HANDOFF_WINDOW_NS_BY_SHOT = {27300: (273.0, 278.0)}
-EXP2_LINEAR_MIN_NS_AFTER_SPLIT1_BY_SHOT = {27300: 60.0}
-EXP2_LINEAR_STRICT_SLOPE_MULT_BY_SHOT = {27300: 3.2}
-EXP2_LINEAR_STRICT_SUSTAIN_N_BY_SHOT = {27300: 12}
-EXP2_LINEAR_DETECT_SMOOTH_NS_BY_SHOT = {27300: 14.0}
+EXP2_LINEAR_FORCE_ABS_TARGET_SHOTS = {27307}
+EXP2_LINEAR_MIN_NS_AFTER_SPLIT1_BY_SHOT = {27300: 60.0, 27306: 40.0, 27307: 40.0}
+EXP2_LINEAR_STRICT_SLOPE_MULT_BY_SHOT = {27300: 3.2, 27306: 3.0, 27307: 3.0}
+EXP2_LINEAR_STRICT_SUSTAIN_N_BY_SHOT = {27300: 12, 27306: 10, 27307: 10}
+EXP2_LINEAR_DETECT_SMOOTH_NS_BY_SHOT = {27300: 14.0, 27306: 12.0, 27307: 12.0}
+STOP_FLAT_2EXP_SHOTS = set()
+PLOT_MODELED_ONLY_LABEL_SHOTS = set()
+PLOT_HIDE_CONF_BAND_SHOTS = set()
+MODEL_V_FLOOR_BY_SHOT = {}
+EXP2_SIGMOID_FIT_RAW_SHOTS = set()
+EXP2_SIGMOID_USE_ALL_POINTS_SHOTS = set()
+EXP2_SIGMOID_TMID_SHIFT_NS_BY_SHOT = {}
 EXP2_THEN_SIGMOID_SHOTS = {27301, 27302}
 EXP2_SIG_START_WINDOW_NS_BY_SHOT = {27301: (460.0, 560.0), 27302: (300.0, 360.0)}
 EXP2_SIG_SPLIT_SMOOTH_NS_BY_SHOT = {27301: 10.0, 27302: 10.0}
@@ -282,6 +301,7 @@ RECOVERY_SHAPE_CSD = "sigmoid_exp_tail"
 # --- fit speed ---
 SUBSAMPLE_RECOVERY_N = 380
 RECOVERY_BAND_SIGMA = 1.96  # approx 95% band from fit residuals
+SHOW_CONF_BAND = False
 
 # --- current export (doc-style) ---
 K_T = 0.65
@@ -294,6 +314,7 @@ TIME_SHIFT_S  = 1e-6
 # plot zoom window padding (ns)
 ZOOM_LEFT_PAD_NS  = 200.0
 ZOOM_RIGHT_PAD_NS = 600.0
+SHOW_EVENT_MARKERS = False
 
 
 # =============================
@@ -2731,6 +2752,9 @@ def main(csv_file=None, out_dir=None):
         sidx = int(np.searchsorted(t_rel_ns, t_target))
         split1_idx = int(np.clip(sidx, onset_idx + 2, stop_idx - 3))
         split1_mode = f"{split1_mode}_shift_left"
+    if shot_id in SIGMOID_ONLY_FORCE_SPLIT1_NEAR_ONSET_SHOTS:
+        split1_idx = int(np.clip(onset_idx + 2, onset_idx + 2, stop_idx - 3))
+        split1_mode = "split1_forced_near_onset_sigmoid_only"
     split1_t_ns = float(t_rel_ns[split1_idx])
     print("\nSplit1 selection (exp1->exp2):")
     print(f"  split1_mode = {split1_mode}")
@@ -2837,6 +2861,17 @@ def main(csv_file=None, out_dir=None):
                 j = int(np.argmin(np.abs(vz[i0:])))
                 stop_idx = int(i0 + j)
                 stop_mode = "stop_nearest_zero_after"
+            stop_t_ns = float(t_rel_ns[stop_idx])
+            print("\nStop adjusted after split:")
+            print(f"  stop_mode = {stop_mode}")
+            print(f"  stop_t    = {stop_t_ns:.3f} ns | V_stop = {v_diode[stop_idx]:.6f} V")
+    if (not use_three_exp) and (shot_id in STOP_FLAT_2EXP_SHOTS):
+        stop_idx_flat, flat_thr, flat_mode = stop_by_recovery_flattening(
+            t_rel_ns, v_diode, peak_idx, onset_idx=onset_idx, min_recovery_frac=0.75
+        )
+        if (stop_idx_flat is not None) and (stop_idx_flat > split1_idx + 6):
+            stop_idx = int(stop_idx_flat)
+            stop_mode = f"{flat_mode}_2exp"
             stop_t_ns = float(t_rel_ns[stop_idx])
             print("\nStop adjusted after split:")
             print(f"  stop_mode = {stop_mode}")
@@ -3168,9 +3203,45 @@ def main(csv_file=None, out_dir=None):
             V_hi[oC:oC+len(VC_model)] = VC_model + bC
 
             exp2_mode = "four_stage_exp_tail"
+        elif shot_id in EXP2_SIGMOID_ONLY_SHOTS:
+            # Shot-specific 2nd segment: anchored sigmoid from split1 directly to stop.
+            t2_abs = t_diode[split1_idx:stop_idx+1]
+            if shot_id in EXP2_SIGMOID_FIT_RAW_SHOTS:
+                v2 = v_diode[split1_idx:stop_idx+1]
+            else:
+                v2 = v_fit[split1_idx:stop_idx+1]
+            t2 = t2_abs - t2_abs[0]
+            if shot_id in EXP2_SIGMOID_USE_ALL_POINTS_SHOTS:
+                idx2 = np.arange(len(t2), dtype=int)
+            else:
+                idx2 = np.linspace(0, len(t2)-1, min(SUBSAMPLE_RECOVERY_N, len(t2)), dtype=int)
+            p2s, y2_0, sig2 = fit_anchored_sigmoid_fast(t2[idx2], v2[idx2], seg_sign=rec_sign)
+            a2s, tm2s, k2s, m2s = map(float, p2s)
+            if shot_id in EXP2_SIGMOID_TMID_SHIFT_NS_BY_SHOT:
+                tm_shift = _ns_to_s(float(EXP2_SIGMOID_TMID_SHIFT_NS_BY_SHOT[shot_id]))
+                tm2s = float(np.clip(tm2s + tm_shift, 0.0, max(float(t2[-1]) * 0.98, 1e-12)))
+            print("Exp2 fit (split1->stop, anchored-sigmoid):")
+            print(f"  amp2={a2s:.6f}, tmid2={tm2s*1e9:.3f} ns, k2={k2s*1e9:.3f} ns, m2={m2s:.6e}")
+            V2_model = anchored_sigmoid_np(t2, a2s, tm2s, k2s, m2s, y2_0)
+            V_model[n1-1:] = V2_model
+            exp2_mode = "sigmoid_only"
+
+            t2grid = np.linspace(0, float(t2[-1]), max(300, len(t2)))
+            mean2 = anchored_sigmoid_np(t2grid, a2s, tm2s, k2s, m2s, y2_0)
+            band2 = RECOVERY_BAND_SIGMA * sig2
+            lo2 = mean2 - band2
+            hi2 = mean2 + band2
+            V_lo[n1-1:] = np.interp(t2, t2grid, lo2)
+            V_hi[n1-1:] = np.interp(t2, t2grid, hi2)
         # exp2: split1 -> stop
         elif shot_id in EXP2_LINEAR_THEN_EXP_SHOTS:
             split2_target_ns = float(EXP2_LINEAR_SPLIT_ABS_NS_BY_SHOT.get(shot_id, 240.0))
+            split2_target_v = EXP2_LINEAR_END_V_BY_SHOT.get(shot_id, None)
+            split2_target_delay_ns = float(EXP2_LINEAR_END_DELAY_NS_BY_SHOT.get(shot_id, 0.0))
+            split2_target_pick = str(EXP2_LINEAR_END_V_PICK_BY_SHOT.get(shot_id, "first_cross"))
+            split2_target_tol = float(EXP2_LINEAR_END_V_TOL_BY_SHOT.get(shot_id, 0.02))
+            split2_target_near_backoff = int(EXP2_LINEAR_END_V_NEAR_BACKOFF_BY_SHOT.get(shot_id, 0))
+            exp2b_tau_max_mult = float(EXP2_LINEAR_EXP_TAU_MAX_MULT_BY_SHOT.get(shot_id, 3.0))
             min_after_ns = float(EXP2_LINEAR_MIN_NS_AFTER_SPLIT1_BY_SHOT.get(shot_id, 40.0))
             slope_mult = float(EXP2_LINEAR_STRICT_SLOPE_MULT_BY_SHOT.get(shot_id, 3.0))
             sustain_n = int(EXP2_LINEAR_STRICT_SUSTAIN_N_BY_SHOT.get(shot_id, 10))
@@ -3211,8 +3282,50 @@ def main(csv_file=None, out_dir=None):
             d2_thr = float(0.55 * np.percentile(d2_pos, 95)) if len(d2_pos) > 8 else float(np.max(d2_scan) * 0.65 if len(d2_scan) > 0 else 0.0)
             dv_rise_thr = max(1.6 * ref_mag, 1e-18)
 
+            split2_idx = None
+            if shot_id in EXP2_LINEAR_FORCE_ABS_TARGET_SHOTS:
+                split2_idx = int(np.argmin(np.abs(t_rel_ns - split2_target_ns)))
+                split2_idx = int(np.clip(split2_idx, split1_idx + 4, stop_idx - 4))
+                split2_mode = "exp2_linear_handoff_forced_abs_target"
+            if (split2_idx is None) and (split2_target_v is not None):
+                # Primary shot-specific handoff: end linear segment at target voltage
+                # crossing on the RAW diode waveform.
+                i_v0 = max(split1_idx + 2, 1)
+                i_v1 = max(i_v0 + 1, stop_idx - 3)
+                y_raw = v_diode[i_v0:i_v1+1]
+                # Use sign consistent with the branch start (e.g., -1.25 V for negative waveform).
+                target_signed = float(np.copysign(abs(float(split2_target_v)), float(v_diode[split1_idx])))
+                d = y_raw - target_signed
+                if len(d) >= 2:
+                    if split2_target_pick == "last_near":
+                        near = np.where(np.abs(d) <= split2_target_tol)[0]
+                        if len(near) > 0:
+                            k = max(0, len(near) - 1 - max(0, split2_target_near_backoff))
+                            split2_idx = int(i_v0 + near[k])
+                            split2_mode = "exp2_linear_handoff_target_v_raw_last_near"
+                        else:
+                            zc = np.where((d[:-1] == 0.0) | (d[:-1] * d[1:] <= 0.0))[0]
+                            if len(zc) > 0:
+                                split2_idx = int(i_v0 + zc[-1] + 1)
+                                split2_mode = "exp2_linear_handoff_target_v_raw_last_cross"
+                    else:
+                        zc = np.where((d[:-1] == 0.0) | (d[:-1] * d[1:] <= 0.0))[0]
+                        if len(zc) > 0:
+                            split2_idx = int(i_v0 + zc[0] + 1)
+                            split2_mode = "exp2_linear_handoff_target_v_raw_first_cross"
+                    if split2_idx is None:
+                        # Fallback in the same raw segment: pick nearest target point.
+                        jn = int(np.argmin(np.abs(d)))
+                        split2_idx = int(i_v0 + jn)
+                        split2_mode = "exp2_linear_handoff_target_v_raw_nearest"
+                if (split2_idx is not None) and (split2_target_delay_ns != 0.0):
+                    t_late = float(t_rel_ns[split2_idx]) + split2_target_delay_ns
+                    split2_idx = int(np.searchsorted(t_rel_ns, t_late))
+                    split2_idx = int(np.clip(split2_idx, split1_idx + 4, stop_idx - 4))
+                    split2_mode = f"{split2_mode}_delay"
+
             # Optional strict handoff window (shot-specific): choose inflection (max d2) inside window.
-            if shot_id in EXP2_LINEAR_HANDOFF_WINDOW_NS_BY_SHOT:
+            if (split2_idx is None) and (shot_id in EXP2_LINEAR_HANDOFF_WINDOW_NS_BY_SHOT):
                 w0_ns, w1_ns = EXP2_LINEAR_HANDOFF_WINDOW_NS_BY_SHOT[shot_id]
                 m_hw = (t_rel_ns >= float(w0_ns)) & (t_rel_ns <= float(w1_ns))
                 idx_hw = np.where(m_hw)[0]
@@ -3221,10 +3334,6 @@ def main(csv_file=None, out_dir=None):
                     j_hw = int(np.argmax(d2[idx_hw]))
                     split2_idx = int(idx_hw[j_hw])
                     split2_mode = "exp2_linear_handoff_window_inflection"
-                else:
-                    split2_idx = None
-            else:
-                split2_idx = None
 
             if split2_idx is None:
                 for i in range(i_start, i_end - sustain_n):
@@ -3256,26 +3365,42 @@ def main(csv_file=None, out_dir=None):
             split2_t_ns = float(t_rel_ns[split2_idx])
             print("\nSplit2 selection (linear->exp):")
             print(f"  split2_mode = {split2_mode}")
-            print(f"  split2_t    = {split2_t_ns:.3f} ns | V_split2 = {v_diode[split2_idx]:.6f} V")
+            print(f"  split2_t    = {split2_t_ns:.5f} ns | V_split2 = {v_diode[split2_idx]:.6f} V")
+            if split2_target_v is not None:
+                print(f"  split2_target_v = {float(split2_target_v):.6f} V")
+                print(f"  split2_target_pick = {split2_target_pick}, tol={split2_target_tol:.4f} V")
+                if split2_target_pick == "last_near":
+                    print(f"  split2_target_near_backoff = {split2_target_near_backoff}")
+            if split2_target_delay_ns != 0.0:
+                print(f"  split2_target_delay = {split2_target_delay_ns:.3f} ns")
 
             # Segment 2a: linear from split1 to fixed handoff (~240 ns).
             t2a_abs = t_diode[split1_idx:split2_idx+1]
             t2a = t2a_abs - t2a_abs[0]
             y2a0 = float(v_diode[split1_idx])
-            y2a1 = float(v_fit[split2_idx])
+            if shot_id in EXP2_LINEAR_END_USE_RAW_SHOTS:
+                y2a1 = float(v_diode[split2_idx])
+            else:
+                y2a1 = float(v_fit[split2_idx])
             T2a = max(float(t2a[-1]), 1e-12)
             V2a_model = y2a0 + (y2a1 - y2a0) * (t2a / T2a)
-            sig2a = float(np.std(v_fit[split1_idx:split2_idx+1] - V2a_model) + 1e-9)
+            sig2a = float(np.std(v_diode[split1_idx:split2_idx+1] - V2a_model) + 1e-9)
             print("Exp2a fit (split1->split2, linear):")
             print(f"  y2a_0={y2a0:.6f}, y2a_1={y2a1:.6f}")
 
             # Segment 2b: final exponential from handoff to zero-reaching stop.
             t2b_abs = t_diode[split2_idx:stop_idx+1]
-            v2b = v_fit[split2_idx:stop_idx+1]
+            if shot_id in EXP2_LINEAR_EXP_FIT_RAW_SHOTS:
+                v2b = v_diode[split2_idx:stop_idx+1]
+            else:
+                v2b = v_fit[split2_idx:stop_idx+1]
             t2b = t2b_abs - t2b_abs[0]
-            idx2b = np.linspace(0, len(t2b)-1, min(SUBSAMPLE_RECOVERY_N, len(t2b)), dtype=int)
+            if shot_id in EXP2_LINEAR_EXP_USE_ALL_POINTS_SHOTS:
+                idx2b = np.arange(len(t2b), dtype=int)
+            else:
+                idx2b = np.linspace(0, len(t2b)-1, min(SUBSAMPLE_RECOVERY_N, len(t2b)), dtype=int)
             p2b, y2_0, sig2b = fit_anchored_exp_through_endpoint_fast(
-                t2b[idx2b], v2b[idx2b], seg_sign=rec_sign, tau_max_mult=3.0
+                t2b[idx2b], v2b[idx2b], seg_sign=rec_sign, tau_max_mult=exp2b_tau_max_mult
             )
             b2, tau2 = map(float, p2b)
             print("Exp2b fit (split2->stop, anchored-exp-endpoint):")
@@ -3493,7 +3618,16 @@ def main(csv_file=None, out_dir=None):
             V_lo[n1-1:] = np.interp(t2, t2grid, lo2)
             V_hi[n1-1:] = np.interp(t2, t2grid, hi2)
 
+    # Optional per-shot floor to suppress non-physical undershoot.
+    if shot_id in MODEL_V_FLOOR_BY_SHOT:
+        v_floor = float(MODEL_V_FLOOR_BY_SHOT[shot_id])
+        V_model = np.maximum(V_model, v_floor)
+        V_lo = np.maximum(V_lo, v_floor)
+        V_hi = np.maximum(V_hi, v_floor)
+
     mci = np.isfinite(V_lo) & np.isfinite(V_hi)
+    plot_modeled_only_labels = (shot_id in PLOT_MODELED_ONLY_LABEL_SHOTS)
+    hide_conf_band = (not SHOW_CONF_BAND) or (shot_id in PLOT_HIDE_CONF_BAND_SHOTS)
 
     # =============================
     # PLOTS
@@ -3501,7 +3635,8 @@ def main(csv_file=None, out_dir=None):
 
     # 1) Full trace (for context)
     plt.figure(figsize=(14, 6))
-    plt.plot(t_rel_ns, v_diode, "k-", lw=1.0, alpha=0.8, label="Diode (actual)")
+    diode_lbl = "_nolegend_" if plot_modeled_only_labels else "Diode (actual)"
+    plt.plot(t_rel_ns, v_diode, "k-", lw=1.0, alpha=0.8, label=diode_lbl)
     if use_four_exp:
         model_lbl = "modeled (exp1 + exp2 + exp tail)"
     elif use_gompertz:
@@ -3511,34 +3646,37 @@ def main(csv_file=None, out_dir=None):
     else:
         model_lbl = "modeled (exp1 + exp2)"
     plt.plot(t_seg_ns, V_model, "r-", lw=2.6, label=model_lbl)
-    if np.any(mci):
-        band_lbl = "approx 95% fit band (4-exp/exp-tail)" if use_four_exp else ("approx 95% fit band (gompertz)" if use_gompertz else ("approx 95% fit band (sigmoid segment)" if use_three_exp else "approx 95% fit band (exp2)"))
-        plt.fill_between(t_seg_ns[mci], V_lo[mci], V_hi[mci], color="red", alpha=0.20, label=band_lbl)
+    band_lbl = "approx 95% fit band (4-exp/exp-tail)" if use_four_exp else ("approx 95% fit band (gompertz)" if use_gompertz else ("approx 95% fit band (sigmoid segment)" if use_three_exp else "approx 95% fit band (exp2)"))
+    if np.any(mci) and (not hide_conf_band):
+        band_plot_lbl = "_nolegend_" if plot_modeled_only_labels else band_lbl
+        plt.fill_between(t_seg_ns[mci], V_lo[mci], V_hi[mci], color="red", alpha=0.20, label=band_plot_lbl)
 
     t_cross_rel_ns = _s_to_ns(t_cross - new_t0_abs)
-    plt.axvline(0.0, color="red", ls="--", lw=2, label="NEW t0")
-    plt.axvline(t_cross_rel_ns, color="orange", ls="--", lw=2, label="PCD=0.5V (+100ns)")
-    plt.axvline(onset_t_ns, color="green", ls="--", lw=2, label="onset (model start)")
-    plt.axvline(peak_t_ns, color="blue", ls="--", lw=2, label="peak")
+    if SHOW_EVENT_MARKERS and (not plot_modeled_only_labels):
+        plt.axvline(0.0, color="red", ls="--", lw=2, label="NEW t0")
+        plt.axvline(t_cross_rel_ns, color="orange", ls="--", lw=2, label="PCD=0.5V (+100ns)")
+        plt.axvline(onset_t_ns, color="green", ls="--", lw=2, label="onset (model start)")
+        plt.axvline(peak_t_ns, color="blue", ls="--", lw=2, label="peak")
     sig_start_t_ns = float(t_rel_ns[dip_end_idx]) if (use_three_exp and has_dip and dip_end_idx is not None) else split1_t_ns
-    plt.axvline(split1_t_ns, color="cyan", ls="--", lw=2, label=("peak / seg2 start" if use_three_exp else "exp2 start (turn)"))
-    if (not use_three_exp) and ('exp2_mode' in locals()) and (exp2_mode in {"two_stage_stretched", "linear_then_exp", "exp_then_sigmoid"}) and (split2_t_ns is not None):
-        if exp2_mode == "linear_then_exp":
-            lbl = "linear->exp handoff (~240ns)"
-        elif exp2_mode == "exp_then_sigmoid":
-            lbl = "sigmoid start"
-        else:
-            lbl = "exp3 start (~200ns)"
-        plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label=lbl)
-    if use_four_exp and (split2_t_ns is not None):
-        plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label="exp tail start (old stop)")
-    if use_four_exp and (split3_t_ns is not None):
-        plt.axvline(split3_t_ns, color="teal", ls="--", lw=2, label="shape anchor (rel max)")
-    if use_three_exp and has_dip and dip_end_idx is not None:
-        plt.axvline(sig_start_t_ns, color="teal", ls="--", lw=2, label="sigmoid start (after dip)")
-    if (not use_gompertz) and use_three_exp and split2_t_ns is not None:
-        plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label="exp tail start (slope mismatch)")
-    plt.axvline(stop_t_ns, color="purple", ls="--", lw=2, label="stop")
+    if SHOW_EVENT_MARKERS and (not plot_modeled_only_labels):
+        plt.axvline(split1_t_ns, color="cyan", ls="--", lw=2, label=("peak / seg2 start" if use_three_exp else "exp2 start (turn)"))
+        if (not use_three_exp) and ('exp2_mode' in locals()) and (exp2_mode in {"two_stage_stretched", "linear_then_exp", "exp_then_sigmoid"}) and (split2_t_ns is not None):
+            if exp2_mode == "linear_then_exp":
+                lbl = "linear->exp handoff"
+            elif exp2_mode == "exp_then_sigmoid":
+                lbl = "sigmoid start"
+            else:
+                lbl = "exp3 start (~200ns)"
+            plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label=lbl)
+        if use_four_exp and (split2_t_ns is not None):
+            plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label="exp tail start (old stop)")
+        if use_four_exp and (split3_t_ns is not None):
+            plt.axvline(split3_t_ns, color="teal", ls="--", lw=2, label="shape anchor (rel max)")
+        if use_three_exp and has_dip and dip_end_idx is not None:
+            plt.axvline(sig_start_t_ns, color="teal", ls="--", lw=2, label="sigmoid start (after dip)")
+        if (not use_gompertz) and use_three_exp and split2_t_ns is not None:
+            plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label="exp tail start (slope mismatch)")
+        plt.axvline(stop_t_ns, color="purple", ls="--", lw=2, label="stop")
 
     seg_count_lbl = "4" if use_four_exp else ("3" if use_three_exp else "2")
     plt.title(f"Full overlay (NEW t0 axis): actual diode + piecewise {seg_count_lbl}-exp model", fontweight="bold")
@@ -3556,33 +3694,34 @@ def main(csv_file=None, out_dir=None):
     x0 = onset_t_ns - ZOOM_LEFT_PAD_NS
     x1 = stop_t_ns + ZOOM_RIGHT_PAD_NS
     plt.figure(figsize=(14, 6))
-    plt.plot(t_rel_ns, v_diode, "k-", lw=1.2, alpha=0.85, label="Diode (actual)")
+    plt.plot(t_rel_ns, v_diode, "k-", lw=1.2, alpha=0.85, label=diode_lbl)
     plt.plot(t_seg_ns, V_model, "r-", lw=2.8, label=model_lbl)
-    if np.any(mci):
-        plt.fill_between(t_seg_ns[mci], V_lo[mci], V_hi[mci], color="red", alpha=0.20, label=band_lbl)
+    if np.any(mci) and (not hide_conf_band):
+        plt.fill_between(t_seg_ns[mci], V_lo[mci], V_hi[mci], color="red", alpha=0.20, label=("_nolegend_" if plot_modeled_only_labels else band_lbl))
 
-    plt.axvline(0.0, color="red", ls="--", lw=2, label="NEW t0")
-    plt.axvline(t_cross_rel_ns, color="orange", ls="--", lw=2, label="PCD=0.5V (+100ns)")
-    plt.axvline(onset_t_ns, color="green", ls="--", lw=2, label="onset")
-    plt.axvline(peak_t_ns, color="blue", ls="--", lw=2, label="peak")
-    plt.axvline(split1_t_ns, color="cyan", ls="--", lw=2, label=("peak / seg2 start" if use_three_exp else "exp2 start"))
-    if (not use_three_exp) and ('exp2_mode' in locals()) and (exp2_mode in {"two_stage_stretched", "linear_then_exp", "exp_then_sigmoid"}) and (split2_t_ns is not None):
-        if exp2_mode == "linear_then_exp":
-            lbl = "linear->exp handoff"
-        elif exp2_mode == "exp_then_sigmoid":
-            lbl = "sigmoid start"
-        else:
-            lbl = "exp3 start"
-        plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label=lbl)
-    if use_four_exp and (split2_t_ns is not None):
-        plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label="exp tail start")
-    if use_four_exp and (split3_t_ns is not None):
-        plt.axvline(split3_t_ns, color="teal", ls="--", lw=2, label="shape anchor")
-    if use_three_exp and has_dip and dip_end_idx is not None:
-        plt.axvline(sig_start_t_ns, color="teal", ls="--", lw=2, label="sigmoid start")
-    if (not use_gompertz) and use_three_exp and split2_t_ns is not None:
-        plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label="exp tail start")
-    plt.axvline(stop_t_ns, color="purple", ls="--", lw=2, label="stop")
+    if SHOW_EVENT_MARKERS and (not plot_modeled_only_labels):
+        plt.axvline(0.0, color="red", ls="--", lw=2, label="NEW t0")
+        plt.axvline(t_cross_rel_ns, color="orange", ls="--", lw=2, label="PCD=0.5V (+100ns)")
+        plt.axvline(onset_t_ns, color="green", ls="--", lw=2, label="onset")
+        plt.axvline(peak_t_ns, color="blue", ls="--", lw=2, label="peak")
+        plt.axvline(split1_t_ns, color="cyan", ls="--", lw=2, label=("peak / seg2 start" if use_three_exp else "exp2 start"))
+        if (not use_three_exp) and ('exp2_mode' in locals()) and (exp2_mode in {"two_stage_stretched", "linear_then_exp", "exp_then_sigmoid"}) and (split2_t_ns is not None):
+            if exp2_mode == "linear_then_exp":
+                lbl = "linear->exp handoff"
+            elif exp2_mode == "exp_then_sigmoid":
+                lbl = "sigmoid start"
+            else:
+                lbl = "exp3 start"
+            plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label=lbl)
+        if use_four_exp and (split2_t_ns is not None):
+            plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label="exp tail start")
+        if use_four_exp and (split3_t_ns is not None):
+            plt.axvline(split3_t_ns, color="teal", ls="--", lw=2, label="shape anchor")
+        if use_three_exp and has_dip and dip_end_idx is not None:
+            plt.axvline(sig_start_t_ns, color="teal", ls="--", lw=2, label="sigmoid start")
+        if (not use_gompertz) and use_three_exp and split2_t_ns is not None:
+            plt.axvline(split2_t_ns, color="magenta", ls="--", lw=2, label="exp tail start")
+        plt.axvline(stop_t_ns, color="purple", ls="--", lw=2, label="stop")
     plt.xlim(x0, x1)
 
     split2_tag = str(split2_mode) if (split2_mode is not None) else "n/a"
@@ -3700,6 +3839,10 @@ def main(csv_file=None, out_dir=None):
             print(f"  Segment 3: t in [{t2b_boundary:.9e}, {t_model_end:.9e}]")
             print("    V3(t) = y2b_0 + m_tail*(t-ts2) + amp_s * ((sigmoid((t-ts2)-t_mid_s,k_s)-sigmoid(-t_mid_s,k_s))/(1-sigmoid(-t_mid_s,k_s)))")
             print(f"    ts2={t2b_boundary:.9e}, y2b_0={y2b_0:.9e}, amp_s={a2s:.9e}, t_mid_s={tm2s:.9e}, k_s={k2s:.9e}, m_tail={m2s:.9e}")
+        elif 'exp2_mode' in locals() and exp2_mode == "sigmoid_only":
+            print(f"  Segment 2: t in [{t1_boundary:.9e}, {t_model_end:.9e}]")
+            print("    V2(t) = y2_0 + m_tail*(t-ts) + amp_s * ((sigmoid((t-ts)-t_mid_s,k_s)-sigmoid(-t_mid_s,k_s))/(1-sigmoid(-t_mid_s,k_s)))")
+            print(f"    ts={t1_boundary:.9e}, y2_0={y2_0:.9e}, amp_s={a2s:.9e}, t_mid_s={tm2s:.9e}, k_s={k2s:.9e}, m_tail={m2s:.9e}")
         elif 'exp2_mode' in locals() and exp2_mode == "linear_then_exp" and (split2_idx is not None):
             t2b_boundary = float(t_diode[split2_idx])
             print(f"  Segment 2: t in [{t1_boundary:.9e}, {t2b_boundary:.9e}]")
@@ -3729,9 +3872,44 @@ def main(csv_file=None, out_dir=None):
             print(f"    V2(t) = baseline2 + (y2_0 - baseline2) * exp(-(t - {t1_boundary:.9e})/tau2)")
             print(f"    baseline2={b2:.9e}, y2_0={y2_0:.9e}, tau2={tau2:.9e}")
 
-    print("\nPiecewise I(t) model:")
-    print("  I(t) = K_T * t_out + K_V * V(t)")
-    print(f"  with K_T={K_T:.9e}, K_V={K_V:.9e}, t_out=(t-{new_t0_abs:.9e})+{TIME_SHIFT_S:.9e}")
+    # Numeric-only formulas (constants substituted) for direct reuse.
+    print("\nNumeric Piecewise V(t) (constants substituted; t in absolute seconds):")
+    print(f"  valid on [{t0_model_start:.9e}, {t_model_end:.9e}]")
+    if ('k1' in locals()) and ((shot_id in STRETCHED_ENDPOINT_SHOTS) or (shot_id in EXP1_STRETCHED_ONLY_SHOTS)):
+        print(f"  if {t0_model_start:.9e} <= t <= {t1_boundary:.9e}:")
+        print(f"    V(t) = {b1:.9e} + ({y1_0:.9e} - {b1:.9e}) * exp(-((t - {t0_model_start:.9e}) / {tau1:.9e})^{k1:.9e})")
+    else:
+        print(f"  if {t0_model_start:.9e} <= t <= {t1_boundary:.9e}:")
+        print(f"    V(t) = {b1:.9e} + ({y1_0:.9e} - {b1:.9e}) * exp(-(t - {t0_model_start:.9e}) / {tau1:.9e})")
+
+    if 'exp2_mode' in locals() and exp2_mode == "linear_then_exp" and ('t2b_boundary' in locals()):
+        slope2 = (y2a1 - y2a0) / max((t2b_boundary - t1_boundary), 1e-18)
+        print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
+        print(f"    V(t) = {y2a0:.9e} + ({slope2:.9e}) * (t - {t1_boundary:.9e})")
+        print(f"  if {t2b_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {b2:.9e} + ({y2_0:.9e} - {b2:.9e}) * exp(-(t - {t2b_boundary:.9e}) / {tau2:.9e})")
+    elif 'exp2_mode' in locals() and exp2_mode == "exp_then_sigmoid" and ('t2b_boundary' in locals()):
+        print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
+        print(f"    V(t) = {b2a:.9e} + ({y2a_0:.9e} - {b2a:.9e}) * exp(-(t - {t1_boundary:.9e}) / {tau2a:.9e})")
+        print(f"  if {t2b_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {y2b_0:.9e} + ({m2s:.9e})*(t - {t2b_boundary:.9e}) + ({a2s:.9e}) * "
+              f"((1/(1+exp(-((t - {t2b_boundary:.9e}) - {tm2s:.9e})/{k2s:.9e})) - 1/(1+exp(-(-{tm2s:.9e})/{k2s:.9e})))"
+              f" / (1 - 1/(1+exp(-(-{tm2s:.9e})/{k2s:.9e}))))")
+    elif 'exp2_mode' in locals() and exp2_mode == "sigmoid_only":
+        print(f"  if {t1_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {y2_0:.9e} + ({m2s:.9e})*(t - {t1_boundary:.9e}) + ({a2s:.9e}) * "
+              f"((1/(1+exp(-((t - {t1_boundary:.9e}) - {tm2s:.9e})/{k2s:.9e})) - 1/(1+exp(-(-{tm2s:.9e})/{k2s:.9e})))"
+              f" / (1 - 1/(1+exp(-(-{tm2s:.9e})/{k2s:.9e}))))")
+    else:
+        print(f"  if {t1_boundary:.9e} < t <= {t_model_end:.9e}:")
+        if ('alpha2' in locals()) and ('y2_end' in locals()) and ('exp2_mode' in locals()) and exp2_mode == "accel_endpoint":
+            print(f"    V(t) = {y2_0:.9e} + ({y2_end:.9e} - {y2_0:.9e}) * "
+                  f"((exp({alpha2:.9e} * (t - {t1_boundary:.9e}) / ({t_model_end:.9e} - {t1_boundary:.9e})) - 1) / (exp({alpha2:.9e}) - 1))")
+        else:
+            print(f"    V(t) = {b2:.9e} + ({y2_0:.9e} - {b2:.9e}) * exp(-(t - {t1_boundary:.9e}) / {tau2:.9e})")
+
+    print("\nNumeric I(t) model:")
+    print(f"  I(t) = {K_T:.9e} * ((t - {new_t0_abs:.9e}) + {TIME_SHIFT_S:.9e}) + {K_V:.9e} * V(t)")
 
     print("\nDONE.")
     print("Check:")
