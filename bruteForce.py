@@ -164,7 +164,7 @@ SPLIT1_ZERO_RISE_HOLD_HIT_FRAC = 0.55
 SMAJ_FIT_SMOOTH_NOISE_THRESH_V = 0.020
 SMAJ_FIT_SMOOTH_NS = 3.5
 SHOT_FIT_SMOOTH_NS_OVERRIDE = {27282: 5.5, 27283: 6.5, 27286: 5.5, 27287: 8.5, 27289: 6.5, 27295: 5.5}
-SHOT_FORCE_FIT_SMOOTH_NS = {27296: 10.0, 27297: 10.0, 27298: 10.0, 27299: 18.0}
+SHOT_FORCE_FIT_SMOOTH_NS = {27279: 6.0, 27296: 10.0, 27297: 10.0, 27298: 10.0, 27299: 18.0}
 ONSET_FORCE_T0_SHOTS = set()
 SPLIT1_PEAK_ANCHOR_START_NS = 2.0
 SPLIT1_PEAK_ANCHOR_WIN_NS = 26.0
@@ -179,7 +179,7 @@ SPLIT1_STRICT_INFLECT_PRE_N = 8
 SPLIT1_STRICT_INFLECT_SLOPE_FRAC_P90 = 0.45
 SPLIT1_STRICT_INFLECT_ACCEL_FRAC_P90 = 0.30
 SPLIT1_STRICT_INFLECT_PRE_FRAC_POST = 0.35
-SPLIT1_STRICTER_SHOTS = {27277}
+SPLIT1_STRICTER_SHOTS = {27277, 27278, 27279}
 SPLIT1_STRICTER_MULT = 1.00
 SPLIT1_STRICTER_MIN_NS_AFTER_PEAK = 22.0
 SPLIT1_STRICTER_MIN_NS_BY_SHOT = {27282: 34.0, 27283: 100.0}
@@ -187,11 +187,11 @@ SPLIT1_DISABLE_PEAK_ANCHOR_SHOTS = {27282, 27283}
 SPLIT1_FORCE_AT_PEAK_SHOTS = {27287, 27289, 27290, 27291, 27295, 27296, 27297, 27298}
 SPLIT1_SKIP_STRICT_FALLBACK_SHOTS = {27287}
 SPLIT1_POS_TO_NEG_SLOPE_SHOTS = set()
-SPLIT1_SHIFT_LEFT_NS_BY_SHOT = {27277: -20.0, 27300: 12.0, 27307: -50.0}
-SPLIT1_FORCE_ABS_NS_BY_SHOT = {27277: 200.0}
+SPLIT1_SHIFT_LEFT_NS_BY_SHOT = {27277: -20.0, 27278: -20.0, 27300: 12.0, 27307: -50.0}
+SPLIT1_FORCE_ABS_NS_BY_SHOT = {27277: 200.0, 27278: 190.0, 27279: 175.0, 27280: 200.0, 27282: 201.0}
 SPLIT1_FORCE_ABS_MIN_SHOTS = {27296}
 ONSET_FLUCT_START_WINDOWS_NS_BY_SHOT = {27297: (80.0, 130.0), 27299: (0.0, 180.0)}
-ONSET_SHIFT_NS_BY_SHOT = {27299: 20.0}
+ONSET_SHIFT_NS_BY_SHOT = {27282: 10.0, 27299: 20.0}
 ONSET_PREPEAK_WINDOW_NS_BY_SHOT = {27301: (0.0, 400.0)}
 SPLIT1_TARGET_V_BY_SHOT = {27297: 2.0, 27306: -1.5, 27307: -1.45}
 SPLIT1_TARGET_WINDOW_NS_BY_SHOT = {27297: (120.0, 155.0), 27307: (500.0, 38000.0)}
@@ -206,13 +206,26 @@ STOP_NEXT_PEAK_SMOOTH_NS = 6.0
 SPLIT1_SHOT_MIN_WINDOW_NS = {
     27283: (55.0, 120.0),   # peak ~146 ns -> target split ~201-266 ns (deeper first valley)
 }
-EXP1_ENDPOINT_CONSTRAINED_SHOTS = {27282, 27283, 27286, 27287, 27289, 27296, 27299}
+EXP1_ENDPOINT_CONSTRAINED_SHOTS = {27278, 27279, 27280, 27282, 27283, 27286, 27287, 27289, 27296, 27299}
 EXP1_ENDPOINT_TAU_MAX_MULT_BY_SHOT = {27286: 0.9, 27287: 1.0, 27289: 1.2, 27296: 1.0, 27299: 1.1}
-EXP1_ENDPOINT_RAW_TARGET_SHOTS = {27287, 27289, 27296}
-EXP2_ENDPOINT_TARGET_STOP_SHOTS = {27283, 27286}
+EXP1_ENDPOINT_RAW_TARGET_SHOTS = {27278, 27279, 27280, 27287, 27289, 27296}
+EXP1_START_SHIFT_NS_BY_SHOT = {27282: 50.0, 27298: -5.0}
+EXP1_ENDPOINT_Y_OFFSET_BY_SHOT = {27278: 0.0, 27279: 0.0}
+EXP1_MIN_ANCHOR_V_BY_SHOT = {27279: -2.1}
+EXP1_LEVEL_ANCHOR_V_BY_SHOT = {27282: -3.4}
+EXP1_ONLY_SHOTS = set()
+EXP1_LINEAR_THEN_EXP_SHOTS = {27279}
+EXP1_LINEAR_END_ABS_NS_BY_SHOT = {27279: 205.0}
+EXP1_EXP2_END_ABS_NS_BY_SHOT = {27279: 340.0}
+EXP2_ENDPOINT_TARGET_STOP_SHOTS = {27283, 27286, 27290}
 EXP2_CLASSIC_ENDPOINT_SHOTS = {27287, 27297, 27299}
 EXP2_FIT_RAW_SHOTS = {27297}
-EXP2_ENDPOINT_Y_OFFSET_BY_SHOT = {27286: -0.25}
+EXP2_ENDPOINT_Y_OFFSET_BY_SHOT = {27286: -0.25, 27290: -0.01}
+EXP2_ENDPOINT_SLOPE_SHOTS = {27290}
+EXP2_MIDPOINT_ANCHOR_SHOTS = {27290}
+EXP2_APPEND_TO_ZERO_SHOTS = {27290}
+EXP2_APPEND_TARGET_V_BY_SHOT = {27290: -0.1}
+EXP2_APPEND_ZERO_SMOOTH_NS_BY_SHOT = {27290: 8.0}
 STRETCHED_ENDPOINT_SHOTS = {27286, 27287, 27289, 27295}
 EXP1_STRETCHED_ONLY_SHOTS = {27296, 27298, 27299}
 STOP_AFTER_SPLIT_LOCAL_MAX_WINDOWS_NS = {27283: (70.0, 95.0)}
@@ -225,12 +238,23 @@ STOP_AFTER_SPLIT_ABS_MIN_WINDOWS_NS = {27297: (165.0, 190.0)}
 STOP_ABS_MIN_BEFORE_NS_BY_SHOT = {27299: 240.0}
 STOP_FIRST_ZERO_AFTER_NS_BY_SHOT = {27296: 0.0, 27300: 240.0, 27301: 300.0, 27302: 300.0, 27306: 0.0}
 STOP_FIRST_ZERO_SMOOTH_NS_BY_SHOT = {27296: 10.0, 27300: 10.0, 27301: 10.0, 27302: 10.0, 27306: 10.0}
-EXP2_TWO_STAGE_SHOTS = {27277, 27295}
-EXP2_TWO_STAGE_SPLIT_ABS_NS_BY_SHOT = {27277: 320.0, 27295: 200.0}
-EXP2_TWO_STAGE_FIRST_END_OFFSET_BY_SHOT = {27277: -0.03}
-EXP2_TWO_STAGE_FIRST_USE_RAW_SHOTS = {27277}
-EXP2_TWO_STAGE_SECOND_USE_RAW_SHOTS = {27277}
+EXP2_TWO_STAGE_SHOTS = {27277, 27278, 27279, 27283, 27295}
+EXP2_APPEND_TAIL_SHOTS = {27286}
+EXP2_APPEND_TAIL_ENDPOINT_Y_OFFSET_BY_SHOT = {27286: 0.0}
+EXP2_TWO_STAGE_SPLIT_ABS_NS_BY_SHOT = {27277: 320.0, 27278: 320.0, 27279: 320.0, 27283: 300.0, 27295: 200.0}
+EXP2_TWO_STAGE_INFLECTION_SHOTS = set()
+EXP2_TWO_STAGE_REL_MAX_SHOTS = set()
+EXP2_TWO_STAGE_FIRST_END_OFFSET_BY_SHOT = {27277: -0.03, 27278: -0.015, 27283: -0.10}
+EXP2_TWO_STAGE_FIRST_USE_RAW_SHOTS = {27277, 27278, 27279, 27283}
+EXP2_TWO_STAGE_SECOND_USE_RAW_SHOTS = {27277, 27278, 27279, 27283}
+# 27279 uses explicit timing boundaries instead of voltage-target handoff.
+EXP2_TWO_STAGE_TARGET_V_BY_SHOT = {27283: -0.5}
+EXP2_TWO_STAGE_TARGET_V_WINDOW_NS_BY_SHOT = {27283: (240.0, 340.0)}
+EXP2_TWO_STAGE_TARGET_SHIFT_NS_BY_SHOT = {27283: -15.0}
+EXP2_TWO_STAGE_TARGET_SHIFT_SAMPLES_BY_SHOT = {27283: -2}
 EXP2_SIGMOID_ONLY_SHOTS = {27298}
+EXP2_SIGMOID_ANCHOR_SHOTS = {27298}
+STOP_SHIFT_NS_BY_SHOT = {27298: 2.0}
 SIGMOID_ONLY_FORCE_SPLIT1_NEAR_ONSET_SHOTS = set()
 EXP2_LINEAR_THEN_EXP_SHOTS = {27300, 27306, 27307}
 EXP2_LINEAR_SPLIT_ABS_NS_BY_SHOT = {27300: 240.0, 27306: -25000.0, 27307: 36000.0}
@@ -262,7 +286,8 @@ EXP2_SIG_START_WINDOW_NS_BY_SHOT = {27296: (180.0, 380.0), 27301: (460.0, 560.0)
 EXP2_SIG_TARGET_V_BY_SHOT = {27296: -0.75}
 EXP2_SIG_TARGET_V_TOL_BY_SHOT = {27296: 0.06}
 EXP2_SIG_DURATION_AFTER_SPLIT_NS_BY_SHOT = {}
-STOP_FORCE_ABS_NS_BY_SHOT = {27277: 500.0}
+STOP_FORCE_ABS_NS_BY_SHOT = {27277: 500.0, 27278: 500.0, 27279: 500.0, 27283: 330.0, 27286: 400.0}
+STOP_FORCE_NEAREST_ABS_NS_SHOTS = {27286}
 EXP2_SIG_SPLIT_SMOOTH_NS_BY_SHOT = {27301: 10.0, 27302: 10.0}
 
 # Family-1 (SMAJ400A) stop rule: where slope settles to an approximately constant value
@@ -593,7 +618,7 @@ def fit_anchored_exp_fast(t_fit, y_fit, seg_sign=None):
     fit_sigma = float(np.std(resid) + 1e-9)
     return np.asarray(best, dtype=float), y0_const, fit_sigma
 
-def fit_anchored_exp_through_endpoint_fast(t_fit, y_fit, seg_sign=None, tau_max_mult=6.0):
+def fit_anchored_exp_through_endpoint_fast(t_fit, y_fit, seg_sign=None, tau_max_mult=6.0, y_end_target=None):
     """
     Anchored exponential fit constrained to hit both endpoints:
       y(0)=y0 and y(T)=yT exactly.
@@ -603,7 +628,7 @@ def fit_anchored_exp_through_endpoint_fast(t_fit, y_fit, seg_sign=None, tau_max_
     t_fit = np.asarray(t_fit, dtype=float)
     y_fit = np.asarray(y_fit, dtype=float)
     y0_const = float(y_fit[0])
-    yT = float(y_fit[-1])
+    yT = float(y_fit[-1] if y_end_target is None else y_end_target)
     T = float(max(t_fit[-1], 1e-12))
 
     def baseline_from_tau(tau):
@@ -650,6 +675,192 @@ def fit_anchored_exp_through_endpoint_fast(t_fit, y_fit, seg_sign=None, tau_max_
     resid = y_fit - model_tau(t_fit, best_tau)
     fit_sigma = float(np.std(resid) + 1e-9)
     return np.asarray([b_best, best_tau], dtype=float), y0_const, fit_sigma
+
+def fit_anchored_exp_through_midpoint_endpoint_fast(
+    t_fit, y_fit, t_anchor, y_anchor, seg_sign=None, tau_max_mult=6.0, y_end_target=None
+):
+    """
+    Anchored exponential with y(0)=y0 and y(T)=yT exactly, choosing tau so the
+    curve passes as closely as possible through a specified midpoint anchor.
+    Returns [baseline, tau], y0_const, yT_const, residual_sigma.
+    """
+    t_fit = np.asarray(t_fit, dtype=float)
+    y_fit = np.asarray(y_fit, dtype=float)
+    y0_const = float(y_fit[0])
+    yT_const = float(y_fit[-1] if y_end_target is None else y_end_target)
+    T = float(max(t_fit[-1], 1e-12))
+    ta = float(np.clip(t_anchor, 1e-12, T - 1e-12))
+    ya = float(y_anchor)
+
+    def baseline_from_tau(tau):
+        tau = max(float(tau), 1e-12)
+        eT = float(np.exp(-T / tau))
+        den = max(1.0 - eT, 1e-12)
+        return (yT_const - y0_const * eT) / den
+
+    def model_tau(t, tau):
+        b = baseline_from_tau(tau)
+        return exp_anchor_np(t, b, tau, y0_const)
+
+    dur = T
+    tau_lb = 0.2e-9
+    tau_ub = max(float(tau_max_mult) * dur, 20e-9)
+    tau_grid = np.geomspace(tau_lb, tau_ub, 320)
+    tau_grid = np.unique(np.concatenate((
+        tau_grid,
+        np.array([0.05*dur, 0.12*dur, 0.30*dur, 0.70*dur], dtype=float)
+    )))
+
+    y_scale = float(max(np.std(y_fit), abs(yT_const - y0_const), abs(ya - y0_const), 1e-6))
+    best_tau = None
+    best_cost = np.inf
+    for tau in tau_grid:
+        tau = float(np.clip(tau, tau_lb, tau_ub))
+        b = baseline_from_tau(tau)
+        if seg_sign is not None:
+            slope_sign = np.sign(b - y0_const)
+            if (seg_sign > 0 and slope_sign < 0) or (seg_sign < 0 and slope_sign > 0):
+                continue
+        y_model = model_tau(t_fit, tau)
+        midpoint_err = float(model_tau(np.array([ta], dtype=float), tau)[0] - ya)
+        sse = float(np.mean((y_fit - y_model)**2))
+        cost = (midpoint_err / y_scale)**2 + 0.15 * sse / max(y_scale**2, 1e-18)
+        if cost < best_cost:
+            best_cost = cost
+            best_tau = tau
+
+    if best_tau is None:
+        p_fallback, y0_fallback, sig_fallback = fit_anchored_exp_through_endpoint_fast(
+            t_fit, y_fit, seg_sign=seg_sign, tau_max_mult=tau_max_mult, y_end_target=yT_const
+        )
+        return p_fallback, y0_fallback, yT_const, sig_fallback
+
+    refine_lb = max(tau_lb, 0.55 * best_tau)
+    refine_ub = min(tau_ub, 1.80 * best_tau)
+    for tau in np.geomspace(refine_lb, refine_ub, 160):
+        tau = float(np.clip(tau, tau_lb, tau_ub))
+        b = baseline_from_tau(tau)
+        if seg_sign is not None:
+            slope_sign = np.sign(b - y0_const)
+            if (seg_sign > 0 and slope_sign < 0) or (seg_sign < 0 and slope_sign > 0):
+                continue
+        y_model = model_tau(t_fit, tau)
+        midpoint_err = float(model_tau(np.array([ta], dtype=float), tau)[0] - ya)
+        sse = float(np.mean((y_fit - y_model)**2))
+        cost = (midpoint_err / y_scale)**2 + 0.15 * sse / max(y_scale**2, 1e-18)
+        if cost < best_cost:
+            best_cost = cost
+            best_tau = tau
+
+    b_best = float(baseline_from_tau(best_tau))
+    resid = y_fit - model_tau(t_fit, best_tau)
+    fit_sigma = float(np.std(resid) + 1e-9)
+    return np.asarray([b_best, best_tau], dtype=float), y0_const, yT_const, fit_sigma
+
+def _estimate_local_slope(t_fit, y_fit, frac=0.22, min_pts=6, max_pts=18):
+    """
+    Estimate the local slope near the start of a segment from diode points.
+    Uses a short linear fit on the first few samples to stabilize noise.
+    """
+    t_fit = np.asarray(t_fit, dtype=float)
+    y_fit = np.asarray(y_fit, dtype=float)
+    if len(t_fit) < 2:
+        return 0.0
+
+    n = int(np.ceil(len(t_fit) * float(frac)))
+    n = int(np.clip(n, min_pts, min(max_pts, len(t_fit))))
+    tt = t_fit[:n] - float(t_fit[0])
+    yy = y_fit[:n]
+
+    if len(tt) < 2 or float(np.max(tt) - np.min(tt)) <= 0.0:
+        dt = float(max(t_fit[min(len(t_fit) - 1, 1)] - t_fit[0], 1e-12))
+        return float((y_fit[min(len(y_fit) - 1, 1)] - y_fit[0]) / dt)
+
+    try:
+        return float(np.polyfit(tt, yy, 1)[0])
+    except Exception:
+        dt = float(max(tt[-1] - tt[0], 1e-12))
+        return float((yy[-1] - yy[0]) / dt)
+
+def fit_anchored_exp_endpoint_slope_fast(
+    t_fit, y_fit, seg_sign=None, tau_max_mult=6.0, y_end_target=None, slope_weight=0.35
+):
+    """
+    Endpoint-constrained exponential fit with extra preference for matching the
+    diode's local slope near the handoff.
+
+    Returns [baseline, tau], y0_const, yT_const, slope_est, residual_sigma.
+    """
+    t_fit = np.asarray(t_fit, dtype=float)
+    y_fit = np.asarray(y_fit, dtype=float)
+    y0_const = float(y_fit[0])
+    yT_const = float(y_fit[-1] if y_end_target is None else y_end_target)
+    T = float(max(t_fit[-1], 1e-12))
+
+    if len(t_fit) < 3 or T <= 1e-12:
+        p, y0_fallback, sig_fallback = fit_anchored_exp_through_endpoint_fast(
+            t_fit, y_fit, seg_sign=seg_sign, tau_max_mult=tau_max_mult
+        )
+        return p, y0_fallback, yT_const, 0.0, sig_fallback
+
+    slope_est = float(_estimate_local_slope(t_fit, y_fit))
+    if seg_sign is not None:
+        if seg_sign > 0 and slope_est <= 0.0:
+            slope_est = max(slope_est, (yT_const - y0_const) / T)
+        elif seg_sign < 0 and slope_est >= 0.0:
+            slope_est = min(slope_est, (yT_const - y0_const) / T)
+
+    def baseline_from_tau(tau):
+        tau = max(float(tau), 1e-12)
+        eT = float(np.exp(-T / tau))
+        den = max(1.0 - eT, 1e-12)
+        return (yT_const - y0_const * eT) / den
+
+    def model_tau(t, tau):
+        b = baseline_from_tau(tau)
+        return exp_anchor_np(t, b, tau, y0_const)
+
+    def slope_from_tau(tau):
+        tau = max(float(tau), 1e-12)
+        b = baseline_from_tau(tau)
+        return float((b - y0_const) / tau)
+
+    dur = T
+    tau_lb = 0.2e-9
+    tau_ub = max(float(tau_max_mult) * dur, 20e-9)
+    tau_grid = np.geomspace(tau_lb, tau_ub, 160)
+    tau_grid = np.unique(np.concatenate((
+        tau_grid,
+        np.array([0.05*dur, 0.12*dur, 0.30*dur, 0.70*dur], dtype=float)
+    )))
+
+    y_scale = float(max(np.std(y_fit), abs(yT_const - y0_const), 1e-6))
+    slope_scale = float(max(abs(slope_est), abs((yT_const - y0_const) / T), y_scale / T, 1e-9))
+
+    best_tau = None
+    best_cost = np.inf
+    for tau in tau_grid:
+        tau = float(np.clip(tau, tau_lb, tau_ub))
+        b = baseline_from_tau(tau)
+        s0 = float((b - y0_const) / tau)
+        if seg_sign is not None:
+            if (seg_sign > 0 and s0 < 0.0) or (seg_sign < 0 and s0 > 0.0):
+                continue
+        resid = y_fit - model_tau(t_fit, tau)
+        sse_term = float(np.mean((resid / y_scale) ** 2))
+        slope_term = float(((s0 - slope_est) / slope_scale) ** 2)
+        cost = sse_term + float(slope_weight) * slope_term
+        if cost < best_cost:
+            best_cost = cost
+            best_tau = tau
+
+    if best_tau is None:
+        best_tau = float(np.clip(max(0.25*dur, 1e-12), tau_lb, tau_ub))
+
+    b_best = float(baseline_from_tau(best_tau))
+    resid = y_fit - model_tau(t_fit, best_tau)
+    fit_sigma = float(np.std(resid) + 1e-9)
+    return np.asarray([b_best, best_tau], dtype=float), y0_const, yT_const, slope_est, fit_sigma
 
 def stretched_exp_endpoint_np(t, tau, k, y0, yT, T):
     """
@@ -723,6 +934,74 @@ def fit_stretched_exp_endpoint_fast(t_fit, y_fit, seg_sign=None, tau_max_mult=3.
     fit_sigma = float(np.std(resid) + 1e-9)
     return np.asarray(best, dtype=float), y0_const, yT_const, fit_sigma
 
+def fit_stretched_exp_endpoint_weighted_fast(
+    t_fit, y_fit, seg_sign=None, tau_max_mult=3.0, y_end_target=None, front_weight=3.0, front_power=1.5
+):
+    """
+    Weighted endpoint-constrained stretched exponential fit.
+    Earlier points get more weight so the handoff region follows the diode curve
+    more closely instead of only matching the far endpoint.
+    """
+    t_fit = np.asarray(t_fit, dtype=float)
+    y_fit = np.asarray(y_fit, dtype=float)
+    y0_const = float(y_fit[0])
+    yT_const = float(y_fit[-1] if y_end_target is None else y_end_target)
+    T = float(max(t_fit[-1], 1e-12))
+
+    def mf(t, tau, k):
+        return stretched_exp_endpoint_np(t, tau, k, y0_const, yT_const, T)
+
+    tau_lb = 0.2e-9
+    tau_ub = max(float(tau_max_mult) * T, 20e-9)
+    k_lb, k_ub = 0.35, 5.0
+
+    u = np.clip(t_fit / T, 0.0, 1.0)
+    sigma_w = 1.0 / (1.0 + float(front_weight) * np.power(1.0 - u, float(front_power)))
+    sigma_w = np.maximum(sigma_w, 1e-3)
+
+    guesses = [
+        (0.08*T, 0.8),
+        (0.14*T, 1.0),
+        (0.22*T, 1.4),
+        (0.35*T, 2.0),
+        (0.55*T, 2.8),
+    ]
+
+    best = None
+    best_sse = np.inf
+    for tg, kg in guesses:
+        p0 = [float(np.clip(max(tg, 1e-12), tau_lb, tau_ub)), float(np.clip(kg, k_lb, k_ub))]
+        try:
+            popt, _ = curve_fit(
+                mf, t_fit, y_fit, p0=p0,
+                bounds=([tau_lb, k_lb], [tau_ub, k_ub]),
+                sigma=sigma_w, absolute_sigma=False, maxfev=40000
+            )
+            tau, kval = map(float, popt)
+            eT = float(np.exp(-((T / max(tau, 1e-12)) ** max(kval, 1e-9))))
+            den = max(1.0 - eT, 1e-12)
+            b = (yT_const - y0_const * eT) / den
+            if seg_sign is not None:
+                slope_sign = np.sign(b - y0_const)
+                if (seg_sign > 0 and slope_sign < 0) or (seg_sign < 0 and slope_sign > 0):
+                    continue
+            resid = y_fit - mf(t_fit, tau, kval)
+            sse = float(np.mean((resid / sigma_w) ** 2))
+            if sse < best_sse:
+                best_sse = sse
+                best = (tau, kval)
+        except Exception:
+            continue
+
+    if best is None:
+        return fit_stretched_exp_endpoint_fast(
+            t_fit, y_fit, seg_sign=seg_sign, tau_max_mult=tau_max_mult, y_end_target=y_end_target
+        )
+
+    resid = y_fit - mf(t_fit, best[0], best[1])
+    fit_sigma = float(np.std(resid) + 1e-9)
+    return np.asarray(best, dtype=float), y0_const, yT_const, fit_sigma
+
 def exp2_accel_endpoint_np(t, alpha, y0, yT, T):
     """
     Endpoint-anchored accelerating exponential profile:
@@ -772,6 +1051,51 @@ def fit_exp2_accel_endpoint_fast(t_fit, y_fit, y_end_target=None):
     resid = y_fit - mf(t_fit, *best)
     fit_sigma = float(np.std(resid) + 1e-9)
     return np.asarray(best, dtype=float), y0_const, yT_const, fit_sigma
+
+def fit_exp2_accel_midpoint_endpoint_fast(t_fit, y_fit, t_anchor, y_anchor, y_end_target=None):
+    """
+    Endpoint-anchored accelerating exponential profile with alpha chosen to pass
+    as closely as possible through a specified midpoint anchor.
+    Returns [alpha], y0_const, yT_const, residual_sigma.
+    """
+    t_fit = np.asarray(t_fit, dtype=float)
+    y_fit = np.asarray(y_fit, dtype=float)
+    y0_const = float(y_fit[0])
+    yT_const = float(y_fit[-1] if y_end_target is None else y_end_target)
+    T = float(max(t_fit[-1], 1e-12))
+    ta = float(np.clip(t_anchor, 1e-12, T - 1e-12))
+    ya = float(y_anchor)
+
+    def mf(t, alpha):
+        return exp2_accel_endpoint_np(t, alpha, y0_const, yT_const, T)
+
+    alphas = np.geomspace(0.8, 12.0, 320)
+    y_scale = float(max(np.std(y_fit), abs(yT_const - y0_const), abs(ya - y0_const), 1e-6))
+    best_alpha = None
+    best_cost = np.inf
+    for alpha in alphas:
+        y_model = mf(t_fit, alpha)
+        midpoint_err = float(mf(np.array([ta], dtype=float), alpha)[0] - ya)
+        sse = float(np.mean((y_fit - y_model)**2))
+        cost = (midpoint_err / y_scale)**2 + 0.15 * sse / max(y_scale**2, 1e-18)
+        if cost < best_cost:
+            best_cost = cost
+            best_alpha = float(alpha)
+
+    refine_lb = max(0.8, 0.60 * best_alpha)
+    refine_ub = min(12.0, 1.60 * best_alpha)
+    for alpha in np.geomspace(refine_lb, refine_ub, 160):
+        y_model = mf(t_fit, alpha)
+        midpoint_err = float(mf(np.array([ta], dtype=float), alpha)[0] - ya)
+        sse = float(np.mean((y_fit - y_model)**2))
+        cost = (midpoint_err / y_scale)**2 + 0.15 * sse / max(y_scale**2, 1e-18)
+        if cost < best_cost:
+            best_cost = cost
+            best_alpha = float(alpha)
+
+    resid = y_fit - mf(t_fit, best_alpha)
+    fit_sigma = float(np.std(resid) + 1e-9)
+    return np.asarray([best_alpha], dtype=float), y0_const, yT_const, fit_sigma
 
 def fit_anchored_sigmoid_fast(t_fit, y_fit, seg_sign=None):
     """
@@ -852,6 +1176,87 @@ def fit_anchored_sigmoid_fast(t_fit, y_fit, seg_sign=None):
             min(max(0.08*dur, lb[2]), ub[2]),
             min(max(0.5*m0_est, lb[3]), ub[3]),
         ], dtype=float)
+
+    resid = y_fit - sf_fit(t_fit, *best)
+    fit_sigma = float(np.std(resid) + 1e-9)
+    return np.asarray(best, dtype=float), y0_const, fit_sigma
+
+def fit_anchored_sigmoid_anchor_weighted_fast(t_fit, y_fit, seg_sign=None):
+    """
+    Anchored sigmoid fit with extra weight on a few interior diode points so the
+    segment follows the observed slope/shape more closely, not just the knee.
+    """
+    t_fit = np.asarray(t_fit, dtype=float)
+    y_fit = np.asarray(y_fit, dtype=float)
+    if len(t_fit) < 8:
+        return fit_anchored_sigmoid_fast(t_fit, y_fit, seg_sign=seg_sign)
+
+    y0_const = float(y_fit[0])
+    dur = float(max(t_fit[-1], 1e-9))
+    span = float(max(np.max(y_fit) - np.min(y_fit), 1e-6))
+
+    tail_n = max(10, len(y_fit)//10)
+    tail = y_fit[-tail_n:]
+    b0 = float(np.mean(tail))
+    bstd = float(np.std(tail) + 1e-6)
+    m0_est = float((y_fit[-1] - y_fit[0]) / max(dur, 1e-12))
+
+    a_ub = max(2.0*span, 6.0*bstd)
+    m_ub = 8.0*abs(m0_est) + 8.0*span/dur
+    lb = [-a_ub, 0.05*dur, max(0.005*dur, 1e-9), -m_ub]
+    ub = [a_ub, 0.98*dur, max(SIGMOID_K_MAX_FRAC*dur, 8e-9), m_ub]
+
+    def sf_fit(t, amp, t_mid, k, m_tail):
+        return anchored_sigmoid_np(t, amp, t_mid, k, m_tail, y0_const)
+
+    candidates = [
+        [0.55*span*np.sign(m0_est if abs(m0_est) > 0 else 1.0), 0.50*dur, 0.05*dur, 0.60*m0_est],
+        [0.85*span*np.sign(m0_est if abs(m0_est) > 0 else 1.0), 0.62*dur, 0.07*dur, 0.50*m0_est],
+        [1.10*span*np.sign(m0_est if abs(m0_est) > 0 else 1.0), 0.72*dur, 0.09*dur, 0.40*m0_est],
+    ]
+
+    dy = np.gradient(y_fit, t_fit)
+    d_eff = dy if (seg_sign is None) else (seg_sign * dy)
+    i_mid = int(np.argmax(d_eff))
+    half_w = max(3, int(SIGMOID_WEIGHT_MID_FRAC * len(t_fit)))
+    a = max(0, i_mid - half_w)
+    b = min(len(t_fit), i_mid + half_w + 1)
+    sigma_w = np.ones_like(t_fit, dtype=float)
+    sigma_w[a:b] = 1.0 / max(SIGMOID_WEIGHT_MID_BOOST, 1.0)
+
+    anchor_ids = np.unique(np.clip(np.array([
+        max(1, int(0.12 * (len(t_fit) - 1))),
+        max(1, int(0.25 * (len(t_fit) - 1))),
+        max(1, int(0.42 * (len(t_fit) - 1))),
+        max(1, int(0.62 * (len(t_fit) - 1))),
+    ], dtype=int), 1, len(t_fit) - 2))
+    t_aug = np.concatenate((t_fit, t_fit[anchor_ids]))
+    y_aug = np.concatenate((y_fit, y_fit[anchor_ids]))
+    sigma_aug = np.concatenate((sigma_w, np.full(len(anchor_ids), 0.08, dtype=float)))
+
+    best = None
+    best_sse = np.inf
+    for p0 in candidates:
+        p0 = [
+            float(np.clip(p0[0], lb[0], ub[0])),
+            float(np.clip(p0[1], lb[1], ub[1])),
+            float(np.clip(max(p0[2], 1e-12), lb[2], ub[2])),
+            float(np.clip(p0[3], lb[3], ub[3])),
+        ]
+        try:
+            popt, _ = curve_fit(
+                sf_fit, t_aug, y_aug,
+                p0=p0, bounds=(lb, ub), sigma=sigma_aug, absolute_sigma=False, maxfev=30000
+            )
+            sse = float(np.sum((y_fit - sf_fit(t_fit, *popt))**2))
+            if sse < best_sse:
+                best_sse = sse
+                best = popt
+        except Exception:
+            continue
+
+    if best is None:
+        return fit_anchored_sigmoid_fast(t_fit, y_fit, seg_sign=seg_sign)
 
     resid = y_fit - sf_fit(t_fit, *best)
     fit_sigma = float(np.std(resid) + 1e-9)
@@ -1005,6 +1410,87 @@ def fit_anchored_sigmoid_endpoint_fast(t_fit, y_fit):
 
     if best is None:
         best = np.array([min(max(0.48 * dur, lb[0]), ub[0]), min(max(0.07 * dur, lb[1]), ub[1])], dtype=float)
+
+    resid = y_fit - sf_fit_ep(t_fit, *best)
+    fit_sigma = float(np.std(resid) + 1e-9)
+    return np.asarray(best, dtype=float), y0_const, yT_const, fit_sigma
+
+def fit_anchored_sigmoid_endpoint_anchor_weighted_fast(t_fit, y_fit, anchor_ids=None, anchor_sigma=0.06):
+    """
+    Endpoint-anchored sigmoid fit with extra weight on selected interior diode points.
+    Returns [t_mid, k], y0_const, yT_const, residual_sigma.
+    """
+    t_fit = np.asarray(t_fit, dtype=float)
+    y_fit = np.asarray(y_fit, dtype=float)
+    y0_const = float(y_fit[0])
+    yT_const = float(y_fit[-1])
+    dur = float(max(t_fit[-1], 1e-9))
+
+    lb = [SIGMOID_TMID_MIN_FRAC * dur, 0.5e-9]
+    ub = [0.98 * dur, max(SIGMOID_K_MAX_FRAC * dur, 8e-9)]
+
+    def sf_fit_ep(t, t_mid, k):
+        return anchored_sigmoid_endpoint_np(t, t_mid, k, y0_const, yT_const, dur)
+
+    candidates = [
+        [0.12 * dur, 0.025 * dur],
+        [0.22 * dur, 0.040 * dur],
+        [0.35 * dur, 0.060 * dur],
+        [0.48 * dur, 0.080 * dur],
+    ]
+
+    dy = np.gradient(y_fit, t_fit)
+    i_mid = int(np.argmax(np.abs(dy)))
+    half_w = max(4, int(0.14 * len(t_fit)))
+    a = max(0, i_mid - half_w)
+    b = min(len(t_fit), i_mid + half_w + 1)
+    sigma_w = np.ones_like(t_fit, dtype=float)
+    sigma_w[a:b] = 1.0 / max(3.5 * SIGMOID_WEIGHT_MID_BOOST, 1.0)
+
+    default_anchor_ids = []
+    if len(t_fit) >= 12:
+        default_anchor_ids = [
+            max(1, int(0.10 * (len(t_fit) - 1))),
+            max(2, int(0.22 * (len(t_fit) - 1))),
+            i_mid,
+            max(i_mid + 2, int(0.45 * (len(t_fit) - 1))),
+        ]
+    if anchor_ids is None:
+        anchor_ids = default_anchor_ids
+    else:
+        anchor_ids = list(anchor_ids) + default_anchor_ids
+
+    if len(anchor_ids) > 0:
+        anchor_ids = np.unique(np.clip(np.asarray(anchor_ids, dtype=int), 1, len(t_fit) - 2))
+        t_aug = np.concatenate((t_fit, t_fit[anchor_ids]))
+        y_aug = np.concatenate((y_fit, y_fit[anchor_ids]))
+        sigma_aug = np.concatenate((sigma_w, np.full(len(anchor_ids), float(anchor_sigma), dtype=float)))
+    else:
+        t_aug = t_fit
+        y_aug = y_fit
+        sigma_aug = sigma_w
+
+    best = None
+    best_sse = np.inf
+    for p0 in candidates:
+        p0 = [
+            float(np.clip(p0[0], lb[0], ub[0])),
+            float(np.clip(max(p0[1], 1e-12), lb[1], ub[1])),
+        ]
+        try:
+            popt, _ = curve_fit(
+                sf_fit_ep, t_aug, y_aug,
+                p0=p0, bounds=(lb, ub), sigma=sigma_aug, absolute_sigma=False, maxfev=30000
+            )
+            sse = float(np.sum((y_fit - sf_fit_ep(t_fit, *popt))**2))
+            if sse < best_sse:
+                best_sse = sse
+                best = popt
+        except Exception:
+            continue
+
+    if best is None:
+        return fit_anchored_sigmoid_endpoint_fast(t_fit, y_fit)
 
     resid = y_fit - sf_fit_ep(t_fit, *best)
     fit_sigma = float(np.std(resid) + 1e-9)
@@ -3060,9 +3546,35 @@ def main(csv_file=None, out_dir=None):
             print("\nStop adjusted after split:")
             print(f"  stop_mode = {stop_mode}")
             print(f"  stop_t    = {stop_t_ns:.3f} ns | V_stop = {v_diode[stop_idx]:.6f} V")
+    stop_idx_before_forced = int(stop_idx)
+    stop_mode_before_forced = str(stop_mode)
+    if (not use_three_exp) and (shot_id in EXP2_APPEND_TO_ZERO_SHOTS):
+        i0 = max(stop_idx_before_forced + 2, split1_idx + 8)
+        if i0 < len(v_diode) - 2:
+            z_smooth_ns = float(EXP2_APPEND_ZERO_SMOOTH_NS_BY_SHOT.get(shot_id, 8.0))
+            vz, _ = smooth_by_ns(t_diode, v_diode, z_smooth_ns)
+            target_v = float(EXP2_APPEND_TARGET_V_BY_SHOT.get(shot_id, -0.1))
+            stop_idx = int(i0 + int(np.argmin(np.abs(vz[i0:] - target_v))))
+            stop_mode = "stop_append_target_v_after_exp2"
+            stop_t_ns = float(t_rel_ns[stop_idx])
+            print("\nStop adjusted after split:")
+            print(f"  stop_mode = {stop_mode}")
+            print(f"  stop_t    = {stop_t_ns:.3f} ns | V_stop = {v_diode[stop_idx]:.6f} V")
+    if (not use_three_exp) and (shot_id in STOP_SHIFT_NS_BY_SHOT):
+        t_stop_target = float(t_rel_ns[stop_idx]) + float(STOP_SHIFT_NS_BY_SHOT[shot_id])
+        sidx = int(np.searchsorted(t_rel_ns, t_stop_target))
+        stop_idx = int(np.clip(sidx, split1_idx + 8, len(v_diode) - 1))
+        stop_mode = "stop_shift_ns"
+        stop_t_ns = float(t_rel_ns[stop_idx])
+        print("\nStop adjusted after split:")
+        print(f"  stop_mode = {stop_mode}")
+        print(f"  stop_t    = {stop_t_ns:.3f} ns | V_stop = {v_diode[stop_idx]:.6f} V")
     if (not use_three_exp) and (shot_id in STOP_FORCE_ABS_NS_BY_SHOT):
         t_stop_target = float(STOP_FORCE_ABS_NS_BY_SHOT[shot_id])
-        sidx = int(np.searchsorted(t_rel_ns, t_stop_target))
+        if shot_id in STOP_FORCE_NEAREST_ABS_NS_SHOTS:
+            sidx = int(np.argmin(np.abs(t_rel_ns - t_stop_target)))
+        else:
+            sidx = int(np.searchsorted(t_rel_ns, t_stop_target))
         stop_idx = int(np.clip(sidx, split1_idx + 8, len(v_diode) - 1))
         stop_mode = "stop_forced_abs_ns"
         stop_t_ns = float(t_rel_ns[stop_idx])
@@ -3200,11 +3712,13 @@ def main(csv_file=None, out_dir=None):
     v1 = v_fit[onset_idx:split1_idx+1]
     t1 = t1_abs - t1_abs[0]
     idx1 = np.linspace(0, len(t1)-1, min(SUBSAMPLE_RECOVERY_N, len(t1)), dtype=int)
+    y1_end_target = None
+    if shot_id in EXP1_ENDPOINT_RAW_TARGET_SHOTS:
+        y1_end_target = float(v_diode[split1_idx]) + float(EXP1_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
     use_endpoint_constrained = (family == "SMAJ400A") and (split1_mode == "split1_peak_reversal_anchor") and (not use_three_exp)
     if use_endpoint_constrained or ((not use_three_exp) and (shot_id in EXP1_ENDPOINT_CONSTRAINED_SHOTS)):
         tau1_mult = float(EXP1_ENDPOINT_TAU_MAX_MULT_BY_SHOT.get(shot_id, 3.0))
         if (shot_id in STRETCHED_ENDPOINT_SHOTS) or (shot_id in EXP1_STRETCHED_ONLY_SHOTS):
-            y1_end_target = float(v_diode[split1_idx]) if (shot_id in EXP1_ENDPOINT_RAW_TARGET_SHOTS) else None
             p1s, y1_0, y1_end, sig1 = fit_stretched_exp_endpoint_fast(
                 t1[idx1], v1[idx1], seg_sign=pre_sign, tau_max_mult=tau1_mult, y_end_target=y1_end_target
             )
@@ -3216,7 +3730,7 @@ def main(csv_file=None, out_dir=None):
             b1 = np.nan
         else:
             p1, y1_0, sig1 = fit_anchored_exp_through_endpoint_fast(
-                t1[idx1], v1[idx1], seg_sign=pre_sign, tau_max_mult=tau1_mult
+                t1[idx1], v1[idx1], seg_sign=pre_sign, tau_max_mult=tau1_mult, y_end_target=y1_end_target
             )
             b1, tau1 = map(float, p1)
             print("\nExp1 fit (onset->split1):")
@@ -3231,6 +3745,29 @@ def main(csv_file=None, out_dir=None):
         V1_model = exp_anchor_np(t1, b1, tau1, y1_0)
         exp1_eval = lambda tt: exp_anchor_np(np.asarray(tt, dtype=float), b1, tau1, y1_0)
 
+    if shot_id in EXP1_MIN_ANCHOR_V_BY_SHOT and len(t1) >= 5:
+        i_anchor = int(np.argmin(v1))
+        if 1 <= i_anchor <= len(t1) - 2:
+            t1_anchor = float(t1[i_anchor])
+            y1_anchor = float(EXP1_MIN_ANCHOR_V_BY_SHOT[shot_id])
+            V1_model = cubic_anchor_max_np(t1, float(V1_model[0]), float(V1_model[-1]), t1_anchor, y1_anchor, s1=0.0)
+            V1_model[0] = float(v1[0])
+            V1_model[-1] = float(V1_model[-1])
+            sig1 = float(np.std(v1 - V1_model) + 1e-9)
+            print(f"  exp1 min anchor: t={t1_anchor*1e9:.3f} ns, V={y1_anchor:.6f}")
+
+    if shot_id in EXP1_LEVEL_ANCHOR_V_BY_SHOT and len(t1) >= 5:
+        vd1 = v_diode[onset_idx:split1_idx+1]
+        target_v = float(EXP1_LEVEL_ANCHOR_V_BY_SHOT[shot_id])
+        i_anchor = int(np.argmin(np.abs(vd1 - target_v)))
+        if 1 <= i_anchor <= len(t1) - 2:
+            t1_anchor = float(t1[i_anchor])
+            V1_model = cubic_anchor_max_np(t1, float(V1_model[0]), float(V1_model[-1]), t1_anchor, target_v, s1=0.0)
+            V1_model[0] = float(v1[0])
+            V1_model[-1] = float(V1_model[-1])
+            sig1 = float(np.std(v1 - V1_model) + 1e-9)
+            print(f"  exp1 level anchor: t={t1_anchor*1e9:.3f} ns, V={target_v:.6f}")
+
     V_model = np.empty_like(t_seg_abs, dtype=float)
     V_lo = np.full_like(V_model, np.nan, dtype=float)
     V_hi = np.full_like(V_model, np.nan, dtype=float)
@@ -3238,7 +3775,126 @@ def main(csv_file=None, out_dir=None):
     n1 = len(V1_model)
     V_model[:n1] = V1_model
 
-    if use_three_exp:
+    if shot_id in EXP1_ONLY_SHOTS:
+        V_model[n1:] = float(V1_model[-1])
+        band1 = RECOVERY_BAND_SIGMA * sig1
+        V_lo[:n1] = V1_model - band1
+        V_hi[:n1] = V1_model + band1
+        V_lo[n1:] = float(V1_model[-1]) - band1
+        V_hi[n1:] = float(V1_model[-1]) + band1
+        exp2_mode = "exp1_only"
+    elif shot_id in EXP1_LINEAR_THEN_EXP_SHOTS:
+        line_end_target = float(EXP1_LINEAR_END_ABS_NS_BY_SHOT.get(shot_id, float(t_rel_ns[stop_idx])))
+        line_end_idx = int(np.searchsorted(t_rel_ns, line_end_target))
+        exp2_end_target = float(EXP1_EXP2_END_ABS_NS_BY_SHOT.get(shot_id, float(t_rel_ns[stop_idx])))
+        exp2_end_idx = int(np.searchsorted(t_rel_ns, exp2_end_target))
+        exp2_end_idx = int(np.clip(exp2_end_idx, split1_idx + 6, stop_idx - 3))
+        line_end_idx = int(np.clip(line_end_idx, split1_idx + 2, exp2_end_idx - 3))
+
+        t2a_abs = t_diode[split1_idx:line_end_idx+1]
+        t2a = t2a_abs - t2a_abs[0]
+        y2a0 = float(V1_model[-1])
+        y2a1 = float(v_diode[line_end_idx])
+        if len(t2a) > 1 and float(t2a[-1]) > 0.0:
+            V2a_model = y2a0 + (y2a1 - y2a0) * (t2a / float(t2a[-1]))
+        else:
+            V2a_model = np.full_like(t2a, y2a1, dtype=float)
+
+        t2b_abs = t_diode[line_end_idx:exp2_end_idx+1]
+        t2b = t2b_abs - t2b_abs[0]
+        v2b = v_diode[line_end_idx:exp2_end_idx+1]
+        if len(v2b) > 0:
+            v2b = np.asarray(v2b, dtype=float).copy()
+            v2b[0] = float(V2a_model[-1])
+        idx2b = np.linspace(0, len(t2b)-1, min(SUBSAMPLE_RECOVERY_N, len(t2b)), dtype=int)
+        p2b, y2b_0, sig2b = fit_anchored_exp_through_endpoint_fast(
+            t2b[idx2b], v2b[idx2b], seg_sign=rec_sign, tau_max_mult=3.5, y_end_target=float(v_diode[exp2_end_idx])
+        )
+        b2b, tau2b = map(float, p2b)
+        V2b_model = exp_anchor_np(t2b, b2b, tau2b, y2b_0)
+        anchor2b_idx, anchor2b_mode = find_next_rel_max_by_rolling(
+            t_rel_ns, v_diode, line_end_idx, min_delay_ns=8.0, max_delay_ns=max(20.0, float(t_rel_ns[exp2_end_idx] - t_rel_ns[line_end_idx] - 2.0)),
+            smooth_ns=8.0, prom_frac=0.10
+        )
+        t2b_anchor = None
+        y2b_anchor = None
+        if (anchor2b_idx is not None) and (line_end_idx + 2 < anchor2b_idx < exp2_end_idx - 1):
+            v2b_sm, _ = smooth_by_ns(t_diode[line_end_idx:exp2_end_idx+1], v_diode[line_end_idx:exp2_end_idx+1], 8.0)
+            t2b_anchor = float(t_diode[anchor2b_idx] - t_diode[line_end_idx])
+            y2b_anchor = float(v2b_sm[anchor2b_idx - line_end_idx])
+            i_anchor = int(np.argmin(np.abs(t2b - t2b_anchor)))
+            delta = y2b_anchor - float(V2b_model[i_anchor])
+            T2b = max(float(t2b[-1]), 1e-12)
+            w = (t2b / T2b) * (1.0 - t2b / T2b)
+            w = w / max(float(w[i_anchor]), 1e-12)
+            V2b_model = V2b_model + delta * w
+            V2b_model[0] = float(V2a_model[-1])
+            V2b_model[-1] = float(v_diode[exp2_end_idx])
+            sig2b = float(np.std(v_diode[line_end_idx:exp2_end_idx+1] - V2b_model) + 1e-9)
+            print(
+                f"  exp tail anchor: mode={anchor2b_mode}, t_anchor={t2b_anchor*1e9:.3f} ns, "
+                f"y_anchor={y2b_anchor:.6f}"
+            )
+
+        t3_abs = t_diode[exp2_end_idx:stop_idx+1]
+        t3 = t3_abs - t3_abs[0]
+        v3 = v_diode[exp2_end_idx:stop_idx+1]
+        if len(v3) > 0:
+            v3 = np.asarray(v3, dtype=float).copy()
+            v3[0] = float(V2b_model[-1])
+        idx3 = np.linspace(0, len(t3)-1, min(SUBSAMPLE_RECOVERY_N, len(t3)), dtype=int)
+        p3, y3_0, sig3 = fit_anchored_exp_through_endpoint_fast(
+            t3[idx3], v3[idx3], seg_sign=rec_sign, tau_max_mult=3.5, y_end_target=float(v_diode[stop_idx])
+        )
+        b3, tau3 = map(float, p3)
+        V3_model = exp_anchor_np(t3, b3, tau3, y3_0)
+        anchor3_idx, anchor3_mode = find_next_big_min_by_rolling(
+            t_rel_ns, v_diode, exp2_end_idx, min_delay_ns=8.0, max_delay_ns=max(20.0, float(t_rel_ns[stop_idx] - t_rel_ns[exp2_end_idx] - 2.0)),
+            smooth_ns=8.0, prom_frac=0.10
+        )
+        if (anchor3_idx is not None) and (exp2_end_idx + 2 < anchor3_idx < stop_idx - 1):
+            v3_sm, _ = smooth_by_ns(t_diode[exp2_end_idx:stop_idx+1], v_diode[exp2_end_idx:stop_idx+1], 8.0)
+            t3_anchor = float(t_diode[anchor3_idx] - t_diode[exp2_end_idx])
+            y3_anchor = float(v3_sm[anchor3_idx - exp2_end_idx])
+            i3_anchor = int(np.argmin(np.abs(t3 - t3_anchor)))
+            delta3 = y3_anchor - float(V3_model[i3_anchor])
+            T3 = max(float(t3[-1]), 1e-12)
+            w3 = (t3 / T3) * (1.0 - t3 / T3)
+            w3 = w3 / max(float(w3[i3_anchor]), 1e-12)
+            V3_model = V3_model + delta3 * w3
+            V3_model[0] = float(V2b_model[-1])
+            V3_model[-1] = float(v_diode[stop_idx])
+            sig3 = float(np.std(v_diode[exp2_end_idx:stop_idx+1] - V3_model) + 1e-9)
+            print(
+                f"  exp3 anchor: mode={anchor3_mode}, t_anchor={t3_anchor*1e9:.3f} ns, "
+                f"y_anchor={y3_anchor:.6f}"
+            )
+
+        i2a = n1 - 1
+        V_model[i2a:i2a+len(V2a_model)] = V2a_model
+        i2b = i2a + len(V2a_model) - 1
+        V_model[i2b:i2b+len(V2b_model)] = V2b_model
+        i3 = i2b + len(V2b_model) - 1
+        V_model[i3:i3+len(V3_model)] = V3_model
+
+        band1 = RECOVERY_BAND_SIGMA * sig1
+        V_lo[:n1] = V1_model - band1
+        V_hi[:n1] = V1_model + band1
+        sig2a = float(np.std(v_diode[split1_idx:line_end_idx+1] - V2a_model) + 1e-9)
+        band2a = RECOVERY_BAND_SIGMA * sig2a
+        V_lo[i2a:i2a+len(V2a_model)] = V2a_model - band2a
+        V_hi[i2a:i2a+len(V2a_model)] = V2a_model + band2a
+        band2b = RECOVERY_BAND_SIGMA * sig2b
+        V_lo[i2b:i2b+len(V2b_model)] = V2b_model - band2b
+        V_hi[i2b:i2b+len(V2b_model)] = V2b_model + band2b
+        band3 = RECOVERY_BAND_SIGMA * sig3
+        V_lo[i3:i3+len(V3_model)] = V3_model - band3
+        V_hi[i3:i3+len(V3_model)] = V3_model + band3
+        split2_idx = int(exp2_end_idx)
+        split2_t_ns = float(t_rel_ns[split2_idx])
+        split2_mode = "exp2_to_exp3_handoff"
+        exp2_mode = "linear_then_two_exp"
+    elif use_three_exp:
         # second function starts at peak
         sig_start_idx = split1_idx
         if has_dip:
@@ -3296,9 +3952,14 @@ def main(csv_file=None, out_dir=None):
             V_lo[i2:] = np.interp(t2, t2grid, lo2)
             V_hi[i2:] = np.interp(t2, t2grid, hi2)
         else:
-            p2s, y2_0, sig2 = fit_anchored_sigmoid_fast(t2[idx2], v2[idx2], seg_sign=rec_sign)
+            if shot_id in EXP2_SIGMOID_ANCHOR_SHOTS:
+                p2s, y2_0, sig2 = fit_anchored_sigmoid_anchor_weighted_fast(t2, v2, seg_sign=rec_sign)
+                fit_label = "anchored-sigmoid-anchor-weighted"
+            else:
+                p2s, y2_0, sig2 = fit_anchored_sigmoid_fast(t2[idx2], v2[idx2], seg_sign=rec_sign)
+                fit_label = "anchored-sigmoid"
             a2s, tm2s, k2s, m2s = map(float, p2s)
-            print("Sigmoid fit (start->stop):")
+            print(f"Sigmoid fit (start->stop, {fit_label}):")
             print(f"  amp={a2s:.6f}, t_mid={tm2s*1e9:.3f} ns, k={k2s*1e9:.3f} ns, m_tail={m2s:.3e} V/s")
 
             V2_full = anchored_sigmoid_np(t2, a2s, tm2s, k2s, m2s, y2_0)
@@ -3334,10 +3995,11 @@ def main(csv_file=None, out_dir=None):
                 tau_tail = float(popt_tau[0])
             except Exception:
                 tau_tail = float(min(max(tau_guess, tau_lb), tau_ub))
-            print(f"Exp tail fit (split2->stop): tau_tail={tau_tail*1e9:.3f} ns")
+            print(f"Exp tail fit (split2->tail_stop): tau_tail={tau_tail*1e9:.3f} ns")
             V3_model = exp_tail_to_zero_np(t3, tau_tail, y0_t)
             i_start3 = (n1 - 1) + (sig_start_idx - split1_idx) + split2_local
             V_model[i_start3:] = V3_model
+            exp2_mode = "sigmoid_exp_tail"
 
             t2grid = np.linspace(0, float(t2[-1]), max(300, len(t2)))
             mean2 = anchored_sigmoid_np(t2grid, a2s, tm2s, k2s, m2s, y2_0)
@@ -3346,6 +4008,13 @@ def main(csv_file=None, out_dir=None):
             hi2 = mean2 + band2
             V_lo[i2:i2+len(V2_model)] = np.interp(t2[:split2_local+1], t2grid, lo2)
             V_hi[i2:i2+len(V2_model)] = np.interp(t2[:split2_local+1], t2grid, hi2)
+            t3grid = np.linspace(0, float(t3[-1]), max(200, len(t3)))
+            mean3 = exp_tail_to_zero_np(t3grid, tau_tail, y0_t)
+            band3 = RECOVERY_BAND_SIGMA * max(float(np.std(v3_obs - V3_model)), 1e-9)
+            lo3 = mean3 - band3
+            hi3 = mean3 + band3
+            V_lo[i_start3:] = np.interp(t3, t3grid, lo3)
+            V_hi[i_start3:] = np.interp(t3, t3grid, hi3)
     else:
         if use_four_exp:
             # 4-exp custom mode (shot-specific): keep exp1+exp2, then single exponential tail from old stop to tail-off.
@@ -3758,10 +4427,60 @@ def main(csv_file=None, out_dir=None):
             V_lo[i2b:] = np.interp(t2b, t2bgrid, mean2b - band2b)
             V_hi[i2b:] = np.interp(t2b, t2bgrid, mean2b + band2b)
         elif shot_id in EXP2_TWO_STAGE_SHOTS:
-            split2_target_ns = float(EXP2_TWO_STAGE_SPLIT_ABS_NS_BY_SHOT.get(shot_id, 200.0))
-            split2_idx = int(np.argmin(np.abs(t_rel_ns - split2_target_ns)))
-            split2_idx = int(np.clip(split2_idx, split1_idx + 4, stop_idx - 4))
-            split2_mode = "exp2_twostage_abs_target"
+            if shot_id in EXP2_TWO_STAGE_TARGET_V_BY_SHOT:
+                split2_target_v = float(EXP2_TWO_STAGE_TARGET_V_BY_SHOT[shot_id])
+                w0, w1 = EXP2_TWO_STAGE_TARGET_V_WINDOW_NS_BY_SHOT.get(
+                    shot_id, (float(t_rel_ns[split1_idx]), float(t_rel_ns[stop_idx]))
+                )
+                m2 = (t_rel_ns >= float(w0)) & (t_rel_ns <= float(w1))
+                idxs2 = np.where(m2)[0]
+                idxs2 = idxs2[(idxs2 >= split1_idx + 4) & (idxs2 <= stop_idx - 4)]
+                if len(idxs2) > 0:
+                    j2 = int(np.argmin(np.abs(v_diode[idxs2] - split2_target_v)))
+                    split2_idx = int(idxs2[j2])
+                    split2_mode = "exp2_twostage_target_v_raw"
+                else:
+                    split2_target_ns = float(EXP2_TWO_STAGE_SPLIT_ABS_NS_BY_SHOT.get(shot_id, 200.0))
+                    split2_idx = int(np.argmin(np.abs(t_rel_ns - split2_target_ns)))
+                    split2_idx = int(np.clip(split2_idx, split1_idx + 4, stop_idx - 4))
+                    split2_mode = "exp2_twostage_target_v_fallback_abs"
+                if shot_id in EXP2_TWO_STAGE_TARGET_SHIFT_NS_BY_SHOT:
+                    split2_idx_prev = int(split2_idx)
+                    t_shifted = float(t_rel_ns[split2_idx]) + float(EXP2_TWO_STAGE_TARGET_SHIFT_NS_BY_SHOT[shot_id])
+                    split2_idx = int(np.searchsorted(t_rel_ns, t_shifted))
+                    split2_idx = int(np.clip(split2_idx, split1_idx + 4, stop_idx - 4))
+                    shift_ns = float(EXP2_TWO_STAGE_TARGET_SHIFT_NS_BY_SHOT[shot_id])
+                    if split2_idx == split2_idx_prev:
+                        if shift_ns < 0.0:
+                            split2_idx = max(split1_idx + 4, split2_idx_prev - 1)
+                        elif shift_ns > 0.0:
+                            split2_idx = min(stop_idx - 4, split2_idx_prev + 1)
+                    split2_mode = f"{split2_mode}_shifted"
+                if shot_id in EXP2_TWO_STAGE_TARGET_SHIFT_SAMPLES_BY_SHOT:
+                    split2_idx = int(np.clip(
+                        split2_idx + int(EXP2_TWO_STAGE_TARGET_SHIFT_SAMPLES_BY_SHOT[shot_id]),
+                        split1_idx + 4, stop_idx - 4
+                    ))
+                    split2_mode = f"{split2_mode}_sample_shifted"
+            elif shot_id in EXP2_TWO_STAGE_REL_MAX_SHOTS:
+                split2_idx, split2_mode = find_next_rel_max_by_rolling(
+                    t_rel_ns, v_diode, split1_idx, min_delay_ns=40.0, max_delay_ns=180.0, smooth_ns=8.0, prom_frac=0.10
+                )
+                if split2_idx is None:
+                    split2_target_ns = float(EXP2_TWO_STAGE_SPLIT_ABS_NS_BY_SHOT.get(shot_id, 200.0))
+                    split2_idx = int(np.argmin(np.abs(t_rel_ns - split2_target_ns)))
+                    split2_idx = int(np.clip(split2_idx, split1_idx + 4, stop_idx - 4))
+                    split2_mode = "exp2_twostage_relmax_fallback_abs"
+                else:
+                    split2_idx = int(np.clip(split2_idx, split1_idx + 4, stop_idx - 4))
+            elif shot_id in EXP2_TWO_STAGE_INFLECTION_SHOTS:
+                split2_idx, split2_mode = find_split2_inflection(t_rel_ns, v_diode, split1_idx, stop_idx, rec_sign)
+                split2_idx = int(np.clip(split2_idx, split1_idx + 4, stop_idx - 4))
+            else:
+                split2_target_ns = float(EXP2_TWO_STAGE_SPLIT_ABS_NS_BY_SHOT.get(shot_id, 200.0))
+                split2_idx = int(np.argmin(np.abs(t_rel_ns - split2_target_ns)))
+                split2_idx = int(np.clip(split2_idx, split1_idx + 4, stop_idx - 4))
+                split2_mode = "exp2_twostage_abs_target"
             split2_t_ns = float(t_rel_ns[split2_idx])
             print("\nSplit2 selection (exp2_a->exp2_b):")
             print(f"  split2_mode = {split2_mode}")
@@ -3793,15 +4512,52 @@ def main(csv_file=None, out_dir=None):
                 v2b[0] = float(V2a_model[-1])
             t2b = t2b_abs - t2b_abs[0]
             idx2b = np.linspace(0, len(t2b)-1, min(SUBSAMPLE_RECOVERY_N, len(t2b)), dtype=int)
-            if shot_id == 27277:
-                p2b, y2b_0, sig2b = fit_anchored_exp_fast(t2b[idx2b], v2b[idx2b], seg_sign=rec_sign)
+            if shot_id in {27277, 27278}:
+                p2b_dip, y2b_0, sig2b = fit_dip_biexp_fast(t2b, v2b)
+                A2b, tf2b, ts2b = map(float, p2b_dip)
+                V2b_model = dip_biexp_np(t2b, A2b, tf2b, ts2b, y2b_0)
+
+                anchor_idx, anchor_mode = find_next_big_min_by_rolling(
+                    t_rel_ns, v_diode, split2_idx, min_delay_ns=20.0, max_delay_ns=90.0, smooth_ns=8.0, prom_frac=0.10
+                )
+                t2b_anchor = None
+                y2b_anchor = None
+                if (anchor_idx is not None) and (split2_idx + 2 < anchor_idx < stop_idx - 2):
+                    t2b_anchor = float(t_diode[anchor_idx] - t_diode[split2_idx])
+                    y2b_anchor = float(v_diode[anchor_idx])
+                    i_anchor = int(np.argmin(np.abs(t2b - t2b_anchor)))
+                    delta = y2b_anchor - float(V2b_model[i_anchor])
+                    T2b = max(float(t2b[-1]), 1e-12)
+                    w = (t2b / T2b) * (1.0 - t2b / T2b)
+                    w = w / max(float(w[i_anchor]), 1e-12)
+                    V2b_model = V2b_model + delta * w
+                    V2b_model[0] = float(y2b_0)
+                    V2b_model[-1] = float(v_diode[stop_idx])
+                sig2b = float(np.std(v2b - V2b_model) + 1e-9)
+                print("Exp2b fit (split2->stop, dip-rebound tail anchored to diode minimum):")
+                print(
+                    f"  A2b={A2b:.6f}, tau_fast2b={tf2b*1e9:.3f} ns, tau_slow2b={ts2b*1e9:.3f} ns, "
+                    f"anchor_mode={anchor_mode}, t_anchor={(t2b_anchor*1e9 if t2b_anchor is not None else float('nan')):.3f} ns, "
+                    f"y_anchor={(y2b_anchor if y2b_anchor is not None else float('nan')):.6f}"
+                )
+                exp2_mode = "two_stage_dip_rebound"
+            elif shot_id == 27279:
+                p2b, y2b_0, sig2b = fit_anchored_exp_through_endpoint_fast(
+                    t2b[idx2b], v2b[idx2b], seg_sign=rec_sign, tau_max_mult=4.0,
+                    y_end_target=float(v_diode[stop_idx])
+                )
                 b2b, tau2b = map(float, p2b)
-                print("Exp2b fit (split2->stop, anchored-exp-tail):")
+                print("Exp3 fit (split2->stop, anchored-exp-endpoint):")
                 print(f"  baseline2b={b2b:.6f}, tau2b={tau2b*1e9:.3f} ns")
                 V2b_model = exp_anchor_np(t2b, b2b, tau2b, y2b_0)
                 exp2_mode = "two_stage_exp_tail"
             else:
-                y2b_end_target = float(v_diode[stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
+                y2b_end_target = float(v_diode[stop_idx]) + float(
+                    EXP2_APPEND_TAIL_ENDPOINT_Y_OFFSET_BY_SHOT.get(
+                        shot_id,
+                        EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0)
+                    )
+                )
                 p2b_s, y2b_0, y2b_end, sig2b = fit_stretched_exp_endpoint_fast(
                     t2b[idx2b], v2b[idx2b], seg_sign=rec_sign, tau_max_mult=2.5, y_end_target=y2b_end_target
                 )
@@ -3814,7 +4570,7 @@ def main(csv_file=None, out_dir=None):
             V_model[i2a:i2a+len(V2a_model)] = V2a_model
             i2b = i2a + len(V2a_model) - 1
             V_model[i2b:] = V2b_model
-            if shot_id != 27277:
+            if shot_id not in {27277, 27278, 27279}:
                 exp2_mode = "two_stage_stretched"
 
             t2agrid = np.linspace(0, float(t2a[-1]), max(200, len(t2a)))
@@ -3826,7 +4582,9 @@ def main(csv_file=None, out_dir=None):
             V_hi[i2a:i2a+len(t2a)] = np.interp(t2a, t2agrid, hi2a)
 
             t2bgrid = np.linspace(0, float(t2b[-1]), max(200, len(t2b)))
-            if shot_id == 27277:
+            if shot_id in {27277, 27278}:
+                mean2b = np.interp(t2bgrid, t2b, V2b_model)
+            elif shot_id == 27279:
                 mean2b = exp_anchor_np(t2bgrid, b2b, tau2b, y2b_0)
             else:
                 mean2b = stretched_exp_endpoint_np(t2bgrid, tau2b, k2b, y2b_0, y2b_end, float(t2b[-1]))
@@ -3836,16 +4594,24 @@ def main(csv_file=None, out_dir=None):
             V_lo[i2b:] = np.interp(t2b, t2bgrid, lo2b)
             V_hi[i2b:] = np.interp(t2b, t2bgrid, hi2b)
         else:
-            t2_abs = t_diode[split1_idx:stop_idx+1]
+            use_append_tail = (
+                (shot_id in (EXP2_APPEND_TAIL_SHOTS | EXP2_APPEND_TO_ZERO_SHOTS))
+                and (stop_idx_before_forced > split1_idx + 6)
+                and (stop_idx > stop_idx_before_forced + 4)
+            )
+            exp2_stop_idx = int(stop_idx_before_forced) if use_append_tail else int(stop_idx)
+            if use_append_tail:
+                split2_idx = int(np.clip(exp2_stop_idx, split1_idx + 4, stop_idx - 4))
+            t2_abs = t_diode[split1_idx:exp2_stop_idx+1]
             if shot_id in EXP2_FIT_RAW_SHOTS:
-                v2 = v_diode[split1_idx:stop_idx+1]
+                v2 = v_diode[split1_idx:exp2_stop_idx+1]
             else:
-                v2 = v_fit[split1_idx:stop_idx+1]
+                v2 = v_fit[split1_idx:exp2_stop_idx+1]
             t2 = t2_abs - t2_abs[0]
             idx2 = np.linspace(0, len(t2)-1, min(SUBSAMPLE_RECOVERY_N, len(t2)), dtype=int)
             exp2_mode = "anchored_exp"
             if (shot_id in STRETCHED_ENDPOINT_SHOTS):
-                y_end_target = float(v_diode[stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
+                y_end_target = float(v_diode[exp2_stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
                 p2s, y2_0, y2_end, sig2 = fit_stretched_exp_endpoint_fast(
                     t2[idx2], v2[idx2], seg_sign=rec_sign, tau_max_mult=2.5, y_end_target=y_end_target
                 )
@@ -3864,15 +4630,42 @@ def main(csv_file=None, out_dir=None):
                 V2_model = exp_anchor_np(t2, b2, tau2, y2_0)
                 exp2_mode = "anchored_exp"
             elif (shot_id in EXP2_ENDPOINT_TARGET_STOP_SHOTS):
-                y_end_target = float(v_diode[stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
-                p2a, y2_0, y2_end, sig2 = fit_exp2_accel_endpoint_fast(
-                    t2[idx2], v2[idx2], y_end_target=y_end_target
-                )
-                alpha2 = float(p2a[0])
-                print("Exp2 fit (split1->stop, accel-endpoint-target-stop):")
-                print(f"  alpha2={alpha2:.6f}, y2_0={y2_0:.6f}, y2_end(target)={y2_end:.6f}")
-                V2_model = exp2_accel_endpoint_np(t2, alpha2, y2_0, y2_end, float(t2[-1]))
-                exp2_mode = "accel_endpoint"
+                y_end_target = float(v_diode[exp2_stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
+                if shot_id in EXP2_ENDPOINT_SLOPE_SHOTS:
+                    p2, y2_0, y2_end, slope2_est, sig2 = fit_anchored_exp_endpoint_slope_fast(
+                        t2[idx2], v2[idx2], seg_sign=rec_sign, tau_max_mult=3.5, y_end_target=y_end_target, slope_weight=0.60
+                    )
+                    b2, tau2 = map(float, p2)
+                    print("Exp2 fit (split1->stop, anchored-exp-endpoint-slope):")
+                    print(
+                        f"  baseline2={b2:.6f}, tau2={tau2*1e9:.3f} ns, "
+                        f"y2_0={y2_0:.6f}, y2_end(target)={y2_end:.6f}, slope_est={slope2_est:.6e}"
+                    )
+                    V2_model = exp_anchor_np(t2, b2, tau2, y2_0)
+
+                    if (shot_id in EXP2_MIDPOINT_ANCHOR_SHOTS) and (len(t2) >= 5):
+                        v2_sm, _ = smooth_by_ns(t2_abs, v2, max(5.0, fit_smooth_ns))
+                        i_anchor = int(np.clip(len(t2) // 2, 1, len(t2) - 2))
+                        t_anchor = float(t2[i_anchor])
+                        y_anchor = float(v2_sm[i_anchor])
+                        delta = y_anchor - float(V2_model[i_anchor])
+                        T2 = max(float(t2[-1]), 1e-12)
+                        w = (t2 / T2) * (1.0 - t2 / T2)
+                        w = w / max(float(w[i_anchor]), 1e-12)
+                        V2_model = V2_model + delta * w
+                        V2_model[0] = float(y2_0)
+                        V2_model[-1] = float(y_end_target)
+                        print(f"  midpoint anchor: t={t_anchor*1e9:.3f} ns, y={y_anchor:.6f}")
+                    exp2_mode = "anchored_exp_slope"
+                else:
+                    p2a, y2_0, y2_end, sig2 = fit_exp2_accel_endpoint_fast(
+                        t2[idx2], v2[idx2], y_end_target=y_end_target
+                    )
+                    alpha2 = float(p2a[0])
+                    print("Exp2 fit (split1->stop, accel-endpoint-target-stop):")
+                    print(f"  alpha2={alpha2:.6f}, y2_0={y2_0:.6f}, y2_end(target)={y2_end:.6f}")
+                    V2_model = exp2_accel_endpoint_np(t2, alpha2, y2_0, y2_end, float(t2[-1]))
+                    exp2_mode = "accel_endpoint"
             elif use_endpoint_constrained:
                 p2a, y2_0, y2_end, sig2 = fit_exp2_accel_endpoint_fast(t2[idx2], v2[idx2])
                 alpha2 = float(p2a[0])
@@ -3886,23 +4679,93 @@ def main(csv_file=None, out_dir=None):
                 print("Exp2 fit (split1->stop):")
                 print(f"  baseline2={b2:.6f}, tau2={tau2*1e9:.3f} ns")
                 V2_model = exp_anchor_np(t2, b2, tau2, y2_0)
-            V_model[n1-1:] = V2_model
-            if shot_id in EXP1_ENDPOINT_RAW_TARGET_SHOTS:
-                # Keep current curve shapes, but guarantee the stitched handoff hits the true valley sample.
-                V_model[n1-1] = float(v_diode[split1_idx])
+            if use_append_tail:
+                t2b_abs = t_diode[split2_idx:stop_idx+1]
+                v2b = np.asarray(v_diode[split2_idx:stop_idx+1], dtype=float).copy()
+                if len(v2b) > 0:
+                    v2b[0] = float(V2_model[-1])
+                t2b = t2b_abs - t2b_abs[0]
+                idx2b = np.linspace(0, len(t2b)-1, min(SUBSAMPLE_RECOVERY_N, len(t2b)), dtype=int)
+                y2b_end_target = float(v_diode[stop_idx]) + float(
+                    EXP2_APPEND_TAIL_ENDPOINT_Y_OFFSET_BY_SHOT.get(
+                        shot_id,
+                        EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0)
+                    )
+                )
+                if shot_id in EXP2_APPEND_TO_ZERO_SHOTS:
+                    v2b_sm, _ = smooth_by_ns(t2b_abs, v2b, max(5.0, fit_smooth_ns))
+                    i_anchor = int(np.clip(len(t2b) // 2, 1, len(t2b) - 2))
+                    t2b_anchor = float(t2b[i_anchor])
+                    y2b_anchor = float(v2b_sm[i_anchor])
+                    p2b_mid, y2b_0, y2b_end, sig2b = fit_exp2_accel_midpoint_endpoint_fast(
+                        t2b[idx2b], v2b[idx2b], t2b_anchor, y2b_anchor, y_end_target=y2b_end_target
+                    )
+                    alpha2b = float(p2b_mid[0])
+                    print("Exp3 fit (current stop->target stop, accel-midpoint-endpoint):")
+                    print(
+                        f"  alpha2b={alpha2b:.6f}, "
+                        f"y2b_0={y2b_0:.6f}, y2b_end(target)={y2b_end:.6f}, "
+                        f"t_anchor={t2b_anchor*1e9:.3f} ns, y_anchor={y2b_anchor:.6f}"
+                    )
+                    V2b_model = exp2_accel_endpoint_np(t2b, alpha2b, y2b_0, y2b_end, float(t2b[-1]))
+                else:
+                    p2b, y2b_0, sig2b = fit_anchored_exp_through_endpoint_fast(
+                        t2b[idx2b], v2b[idx2b], seg_sign=rec_sign, tau_max_mult=3.5, y_end_target=y2b_end_target
+                    )
+                    b2b, tau2b = map(float, p2b)
+                    print("Exp3 fit (current stop->extended stop, anchored-exp-endpoint):")
+                    print(f"  baseline2b={b2b:.6f}, tau2b={tau2b*1e9:.3f} ns, y2b_0={y2b_0:.6f}, y2b_end(target)={y2b_end_target:.6f}")
+                    V2b_model = exp_anchor_np(t2b, b2b, tau2b, y2b_0)
+                if len(V2b_model) > 0:
+                    V2b_model[-1] = float(v_diode[stop_idx])
 
-            t2grid = np.linspace(0, float(t2[-1]), max(300, len(t2)))
-            if exp2_mode == "accel_endpoint":
-                mean2 = exp2_accel_endpoint_np(t2grid, alpha2, y2_0, y2_end, float(t2[-1]))
-            elif exp2_mode == "stretched_endpoint":
-                mean2 = stretched_exp_endpoint_np(t2grid, tau2, k2, y2_0, y2_end, float(t2[-1]))
+                i2a = n1 - 1
+                V_model[i2a:i2a+len(V2_model)] = V2_model
+                i2b = i2a + len(V2_model) - 1
+                V_model[i2b:] = V2b_model
+                exp2_mode = "append_tail_slope_exp" if shot_id in EXP2_APPEND_TO_ZERO_SHOTS else "append_tail_exp"
+
+                t2grid = np.linspace(0, float(t2[-1]), max(300, len(t2)))
+                if exp2_mode == "accel_endpoint":
+                    mean2 = exp2_accel_endpoint_np(t2grid, alpha2, y2_0, y2_end, float(t2[-1]))
+                elif "k2" in locals():
+                    mean2 = stretched_exp_endpoint_np(t2grid, tau2, k2, y2_0, y2_end, float(t2[-1]))
+                else:
+                    mean2 = exp_anchor_np(t2grid, b2, tau2, y2_0)
+                band2 = RECOVERY_BAND_SIGMA * sig2
+                lo2 = mean2 - band2
+                hi2 = mean2 + band2
+                V_lo[i2a:i2a+len(t2)] = np.interp(t2, t2grid, lo2)
+                V_hi[i2a:i2a+len(t2)] = np.interp(t2, t2grid, hi2)
+
+                t2bgrid = np.linspace(0, float(t2b[-1]), max(200, len(t2b)))
+                if shot_id in EXP2_APPEND_TO_ZERO_SHOTS:
+                    mean2b = exp2_accel_endpoint_np(t2bgrid, alpha2b, y2b_0, y2b_end, float(t2b[-1]))
+                else:
+                    mean2b = exp_anchor_np(t2bgrid, b2b, tau2b, y2b_0)
+                band2b = RECOVERY_BAND_SIGMA * sig2b
+                lo2b = mean2b - band2b
+                hi2b = mean2b + band2b
+                V_lo[i2b:] = np.interp(t2b, t2bgrid, lo2b)
+                V_hi[i2b:] = np.interp(t2b, t2bgrid, hi2b)
             else:
-                mean2 = exp_anchor_np(t2grid, b2, tau2, y2_0)
-            band2 = RECOVERY_BAND_SIGMA * sig2
-            lo2 = mean2 - band2
-            hi2 = mean2 + band2
-            V_lo[n1-1:] = np.interp(t2, t2grid, lo2)
-            V_hi[n1-1:] = np.interp(t2, t2grid, hi2)
+                V_model[n1-1:] = V2_model
+                if shot_id in EXP1_ENDPOINT_RAW_TARGET_SHOTS:
+                    # Keep current curve shapes, but guarantee the stitched handoff hits the true valley sample.
+                    V_model[n1-1] = float(v_diode[split1_idx])
+
+                t2grid = np.linspace(0, float(t2[-1]), max(300, len(t2)))
+                if exp2_mode == "accel_endpoint":
+                    mean2 = exp2_accel_endpoint_np(t2grid, alpha2, y2_0, y2_end, float(t2[-1]))
+                elif exp2_mode == "stretched_endpoint":
+                    mean2 = stretched_exp_endpoint_np(t2grid, tau2, k2, y2_0, y2_end, float(t2[-1]))
+                else:
+                    mean2 = exp_anchor_np(t2grid, b2, tau2, y2_0)
+                band2 = RECOVERY_BAND_SIGMA * sig2
+                lo2 = mean2 - band2
+                hi2 = mean2 + band2
+                V_lo[n1-1:] = np.interp(t2, t2grid, lo2)
+                V_hi[n1-1:] = np.interp(t2, t2grid, hi2)
 
     # Optional per-shot floor to suppress non-physical undershoot.
     if shot_id in MODEL_V_FLOOR_BY_SHOT:
@@ -3934,6 +4797,10 @@ def main(csv_file=None, out_dir=None):
             else:
                 t_bridge_start_abs = t_fit_start_abs
             t_exp1_start_abs = t_bridge_start_abs
+            if shot_id in EXP1_START_SHIFT_NS_BY_SHOT:
+                dt_shift = _ns_to_s(float(EXP1_START_SHIFT_NS_BY_SHOT[shot_id]))
+                t_bridge_start_abs = float(np.clip(t_bridge_start_abs + dt_shift, new_t0_abs, t_fit_start_abs))
+                t_exp1_start_abs = t_bridge_start_abs
 
             flat_abs = prefix_abs[prefix_abs < t_bridge_start_abs]
             bridge_abs = prefix_abs[prefix_abs > t_bridge_start_abs]
@@ -3977,6 +4844,9 @@ def main(csv_file=None, out_dir=None):
                 else:
                     t_zero_rel = t_a
                 t_exp1_start_abs = float(np.clip(t_fit_start_abs + t_zero_rel, new_t0_abs, t_fit_start_abs))
+            if shot_id in EXP1_START_SHIFT_NS_BY_SHOT:
+                dt_shift = _ns_to_s(float(EXP1_START_SHIFT_NS_BY_SHOT[shot_id]))
+                t_exp1_start_abs = float(np.clip(t_exp1_start_abs + dt_shift, new_t0_abs, t_fit_start_abs))
 
             flat_abs = prefix_abs[prefix_abs < t_exp1_start_abs]
             ext_abs = prefix_abs[prefix_abs > t_exp1_start_abs]
@@ -4168,7 +5038,15 @@ def main(csv_file=None, out_dir=None):
             print("    V3(t) = y3_0 * exp(-(t-ts2)/tau_tail)")
             print(f"    ts2={t2_boundary:.9e}, y3_0={y0_t:.9e}, tau_tail={tau_tail:.9e}")
     else:
-        if 'exp2_mode' in locals() and exp2_mode == "exp_then_sigmoid" and (split2_idx is not None):
+        if 'exp2_mode' in locals() and exp2_mode == "exp1_only":
+            print(f"  Segment 2: t in [{t1_boundary:.9e}, {t_model_end:.9e}]")
+            print("    V2(t) = constant continuation of exp1 endpoint")
+            print(f"    V_end={V1_model[-1]:.9e}")
+        elif 'exp2_mode' in locals() and exp2_mode == "exp1_then_linear_stop":
+            print(f"  Segment 2: t in [{t1_boundary:.9e}, {t_model_end:.9e}]")
+            print("    V2(t) = linear connector from exp1 endpoint to diode at stop")
+            print(f"    y2a_0={y2a0:.9e}, y2a_1={y2a1:.9e}")
+        elif 'exp2_mode' in locals() and exp2_mode == "exp_then_sigmoid" and (split2_idx is not None):
             t2b_boundary = float(t_diode[split2_idx])
             print(f"  Segment 2: t in [{t1_boundary:.9e}, {t2b_boundary:.9e}]")
             print("    V2(t) = baseline2a + (y2a_0 - baseline2a) * exp(-(t - ts)/tau2a)")
@@ -4176,6 +5054,14 @@ def main(csv_file=None, out_dir=None):
             print(f"  Segment 3: t in [{t2b_boundary:.9e}, {t_model_end:.9e}]")
             print("    V3(t) = y2b_0 + m_tail*(t-ts2) + amp_s * ((sigmoid((t-ts2)-t_mid_s,k_s)-sigmoid(-t_mid_s,k_s))/(1-sigmoid(-t_mid_s,k_s)))")
             print(f"    ts2={t2b_boundary:.9e}, y2b_0={y2b_0:.9e}, amp_s={a2s:.9e}, t_mid_s={tm2s:.9e}, k_s={k2s:.9e}, m_tail={m2s:.9e}")
+        elif 'exp2_mode' in locals() and exp2_mode == "sigmoid_exp_tail" and (split2_idx is not None):
+            t2b_boundary = float(t_diode[split2_idx])
+            print(f"  Segment 2: t in [{t1_boundary:.9e}, {t2b_boundary:.9e}]")
+            print("    V2(t) = anchored sigmoid")
+            print(f"    ts={t1_boundary:.9e}, y2_0={y2_0:.9e}, amp_s={a2s:.9e}, t_mid_s={tm2s:.9e}, k_s={k2s:.9e}, m_tail={m2s:.9e}")
+            print(f"  Segment 3: t in [{t2b_boundary:.9e}, {t_model_end:.9e}]")
+            print("    V3(t) = y3_0 * exp(-(t-ts2)/tau_tail)")
+            print(f"    ts2={t2b_boundary:.9e}, y3_0={y0_t:.9e}, tau_tail={tau_tail:.9e}")
         elif 'exp2_mode' in locals() and exp2_mode == "sigmoid_only":
             print(f"  Segment 2: t in [{t1_boundary:.9e}, {t_model_end:.9e}]")
             if shot_id in EXP2_SIGMOID_ENDPOINT_SHOTS:
@@ -4184,6 +5070,18 @@ def main(csv_file=None, out_dir=None):
             else:
                 print("    V2(t) = y2_0 + m_tail*(t-ts) + amp_s * ((sigmoid((t-ts)-t_mid_s,k_s)-sigmoid(-t_mid_s,k_s))/(1-sigmoid(-t_mid_s,k_s)))")
                 print(f"    ts={t1_boundary:.9e}, y2_0={y2_0:.9e}, amp_s={a2s:.9e}, t_mid_s={tm2s:.9e}, k_s={k2s:.9e}, m_tail={m2s:.9e}")
+        elif 'exp2_mode' in locals() and exp2_mode == "linear_then_two_exp" and (split2_idx is not None):
+            t2b_boundary = float(t_diode[line_end_idx])
+            t3_boundary = float(t_diode[split2_idx])
+            print(f"  Segment 2: t in [{t1_boundary:.9e}, {t2b_boundary:.9e}]")
+            print("    V2(t) = y2a_0 + (y2a_1-y2a_0) * ((t-ts)/(te-ts))")
+            print(f"    ts={t1_boundary:.9e}, te={t2b_boundary:.9e}, y2a_0={y2a0:.9e}, y2a_1={y2a1:.9e}")
+            print(f"  Segment 3: t in [{t2b_boundary:.9e}, {t3_boundary:.9e}]")
+            print("    V3(t) = baseline2 + (y2_0 - baseline2) * exp(-(t - ts2)/tau2)")
+            print(f"    ts2={t2b_boundary:.9e}, baseline2={b2b:.9e}, y2_0={y2b_0:.9e}, tau2={tau2b:.9e}")
+            print(f"  Segment 4: t in [{t3_boundary:.9e}, {t_model_end:.9e}]")
+            print("    V4(t) = baseline3 + (y3_0 - baseline3) * exp(-(t - ts3)/tau3)")
+            print(f"    ts3={t3_boundary:.9e}, baseline3={b3:.9e}, y3_0={y3_0:.9e}, tau3={tau3:.9e}")
         elif 'exp2_mode' in locals() and exp2_mode == "linear_then_exp" and (split2_idx is not None):
             t2b_boundary = float(t_diode[split2_idx])
             print(f"  Segment 2: t in [{t1_boundary:.9e}, {t2b_boundary:.9e}]")
@@ -4200,6 +5098,26 @@ def main(csv_file=None, out_dir=None):
             print(f"  Segment 3: t in [{t2b_boundary:.9e}, {t_model_end:.9e}]")
             print("    V3(t) = baseline2b + (y2b_0 - baseline2b) * exp(-(t - ts2)/tau2b)")
             print(f"    ts2={t2b_boundary:.9e}, baseline2b={b2b:.9e}, y2b_0={y2b_0:.9e}, tau2b={tau2b:.9e}")
+        elif 'exp2_mode' in locals() and exp2_mode == "append_tail_exp" and (split2_idx is not None):
+            t2b_boundary = float(t_diode[split2_idx])
+            print(f"  Segment 2: t in [{t1_boundary:.9e}, {t2b_boundary:.9e}]")
+            print("    V2(t) = y2_end + (y2_0-y2_end)*exp(-((t-ts)/tau2)^k2)")
+            print(f"    ts={t1_boundary:.9e}, te={t2b_boundary:.9e}, y2_0={y2_0:.9e}, y2_end={y2_end:.9e}, tau2={tau2:.9e}, k2={k2:.9e}")
+            print(f"  Segment 3: t in [{t2b_boundary:.9e}, {t_model_end:.9e}]")
+            print("    V3(t) = baseline2b + (y2b_0 - baseline2b) * exp(-(t - ts2)/tau2b)")
+            print(f"    ts2={t2b_boundary:.9e}, te={t_model_end:.9e}, baseline2b={b2b:.9e}, y2b_0={y2b_0:.9e}, tau2b={tau2b:.9e}")
+        elif 'exp2_mode' in locals() and exp2_mode == "append_tail_slope_exp" and (split2_idx is not None):
+            t2b_boundary = float(t_diode[split2_idx])
+            print(f"  Segment 2: t in [{t1_boundary:.9e}, {t2b_boundary:.9e}]")
+            print("    V2(t) = baseline2 + (y2_0 - baseline2) * exp(-(t - ts)/tau2), then midpoint-anchor corrected")
+            print(f"    ts={t1_boundary:.9e}, te={t2b_boundary:.9e}, baseline2={b2:.9e}, y2_0={y2_0:.9e}, tau2={tau2:.9e}")
+            print(f"  Segment 3: t in [{t2b_boundary:.9e}, {t_model_end:.9e}]")
+            print("    V3(t) = y2b_0 + (y2b_end-y2b_0) * ((exp(alpha2b*(t-ts2)/(te-ts2))-1)/(exp(alpha2b)-1)), constrained by midpoint and endpoint")
+            print(f"    ts2={t2b_boundary:.9e}, te={t_model_end:.9e}, y2b_0={y2b_0:.9e}, y2b_end={y2b_end:.9e}, alpha2b={alpha2b:.9e}")
+        elif 'exp2_mode' in locals() and exp2_mode == "anchored_exp_slope":
+            print(f"  Segment 2: t in [{t1_boundary:.9e}, {t_model_end:.9e}]")
+            print("    V2(t) = baseline2 + (y2_0 - baseline2) * exp(-(t - ts)/tau2), then midpoint-anchor corrected")
+            print(f"    ts={t1_boundary:.9e}, te={t_model_end:.9e}, baseline2={b2:.9e}, y2_0={y2_0:.9e}, tau2={tau2:.9e}")
         elif 'exp2_mode' in locals() and exp2_mode == "two_stage_stretched" and (split2_idx is not None):
             t2b_boundary = float(t_diode[split2_idx])
             print(f"  Segment 2: t in [{t1_boundary:.9e}, {t2b_boundary:.9e}]")
@@ -4208,6 +5126,14 @@ def main(csv_file=None, out_dir=None):
             print(f"  Segment 3: t in [{t2b_boundary:.9e}, {t_model_end:.9e}]")
             print("    V3(t) = b2b + (y2b_0-b2b)*exp(-((t-ts2)/tau2b)^k2b), with b2b set by V3(te)=y2b_end")
             print(f"    ts2={t2b_boundary:.9e}, te={t_model_end:.9e}, y2b_0={y2b_0:.9e}, y2b_end={y2b_end:.9e}, tau2b={tau2b:.9e}, k2b={k2b:.9e}")
+        elif 'exp2_mode' in locals() and exp2_mode == "two_stage_dip_rebound" and (split2_idx is not None):
+            t2b_boundary = float(t_diode[split2_idx])
+            print(f"  Segment 2: t in [{t1_boundary:.9e}, {t2b_boundary:.9e}]")
+            print("    V2(t) = b2a + (y2a_0-b2a)*exp(-((t-ts)/tau2a)^k2a), with b2a set by V2(te)=y2a_end")
+            print(f"    ts={t1_boundary:.9e}, te={t2b_boundary:.9e}, y2a_0={y2a_0:.9e}, y2a_end={y2a_end:.9e}, tau2a={tau2a:.9e}, k2a={k2a:.9e}")
+            print(f"  Segment 3: t in [{t2b_boundary:.9e}, {t_model_end:.9e}]")
+            print("    V3(t) = y2b_0 + A2b*(exp(-(t-ts2)/tau_fast2b)-exp(-(t-ts2)/tau_slow2b)), then interior-anchor corrected to diode minimum")
+            print(f"    ts2={t2b_boundary:.9e}, y2b_0={y2b_0:.9e}, A2b={A2b:.9e}, tau_fast2b={tf2b:.9e}, tau_slow2b={ts2b:.9e}")
         elif 'exp2_mode' in locals() and exp2_mode == "accel_endpoint":
             print(f"  Segment 2: t in [{t1_boundary:.9e}, {t_model_end:.9e}]")
             print("    V2(t) = y2_0 + (y2_end-y2_0) * ((exp(alpha2*(t-ts)/(te-ts))-1)/(exp(alpha2)-1))")
@@ -4239,12 +5165,52 @@ def main(csv_file=None, out_dir=None):
         print(f"  if {t_exp1_start_abs:.9e} < t <= {t1_boundary:.9e}:")
         print(f"    V(t) = {b1:.9e} + ({y1_0:.9e} - {b1:.9e}) * exp(-(t - {t_fit_start:.9e}) / {tau1:.9e})")
 
-    if 'exp2_mode' in locals() and exp2_mode == "linear_then_exp" and ('t2b_boundary' in locals()):
+    if 'exp2_mode' in locals() and exp2_mode == "exp1_only":
+        print(f"  if {t1_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {V1_model[-1]:.9e}")
+    elif 'exp2_mode' in locals() and exp2_mode == "exp1_then_linear_stop":
+        slope2 = (y2a1 - y2a0) / max((t_model_end - t1_boundary), 1e-18)
+        print(f"  if {t1_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {y2a0:.9e} + ({slope2:.9e}) * (t - {t1_boundary:.9e})")
+    elif 'exp2_mode' in locals() and exp2_mode == "linear_then_two_exp":
+        t2b_boundary = float(t_diode[line_end_idx])
+        t3_boundary = float(t_diode[split2_idx])
+        slope2 = (y2a1 - y2a0) / max((t2b_boundary - t1_boundary), 1e-18)
+        print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
+        print(f"    V(t) = {y2a0:.9e} + ({slope2:.9e}) * (t - {t1_boundary:.9e})")
+        print(f"  if {t2b_boundary:.9e} < t <= {t3_boundary:.9e}:")
+        print(f"    V(t) = {b2b:.9e} + ({y2b_0:.9e} - {b2b:.9e}) * exp(-(t - {t2b_boundary:.9e}) / {tau2b:.9e})")
+        print(f"  if {t3_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {b3:.9e} + ({y3_0:.9e} - {b3:.9e}) * exp(-(t - {t3_boundary:.9e}) / {tau3:.9e})")
+    elif 'exp2_mode' in locals() and exp2_mode == "linear_then_exp" and ('t2b_boundary' in locals()):
         slope2 = (y2a1 - y2a0) / max((t2b_boundary - t1_boundary), 1e-18)
         print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
         print(f"    V(t) = {y2a0:.9e} + ({slope2:.9e}) * (t - {t1_boundary:.9e})")
         print(f"  if {t2b_boundary:.9e} < t <= {t_model_end:.9e}:")
         print(f"    V(t) = {b2:.9e} + ({y2_0:.9e} - {b2:.9e}) * exp(-(t - {t2b_boundary:.9e}) / {tau2:.9e})")
+    elif 'exp2_mode' in locals() and exp2_mode == "append_tail_exp" and ('split2_idx' in locals()):
+        t2b_boundary = float(t_diode[split2_idx])
+        print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
+        print(f"    V(t) = {y2_end:.9e} + ({y2_0:.9e} - {y2_end:.9e}) * exp(-((t - {t1_boundary:.9e}) / {tau2:.9e})^{k2:.9e})")
+        print(f"  if {t2b_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {b2b:.9e} + ({y2b_0:.9e} - {b2b:.9e}) * exp(-(t - {t2b_boundary:.9e}) / {tau2b:.9e})")
+    elif 'exp2_mode' in locals() and exp2_mode == "append_tail_slope_exp" and ('split2_idx' in locals()):
+        t2b_boundary = float(t_diode[split2_idx])
+        print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
+        print(f"    V(t) = slope-matched endpoint exponential from {y2_0:.9e} to {y2_end:.9e}, midpoint-anchor corrected")
+        print(f"  if {t2b_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {y2b_0:.9e} + ({y2b_end:.9e} - {y2b_0:.9e}) * ((exp({alpha2b:.9e} * (t - {t2b_boundary:.9e}) / ({t_model_end:.9e} - {t2b_boundary:.9e})) - 1) / (exp({alpha2b:.9e}) - 1))")
+    elif 'exp2_mode' in locals() and exp2_mode == "sigmoid_exp_tail" and ('split2_idx' in locals()):
+        t2b_boundary = float(t_diode[split2_idx])
+        print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
+        print(f"    V(t) = {y2_0:.9e} + ({m2s:.9e})*(t - {t1_boundary:.9e}) + ({a2s:.9e}) * "
+              f"((1/(1+exp(-((t - {t1_boundary:.9e}) - {tm2s:.9e})/{k2s:.9e})) - 1/(1+exp(-(-{tm2s:.9e})/{k2s:.9e})))"
+              f" / (1 - 1/(1+exp(-(-{tm2s:.9e})/{k2s:.9e}))))")
+        print(f"  if {t2b_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {y0_t:.9e} * exp(-(t - {t2b_boundary:.9e}) / {tau_tail:.9e})")
+    elif 'exp2_mode' in locals() and exp2_mode == "anchored_exp_slope":
+        print(f"  if {t1_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = slope-matched endpoint exponential from {y2_0:.9e} to {y2_end:.9e}, midpoint-anchor corrected")
     elif 'exp2_mode' in locals() and exp2_mode == "exp_then_sigmoid" and ('t2b_boundary' in locals()):
         print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
         print(f"    V(t) = {b2a:.9e} + ({y2a_0:.9e} - {b2a:.9e}) * exp(-(t - {t1_boundary:.9e}) / {tau2a:.9e})")
