@@ -64,11 +64,11 @@ EXP1_LINEAR_TO_POSITIVE_EXP_SHOTS = set()
 EXP1_LINEAR_TO_POSITIVE_V_BY_SHOT = {27301: 0.0}
 EXP1_LINEAR_TO_POSITIVE_SMOOTH_NS_BY_SHOT = {27301: 6.0}
 EXP1_LINEAR_END_ABS_NS_BY_SHOT = {27301: 365.0}
-APPEND_TWO_EXP_TAIL_SHOTS = {27301}
-APPEND_TWO_EXP_SPLIT_ABS_NS_BY_SHOT = {27301: 620.0}
-APPEND_TWO_EXP_END_ABS_NS_BY_SHOT = {27301: 800.0}
-APPEND_TWO_EXP_FIT_RAW_SHOTS = {27301}
-APPEND_TWO_EXP_FIRST_START_OFFSET_V_BY_SHOT = {27301: -0.03}
+APPEND_TWO_EXP_TAIL_SHOTS = {27272, 27301}
+APPEND_TWO_EXP_SPLIT_ABS_NS_BY_SHOT = {27272: 395.0, 27301: 620.0}
+APPEND_TWO_EXP_END_ABS_NS_BY_SHOT = {27272: 490.0, 27301: 800.0}
+APPEND_TWO_EXP_FIT_RAW_SHOTS = {27272, 27301}
+APPEND_TWO_EXP_FIRST_START_OFFSET_V_BY_SHOT = {27272: 0.0, 27301: -0.03}
 APPEND_LINEAR_TAIL_SHOTS = {27304, 27305}
 APPEND_LINEAR_TAIL_START_ABS_NS_BY_SHOT = {27304: 150.0, 27305: 190.0}
 APPEND_LINEAR_TAIL_END_ABS_NS_BY_SHOT = {27304: 800.0, 27305: 1300.0}
@@ -85,6 +85,9 @@ APPEND_LINEAR_SIGMOID_LINEAR_SHOTS = {27304, 27305}
 APPEND_LINEAR_SIGMOID_LINEAR_MID_ABS_NS_BY_SHOT = {27304: (1010.0, 1290.0), 27305: (1380.0, 1500.0)}
 APPEND_END_EXP_TAIL_SHOTS = {27302}
 APPEND_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27302: 600.0}
+APPEND_END_EXP_TAIL_TARGET_V_BY_SHOT = {}
+APPEND_END_EXP_TAIL_ANCHOR_ABS_NS_BY_SHOT = {}
+APPEND_END_EXP_TAIL_ANCHOR_MIN_WINDOW_NS_BY_SHOT = {}
 APPEND_END_EXP_TAIL_FIT_RAW_SHOTS = set()
 
 # --- onset detection ---
@@ -5235,7 +5238,7 @@ def main(csv_file=None, out_dir=None):
                 if shot_id in EXP2_FIT_RAW_SHOTS:
                     v2 = v_diode[split1_idx:exp2_stop_idx+1]
                 else:
-                    v2 = v_fit[split1_idx:exp2_stop_idx+1]
+                    v2 = v_fit[split1_idx:exp2_stop_idx+2]
                 t2 = t2_abs - t2_abs[0]
                 idx2 = np.linspace(0, len(t2)-1, min(SUBSAMPLE_RECOVERY_N, len(t2)), dtype=int)
                 exp2_mode = "anchored_exp"
@@ -5772,9 +5775,14 @@ def main(csv_file=None, out_dir=None):
 
     t_core_model_end = float(t_model_abs[-1]) if len(t_model_abs) > 0 else float(t_seg_abs[-1])
     end_exp_tail_active = False
+    t_endexp1_abs = None
     if (shot_id in APPEND_END_EXP_TAIL_SHOTS) and len(t_model_abs) >= 1:
         t_endexp0_abs = float(t_model_abs[-1])
-        t_endexp1_abs = float(new_t0_abs + _ns_to_s(APPEND_END_EXP_TAIL_END_ABS_NS_BY_SHOT[shot_id]))
+        target_tail_v = APPEND_END_EXP_TAIL_TARGET_V_BY_SHOT.get(shot_id, None)
+        if shot_id in APPEND_END_EXP_TAIL_END_ABS_NS_BY_SHOT:
+            t_endexp1_abs = float(new_t0_abs + _ns_to_s(APPEND_END_EXP_TAIL_END_ABS_NS_BY_SHOT[shot_id]))
+        else:
+            t_endexp1_abs = t_endexp0_abs
         if t_endexp1_abs > t_endexp0_abs + 1e-12:
             tail_mask = (t_diode > t_endexp0_abs) & (t_diode < t_endexp1_abs)
             tail_abs = t_diode[tail_mask]
@@ -5783,9 +5791,39 @@ def main(csv_file=None, out_dir=None):
             y_fit = np.interp(t_fit_abs, t_diode, y_fit_src)
             y_endexp0 = float(V_model_plot[-1])
             y_fit[0] = y_endexp0
-            p_endexp, y_endexp_fit0, sig_endexp = fit_anchored_exp_through_endpoint_fast(
-                t_fit_abs - t_endexp0_abs, y_fit, tau_max_mult=4.0, y_end_target=float(y_fit[-1])
-            )
+            y_endexp_target = float(target_tail_v) if (target_tail_v is not None) else float(y_fit[-1])
+            y_fit[-1] = y_endexp_target
+            t_anchor_abs_ns = APPEND_END_EXP_TAIL_ANCHOR_ABS_NS_BY_SHOT.get(shot_id, None)
+            if t_anchor_abs_ns is not None:
+                t_anchor_abs = float(new_t0_abs + _ns_to_s(float(t_anchor_abs_ns)))
+                y_anchor = float(np.interp(t_anchor_abs, t_diode, v_diode))
+            else:
+                anchor_window_ns = APPEND_END_EXP_TAIL_ANCHOR_MIN_WINDOW_NS_BY_SHOT.get(shot_id, None)
+                t_anchor_abs = None
+                y_anchor = None
+                if anchor_window_ns is not None:
+                    w0_abs = float(new_t0_abs + _ns_to_s(float(anchor_window_ns[0])))
+                    w1_abs = float(new_t0_abs + _ns_to_s(float(anchor_window_ns[1])))
+                    anchor_mask = (t_diode >= w0_abs) & (t_diode <= w1_abs)
+                    if np.any(anchor_mask):
+                        t_anchor_cand = t_diode[anchor_mask]
+                        v_anchor_cand = v_diode[anchor_mask]
+                        i_anchor = int(np.argmin(v_anchor_cand))
+                        t_anchor_abs = float(t_anchor_cand[i_anchor])
+                        y_anchor = float(v_anchor_cand[i_anchor])
+            if (t_anchor_abs is not None) and (t_endexp0_abs < t_anchor_abs < t_endexp1_abs):
+                p_endexp, y_endexp_fit0, _, sig_endexp = fit_anchored_exp_through_exact_anchor_endpoint(
+                    t_fit_abs - t_endexp0_abs,
+                    y_fit,
+                    t_anchor_abs - t_endexp0_abs,
+                    y_anchor,
+                    seg_sign=float(np.sign(y_endexp_target - y_endexp0)),
+                    y_end_target=y_endexp_target,
+                )
+            else:
+                p_endexp, y_endexp_fit0, sig_endexp = fit_anchored_exp_through_endpoint_fast(
+                    t_fit_abs - t_endexp0_abs, y_fit, tau_max_mult=4.0, y_end_target=y_endexp_target
+                )
             b_endexp, tau_endexp = map(float, p_endexp)
             tail_model_abs = np.concatenate((tail_abs, [t_endexp1_abs]))
             tail_model_vals = exp_anchor_np(tail_model_abs - t_endexp0_abs, b_endexp, tau_endexp, y_endexp_fit0)
@@ -5905,8 +5943,8 @@ def main(csv_file=None, out_dir=None):
     # 2) Zoomed overlay (judge fit here)
     x0 = onset_t_ns - ZOOM_LEFT_PAD_NS
     x1 = stop_t_ns + ZOOM_RIGHT_PAD_NS
-    if end_exp_tail_active:
-        x1 = max(x1, float(APPEND_END_EXP_TAIL_END_ABS_NS_BY_SHOT.get(shot_id, x1)) + ZOOM_RIGHT_PAD_NS)
+    if end_exp_tail_active and (t_endexp1_abs is not None):
+        x1 = max(x1, float(_s_to_ns(t_endexp1_abs - new_t0_abs)) + ZOOM_RIGHT_PAD_NS)
     if two_exp_tail_active:
         x1 = max(x1, float(APPEND_TWO_EXP_END_ABS_NS_BY_SHOT.get(shot_id, x1)) + ZOOM_RIGHT_PAD_NS)
     plt.figure(figsize=(14, 6))
