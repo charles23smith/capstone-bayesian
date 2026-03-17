@@ -106,6 +106,9 @@ ONSET_ZERO_DROP_V_THRESH_BY_SHOT = {27283: 0.12}
 ONSET_ZERO_DROP_DELTA_V_BY_SHOT = {27283: 0.22}
 ONSET_ZERO_DROP_V_THRESH_BY_SHOT.update({27286: 0.08})
 ONSET_ZERO_DROP_DELTA_V_BY_SHOT.update({27286: 0.18})
+ONSET_FIRST_RISE_ABOVE_V_BY_SHOT = {27275: 0.0}
+ONSET_FIRST_RISE_ABOVE_SMOOTH_NS_BY_SHOT = {27275: 6.0}
+ONSET_FIRST_RISE_ABOVE_SUSTAIN_N_BY_SHOT = {27275: 4}
 
 # --- peak selection ---
 PEAK_SEARCH_NS = 1000.0
@@ -230,7 +233,7 @@ ONSET_SHIFT_NS_BY_SHOT = {27282: 10.0, 27299: 20.0, 27304: -1.0}
 ONSET_PREPEAK_WINDOW_NS_BY_SHOT = {27301: (0.0, 400.0), 27302: (150.0, 260.0)}
 SPLIT1_TARGET_V_BY_SHOT = {27297: 2.0, 27306: -1.5, 27307: -1.30}
 SPLIT1_TARGET_WINDOW_NS_BY_SHOT = {27297: (120.0, 155.0), 27307: (500.0, 38000.0)}
-SPLIT1_FORCE_ABS_MAX_SHOTS = {27299}
+SPLIT1_FORCE_ABS_MAX_SHOTS = {27275, 27299}
 
 # Shot-specific stop override: choose next-cycle local peak in a bounded window.
 STOP_NEXT_PEAK_SHOT_WINDOWS_NS = {
@@ -264,16 +267,17 @@ TRIM_MODEL_AFTER_EXP1_SHOTS = set()
 EXP1_LINEAR_THEN_EXP_SHOTS = {27279}
 EXP1_LINEAR_END_ABS_NS_BY_SHOT = {27279: 205.0}
 EXP1_EXP2_END_ABS_NS_BY_SHOT = {27279: 340.0}
-EXP2_ENDPOINT_TARGET_STOP_SHOTS = {27283, 27286, 27290, 27304}
+EXP2_ENDPOINT_TARGET_STOP_SHOTS = {27275, 27283, 27286, 27290, 27304}
 EXP2_CLASSIC_ENDPOINT_SHOTS = {27287, 27297, 27299}
 EXP2_FIT_RAW_SHOTS = {27297, 27304}
 EXP2_ENDPOINT_Y_OFFSET_BY_SHOT = {27286: -0.25, 27290: -0.01}
-EXP2_ENDPOINT_SLOPE_SHOTS = {27290, 27304}
-EXP2_MIDPOINT_ANCHOR_SHOTS = {27290, 27304}
-EXP2_INTERIOR_ANCHOR_ABS_NS_BY_SHOT = {27304: 150.0}
+EXP2_ENDPOINT_SLOPE_SHOTS = {27275, 27290, 27304}
+EXP2_MIDPOINT_ANCHOR_SHOTS = {27275, 27290, 27304}
+EXP2_INTERIOR_ANCHOR_ABS_NS_BY_SHOT = {27275: 210.0, 27304: 150.0}
 EXP2_APPEND_TO_ZERO_SHOTS = {27290}
 EXP2_APPEND_TARGET_V_BY_SHOT = {27290: -0.1}
 EXP2_APPEND_ZERO_SMOOTH_NS_BY_SHOT = {27290: 8.0}
+EXP2_PIN_ENDPOINT_TO_DIODE_SHOTS = set()
 STRETCHED_ENDPOINT_SHOTS = {27286, 27287, 27289, 27295}
 EXP1_STRETCHED_ONLY_SHOTS = {27296, 27298, 27299}
 STOP_AFTER_SPLIT_LOCAL_MAX_WINDOWS_NS = {27283: (70.0, 95.0)}
@@ -282,7 +286,7 @@ STOP_AFTER_SPLIT_LOCAL_MAX_WINDOWS_NS[27290] = (70.0, 120.0)
 STOP_AFTER_SPLIT_GLOBAL_MIN_SHOTS = {27289}
 STOP_AFTER_SPLIT_GLOBAL_MIN_WINDOWS_NS = {27289: (20.0, 240.0)}
 STOP_AFTER_SPLIT_ABS_MAX_WINDOWS_NS = {27291: (175.0, 300.0), 27295: (200.0, 300.0), 27307: (50000.0, 90000.0)}
-STOP_AFTER_SPLIT_ABS_MIN_WINDOWS_NS = {27297: (165.0, 190.0)}
+STOP_AFTER_SPLIT_ABS_MIN_WINDOWS_NS = {27275: (215.0, 245.0), 27297: (165.0, 190.0)}
 STOP_ABS_MIN_BEFORE_NS_BY_SHOT = {27299: 240.0}
 STOP_FIRST_ZERO_AFTER_NS_BY_SHOT = {27296: 0.0, 27300: 240.0, 27301: 300.0, 27302: 300.0, 27306: 0.0}
 STOP_FIRST_ZERO_SMOOTH_NS_BY_SHOT = {27296: 10.0, 27300: 10.0, 27301: 10.0, 27302: 10.0, 27306: 10.0}
@@ -3465,6 +3469,25 @@ def main(csv_file=None, out_dir=None):
     if shot_id in ONSET_FORCE_T0_SHOTS:
         onset_idx = int(np.argmin(np.abs(t_rel_ns - 0.0)))
         onset_mode = "forced_t0"
+    if shot_id in ONSET_FIRST_RISE_ABOVE_V_BY_SHOT:
+        v_thr = float(ONSET_FIRST_RISE_ABOVE_V_BY_SHOT[shot_id])
+        sm_ns = float(ONSET_FIRST_RISE_ABOVE_SMOOTH_NS_BY_SHOT.get(shot_id, max(6.0, fit_smooth_ns)))
+        sustain_n = max(2, int(ONSET_FIRST_RISE_ABOVE_SUSTAIN_N_BY_SHOT.get(shot_id, 3)))
+        vs_on, _ = smooth_by_ns(t_diode, v_diode, sm_ns)
+        i0_on = int(np.searchsorted(t_rel_ns, 0.0))
+        picked = None
+        for ii in range(max(1, i0_on), max(1, len(vs_on) - sustain_n)):
+            if (vs_on[ii - 1] < v_thr <= vs_on[ii]) and np.all(vs_on[ii:ii + sustain_n] >= v_thr):
+                if float(np.median(np.diff(vs_on[ii:ii + sustain_n + 1]))) >= 0.0:
+                    picked = ii
+                    break
+        if picked is None:
+            hits = np.where(vs_on[i0_on:] >= v_thr)[0]
+            if len(hits) > 0:
+                picked = int(i0_on + hits[0])
+        if picked is not None:
+            onset_idx = int(np.clip(picked, 0, len(t_rel_ns) - 1))
+            onset_mode = "first_rise_above_v"
     if shot_id in ONSET_SHIFT_NS_BY_SHOT:
         t_target = float(t_rel_ns[onset_idx]) + float(ONSET_SHIFT_NS_BY_SHOT[shot_id])
         sidx = int(np.searchsorted(t_rel_ns, t_target))
@@ -5276,7 +5299,10 @@ def main(csv_file=None, out_dir=None):
                         V2_model = exp_anchor_np(t2, b2, tau2, y2_0)
 
                         if (shot_id in EXP2_MIDPOINT_ANCHOR_SHOTS) and (len(t2) >= 5):
-                            v2_sm, _ = smooth_by_ns(t2_abs, v2, max(5.0, fit_smooth_ns))
+                            try:
+                                v2_sm, _ = smooth_by_ns(t2_abs, v2, max(5.0, fit_smooth_ns))
+                            except Exception:
+                                v2_sm = np.asarray(v2, dtype=float)
                             if shot_id in EXP2_INTERIOR_ANCHOR_ABS_NS_BY_SHOT:
                                 t_anchor_abs = float(new_t0_abs + _ns_to_s(EXP2_INTERIOR_ANCHOR_ABS_NS_BY_SHOT[shot_id]))
                                 i_anchor = int(np.argmin(np.abs(t2_abs - t_anchor_abs)))
@@ -5316,6 +5342,8 @@ def main(csv_file=None, out_dir=None):
                     print("Exp2 fit (split1->stop):")
                     print(f"  baseline2={b2:.6f}, tau2={tau2*1e9:.3f} ns")
                     V2_model = exp_anchor_np(t2, b2, tau2, y2_0)
+                if (shot_id in EXP2_PIN_ENDPOINT_TO_DIODE_SHOTS) and len(V2_model) > 0:
+                    V2_model[-1] = float(v_diode[exp2_stop_idx])
                 if use_append_tail:
                     t2b_abs = t_diode[split2_idx:stop_idx+1]
                     v2b = np.asarray(v_diode[split2_idx:stop_idx+1], dtype=float).copy()
@@ -6418,6 +6446,12 @@ def main(csv_file=None, out_dir=None):
             print(f"    V(t) = {y2_0:.9e} + ({m2s:.9e})*(t - {t1_boundary:.9e}) + ({a2s:.9e}) * "
                   f"((1/(1+exp(-((t - {t1_boundary:.9e}) - {tm2s:.9e})/{k2s:.9e})) - 1/(1+exp(-(-{tm2s:.9e})/{k2s:.9e})))"
                   f" / (1 - 1/(1+exp(-(-{tm2s:.9e})/{k2s:.9e}))))")
+    elif 'exp2_mode' in locals() and exp2_mode == "two_stage_dip_rebound" and ('split2_idx' in locals()):
+        t2b_boundary = float(t_diode[split2_idx])
+        print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
+        print(f"    V(t) = {y2a_end:.9e} + ({y2a_0:.9e} - {y2a_end:.9e}) * exp(-((t - {t1_boundary:.9e}) / {tau2a:.9e})^{k2a:.9e})")
+        print(f"  if {t2b_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = dip-rebound bi-exponential from {y2b_0:.9e} with A={A2b:.9e}, tau_fast={tf2b:.9e}, tau_slow={ts2b:.9e}, endpoint pinned to diode")
     elif 'exp2_mode' in locals() and exp2_mode == "two_stage_exp_tail" and ('t2b_boundary' in locals()):
         print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
         print(f"    V(t) = {y2a_end:.9e} + ({y2a_0:.9e} - {y2a_end:.9e}) * exp(-((t - {t1_boundary:.9e}) / {tau2a:.9e})^{k2a:.9e})")
