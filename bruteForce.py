@@ -422,10 +422,7 @@ SHOW_CONF_BAND = False
 # --- current export (doc-style) ---
 K_T = 0.65
 K_V = 0.10
-SKEW_FIRST_NS = 0.0
-SKEW_MULT     = 1.0
-TAIL_TAPER_NS = 50.0
-TIME_SHIFT_S  = 1e-6
+TIME_SHIFT_S  = 0
 
 # plot zoom window padding (ns)
 ZOOM_LEFT_PAD_NS  = 200.0
@@ -6579,25 +6576,11 @@ def main(csv_file=None, out_dir=None):
 
     # =============================
     # EXPORT current pulse TXT (2 cols): time(s) current(A)
-    # I(t)=K_T*t + K_V*V(t)  (+ optional skew + tail taper)
+    # I(t)=K_T*t + K_V*V(t)
     # =============================
     t_out = (t_model_abs - new_t0_abs) + TIME_SHIFT_S
     V_out = V_model_plot
     I_out = K_T * t_out + K_V * V_out
-
-    if SKEW_FIRST_NS > 0 and SKEW_MULT != 1.0:
-        msk = (t_out - TIME_SHIFT_S) <= _ns_to_s(SKEW_FIRST_NS)
-        I_out = I_out.copy()
-        I_out[msk] *= SKEW_MULT
-
-    if TAIL_TAPER_NS > 0:
-        taper_s = _ns_to_s(TAIL_TAPER_NS)
-        t_end = t_out[-1]
-        t_start = max(t_out[0], t_end - taper_s)
-        wgt = np.ones_like(t_out)
-        m = t_out >= t_start
-        wgt[m] = np.clip((t_end - t_out[m]) / max(taper_s, 1e-18), 0.0, 1.0)
-        I_out = I_out * wgt
 
     export_i_txt = os.path.join(out_dir, "export_current_pulse.txt")
     with open(export_i_txt, "w") as f:
@@ -7094,7 +7077,7 @@ def main(csv_file=None, out_dir=None):
             print(f"    V(t) = {b_endexp:.9e} + ({y_endexp_fit0:.9e} - {b_endexp:.9e}) * exp(-(t - {t_endexp0_abs:.9e}) / {tau_endexp:.9e})")
 
     print("\nNumeric I(t) model:")
-    print(f"  I(t) = {K_T:.9e} * ((t - {new_t0_abs:.9e}) + {TIME_SHIFT_S:.9e}) + {K_V:.9e} * V(t)")
+    print(f"  I(t) = {K_T:.9e} * t + {K_V:.9e} * V(t)")
 
     print("\nDONE.")
     print("Check:")
