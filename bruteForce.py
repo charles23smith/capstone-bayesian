@@ -83,20 +83,24 @@ APPEND_LINEAR_THEN_SIGMOID_ANCHOR_ABS_NS_BY_SHOT = {
 APPEND_LINEAR_THEN_SIGMOID_K_MAX_FRAC_BY_SHOT = {27304: 0.20, 27305: 0.24}
 APPEND_LINEAR_SIGMOID_LINEAR_SHOTS = {27304, 27305}
 APPEND_LINEAR_SIGMOID_LINEAR_MID_ABS_NS_BY_SHOT = {27304: (1010.0, 1290.0), 27305: (1380.0, 1500.0)}
-APPEND_END_EXP_TAIL_SHOTS = {27299, 27302}
-APPEND_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27299: 144.272, 27302: 600.0}
+APPEND_END_EXP_TAIL_SHOTS = {27276, 27288, 27289, 27299, 27302}
+APPEND_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27276: 293.174, 27288: 180.0, 27289: 258.901, 27299: 144.272, 27302: 600.0}
 APPEND_END_EXP_TAIL_TARGET_V_BY_SHOT = {}
 APPEND_END_EXP_TAIL_ANCHOR_ABS_NS_BY_SHOT = {}
 APPEND_END_EXP_TAIL_TARGET_V_ANCHORS_BY_SHOT = {27299: (0.5, 0.75, 1.25)}
 APPEND_END_EXP_TAIL_ANCHOR_MIN_WINDOW_NS_BY_SHOT = {}
-APPEND_END_EXP_TAIL_FIT_RAW_SHOTS = {27299}
-APPEND_SECOND_END_EXP_TAIL_SHOTS = {27299}
-APPEND_SECOND_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27299: 210.0}
-APPEND_SECOND_END_EXP_TAIL_FIT_RAW_SHOTS = {27299}
-APPEND_QUADRATIC_TAIL_SHOTS = {27298}
-APPEND_QUADRATIC_TAIL_END_ABS_NS_BY_SHOT = {27298: 285.0}
-APPEND_QUADRATIC_TAIL_ANCHOR_ABS_NS_BY_SHOT = {27298: (255.0, 270.0, 285.0)}
-APPEND_QUADRATIC_TAIL_FIT_RAW_SHOTS = {27298}
+APPEND_END_EXP_TAIL_FIT_RAW_SHOTS = {27276, 27288, 27289, 27299}
+APPEND_SECOND_END_EXP_TAIL_SHOTS = {27276, 27299}
+APPEND_SECOND_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27276: 343.174, 27299: 210.0}
+APPEND_SECOND_END_EXP_TAIL_TARGET_V_BY_SHOT = {27276: -1.5}
+APPEND_SECOND_END_EXP_TAIL_ANCHOR_ABS_NS_BY_SHOT = {}
+APPEND_SECOND_END_EXP_TAIL_ANCHOR_V_BY_SHOT = {}
+APPEND_SECOND_END_EXP_TAIL_WEIGHTED_ANCHORS_ABS_NS_BY_SHOT = {}
+APPEND_SECOND_END_EXP_TAIL_FIT_RAW_SHOTS = {27276, 27299}
+APPEND_QUADRATIC_TAIL_SHOTS = {27288, 27298}
+APPEND_QUADRATIC_TAIL_END_ABS_NS_BY_SHOT = {27288: 268.0, 27298: 285.0}
+APPEND_QUADRATIC_TAIL_ANCHOR_ABS_NS_BY_SHOT = {27288: (230.0, 268.0), 27298: (255.0, 270.0, 285.0)}
+APPEND_QUADRATIC_TAIL_FIT_RAW_SHOTS = {27288, 27298}
 APPEND_SECOND_QUADRATIC_TAIL_SHOTS = {27298}
 APPEND_SECOND_QUADRATIC_TAIL_END_ABS_NS_BY_SHOT = {27298: 325.0}
 APPEND_SECOND_QUADRATIC_TAIL_ANCHOR_ABS_NS_BY_SHOT = {27298: (300.0, 325.0)}
@@ -275,7 +279,7 @@ EXP1_ENDPOINT_Y_OFFSET_BY_SHOT = {27278: 0.0, 27279: 0.0}
 EXP1_MIN_ANCHOR_V_BY_SHOT = {27279: -2.1}
 EXP1_LEVEL_ANCHOR_V_BY_SHOT = {27282: -3.4}
 EXP1_ONLY_SHOTS = {27299}
-TRIM_MODEL_AFTER_EXP1_SHOTS = {27299}
+TRIM_MODEL_AFTER_EXP1_SHOTS = {27276, 27288, 27299}
 EXP1_LINEAR_THEN_EXP_SHOTS = {27279}
 EXP1_LINEAR_END_ABS_NS_BY_SHOT = {27279: 205.0}
 EXP1_EXP2_END_ABS_NS_BY_SHOT = {27279: 340.0}
@@ -284,9 +288,10 @@ EXP2_CLASSIC_ENDPOINT_SHOTS = {27287, 27297, 27299}
 EXP2_FIT_RAW_SHOTS = {27297, 27304}
 EXP2_ENDPOINT_Y_OFFSET_BY_SHOT = {27286: -0.25, 27290: -0.01}
 EXP2_ENDPOINT_SLOPE_SHOTS = {27275, 27290, 27304}
+EXP2_FOUR_POINT_FIT_SHOTS = set()
 EXP2_MIDPOINT_ANCHOR_SHOTS = {27275, 27290, 27304}
 EXP2_INTERIOR_ANCHOR_ABS_NS_BY_SHOT = {27275: 210.0, 27304: 150.0}
-EXP2_APPEND_TO_ZERO_SHOTS = {27290}
+EXP2_APPEND_TO_ZERO_SHOTS = set()
 EXP2_APPEND_TARGET_V_BY_SHOT = {27290: -0.1}
 EXP2_APPEND_ZERO_SMOOTH_NS_BY_SHOT = {27290: 8.0}
 EXP2_PIN_ENDPOINT_TO_DIODE_SHOTS = set()
@@ -300,8 +305,8 @@ STOP_AFTER_SPLIT_GLOBAL_MIN_WINDOWS_NS = {27289: (20.0, 240.0)}
 STOP_AFTER_SPLIT_ABS_MAX_WINDOWS_NS = {27291: (175.0, 300.0), 27295: (200.0, 300.0), 27307: (50000.0, 90000.0)}
 STOP_AFTER_SPLIT_ABS_MIN_WINDOWS_NS = {27275: (215.0, 245.0), 27297: (165.0, 190.0)}
 STOP_ABS_MIN_BEFORE_NS_BY_SHOT = {27299: 240.0}
-STOP_FIRST_ZERO_AFTER_NS_BY_SHOT = {27296: 0.0, 27300: 240.0, 27301: 300.0, 27302: 300.0, 27306: 0.0}
-STOP_FIRST_ZERO_SMOOTH_NS_BY_SHOT = {27296: 10.0, 27300: 10.0, 27301: 10.0, 27302: 10.0, 27306: 10.0}
+STOP_FIRST_ZERO_AFTER_NS_BY_SHOT = {27294: 0.0, 27296: 0.0, 27300: 240.0, 27301: 300.0, 27302: 300.0, 27306: 0.0}
+STOP_FIRST_ZERO_SMOOTH_NS_BY_SHOT = {27294: 10.0, 27296: 10.0, 27300: 10.0, 27301: 10.0, 27302: 10.0, 27306: 10.0}
 STOP_FIRST_TARGET_AFTER_NS_BY_SHOT = {27306: 0.0}
 STOP_FIRST_TARGET_V_BY_SHOT = {27306: 1.0}
 STOP_FIRST_TARGET_SMOOTH_NS_BY_SHOT = {27306: 10.0}
@@ -367,7 +372,7 @@ EXP2_SIG_TARGET_V_BY_SHOT = {27296: -0.75}
 EXP2_SIG_TARGET_V_TOL_BY_SHOT = {27296: 0.06}
 EXP2_SIG_END_TARGET_V_BY_SHOT = {}
 EXP2_SIG_DURATION_AFTER_SPLIT_NS_BY_SHOT = {}
-STOP_FORCE_ABS_NS_BY_SHOT = {27277: 500.0, 27278: 500.0, 27279: 500.0, 27283: 330.0, 27286: 400.0, 27298: 241.1, 27304: 1500.0, 27305: 2000.0}
+STOP_FORCE_ABS_NS_BY_SHOT = {27277: 500.0, 27278: 500.0, 27279: 500.0, 27283: 330.0, 27286: 400.0, 27289: 208.5, 27298: 241.1, 27304: 1500.0, 27305: 2000.0}
 STOP_FORCE_NEAREST_ABS_NS_SHOTS = {27286, 27304}
 EXP2_SIG_SPLIT_SMOOTH_NS_BY_SHOT = {27301: 10.0, 27302: 10.0}
 
@@ -420,9 +425,10 @@ RECOVERY_BAND_SIGMA = 1.96  # approx 95% band from fit residuals
 SHOW_CONF_BAND = False
 
 # --- current export (doc-style) ---
-K_T = 0.65
-K_V = 0.10
-TIME_SHIFT_S  = 0
+K_T = 0.112
+K_V = -0.060
+TIME_SCALE_S  = 0.64
+TIME_SHIFT_S  = 2.6e-7
 
 # plot zoom window padding (ns)
 ZOOM_LEFT_PAD_NS  = 200.0
@@ -5243,7 +5249,10 @@ def main(csv_file=None, out_dir=None):
                     else:
                         v2 = v_fit[split1_idx:exp2_stop_idx+1]
                     t2 = t2_abs - t2_abs[0]
-                    idx2 = np.linspace(0, len(t2)-1, min(SUBSAMPLE_RECOVERY_N, len(t2)), dtype=int)
+                    if shot_id in EXP2_FOUR_POINT_FIT_SHOTS:
+                        idx2 = np.unique(np.linspace(0, len(t2)-1, min(4, len(t2)), dtype=int))
+                    else:
+                        idx2 = np.linspace(0, len(t2)-1, min(SUBSAMPLE_RECOVERY_N, len(t2)), dtype=int)
                     y_end_target = float(v_diode[exp2_stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
                     p2, y2_0, y2_end, slope2_est, sig2 = fit_anchored_exp_endpoint_slope_fast(
                         t2[idx2], v2[idx2], seg_sign=rec_sign, tau_max_mult=3.5, y_end_target=y_end_target, slope_weight=0.60
@@ -5503,7 +5512,10 @@ def main(csv_file=None, out_dir=None):
                 else:
                     v2 = v_fit[split1_idx:exp2_stop_idx+2]
                 t2 = t2_abs - t2_abs[0]
-                idx2 = np.linspace(0, len(t2)-1, min(SUBSAMPLE_RECOVERY_N, len(t2)), dtype=int)
+                if shot_id in EXP2_FOUR_POINT_FIT_SHOTS:
+                    idx2 = np.unique(np.linspace(0, len(t2)-1, min(4, len(t2)), dtype=int))
+                else:
+                    idx2 = np.linspace(0, len(t2)-1, min(SUBSAMPLE_RECOVERY_N, len(t2)), dtype=int)
                 exp2_mode = "anchored_exp"
                 if (shot_id in STRETCHED_ENDPOINT_SHOTS):
                     y_end_target = float(v_diode[exp2_stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
@@ -5659,18 +5671,19 @@ def main(csv_file=None, out_dir=None):
                         # Keep current curve shapes, but guarantee the stitched handoff hits the true valley sample.
                         V_model[n1-1] = float(v_diode[split1_idx])
 
-                t2grid = np.linspace(0, float(t2[-1]), max(300, len(t2)))
-                if exp2_mode == "accel_endpoint":
-                    mean2 = exp2_accel_endpoint_np(t2grid, alpha2, y2_0, y2_end, float(t2[-1]))
-                elif exp2_mode == "stretched_endpoint":
-                    mean2 = stretched_exp_endpoint_np(t2grid, tau2, k2, y2_0, y2_end, float(t2[-1]))
-                else:
-                    mean2 = exp_anchor_np(t2grid, b2, tau2, y2_0)
-                band2 = RECOVERY_BAND_SIGMA * sig2
-                lo2 = mean2 - band2
-                hi2 = mean2 + band2
-                V_lo[n1-1:] = np.interp(t2, t2grid, lo2)
-                V_hi[n1-1:] = np.interp(t2, t2grid, hi2)
+                if exp2_mode not in {"append_tail_exp", "append_tail_slope_exp"}:
+                    t2grid = np.linspace(0, float(t2[-1]), max(300, len(t2)))
+                    if exp2_mode == "accel_endpoint":
+                        mean2 = exp2_accel_endpoint_np(t2grid, alpha2, y2_0, y2_end, float(t2[-1]))
+                    elif exp2_mode == "stretched_endpoint":
+                        mean2 = stretched_exp_endpoint_np(t2grid, tau2, k2, y2_0, y2_end, float(t2[-1]))
+                    else:
+                        mean2 = exp_anchor_np(t2grid, b2, tau2, y2_0)
+                    band2 = RECOVERY_BAND_SIGMA * sig2
+                    lo2 = mean2 - band2
+                    hi2 = mean2 + band2
+                    V_lo[n1-1:] = np.interp(t2, t2grid, lo2)
+                    V_hi[n1-1:] = np.interp(t2, t2grid, hi2)
 
     # Optional per-shot floor to suppress non-physical undershoot.
     if shot_id in MODEL_V_FLOOR_BY_SHOT:
@@ -6327,10 +6340,60 @@ def main(csv_file=None, out_dir=None):
             y2_fit_src = v_diode if shot_id in APPEND_SECOND_END_EXP_TAIL_FIT_RAW_SHOTS else v_fit
             y2_fit = np.interp(t2_fit_abs, t_diode, y2_fit_src)
             y2_fit[0] = float(V_model_plot[-1])
-            y2_fit[-1] = float(np.interp(t_endexp21_abs, t_diode, y2_fit_src))
-            p_endexp2, y_endexp2_fit0, sig_endexp2 = fit_anchored_exp_through_endpoint_fast(
-                t2_fit_abs - t_endexp20_abs, y2_fit, tau_max_mult=4.0, y_end_target=float(y2_fit[-1])
-            )
+            y2_end_target = APPEND_SECOND_END_EXP_TAIL_TARGET_V_BY_SHOT.get(shot_id, None)
+            if y2_end_target is None:
+                y2_end_target = float(np.interp(t_endexp21_abs, t_diode, y2_fit_src))
+            else:
+                y2_end_target = float(y2_end_target)
+            y2_fit[-1] = y2_end_target
+            t2_weighted_anchor_ns = APPEND_SECOND_END_EXP_TAIL_WEIGHTED_ANCHORS_ABS_NS_BY_SHOT.get(shot_id, ())
+            if len(t2_weighted_anchor_ns) > 0:
+                t2_weighted_anchor_abs = np.array(
+                    [float(new_t0_abs + _ns_to_s(float(tt))) for tt in t2_weighted_anchor_ns],
+                    dtype=float,
+                )
+                t2_weighted_anchor_abs = t2_weighted_anchor_abs[
+                    (t2_weighted_anchor_abs > t_endexp20_abs + 1e-12) & (t2_weighted_anchor_abs < t_endexp21_abs - 1e-12)
+                ]
+                y2_weighted_anchor = np.interp(t2_weighted_anchor_abs, t_diode, y2_fit_src) if len(t2_weighted_anchor_abs) > 0 else np.array([], dtype=float)
+            else:
+                t2_weighted_anchor_abs = np.array([], dtype=float)
+                y2_weighted_anchor = np.array([], dtype=float)
+            t2_anchor_abs_ns = APPEND_SECOND_END_EXP_TAIL_ANCHOR_ABS_NS_BY_SHOT.get(shot_id, None)
+            if t2_anchor_abs_ns is not None:
+                t2_anchor_abs = float(new_t0_abs + _ns_to_s(float(t2_anchor_abs_ns)))
+                y2_anchor_override = APPEND_SECOND_END_EXP_TAIL_ANCHOR_V_BY_SHOT.get(shot_id, None)
+                if y2_anchor_override is None:
+                    y2_anchor = float(np.interp(t2_anchor_abs, t_diode, y2_fit_src))
+                else:
+                    y2_anchor = float(y2_anchor_override)
+            else:
+                t2_anchor_abs = None
+                y2_anchor = None
+            if len(t2_weighted_anchor_abs) > 0:
+                p_endexp2, y_endexp2_fit0, _, sig_endexp2 = fit_anchored_exp_through_weighted_anchors_endpoint_fast(
+                    t2_fit_abs - t_endexp20_abs,
+                    y2_fit,
+                    t2_weighted_anchor_abs - t_endexp20_abs,
+                    y2_weighted_anchor,
+                    seg_sign=float(np.sign(y2_end_target - float(V_model_plot[-1]))),
+                    tau_max_mult=4.0,
+                    y_end_target=y2_end_target,
+                    anchor_weight=10.0,
+                )
+            elif (t2_anchor_abs is not None) and (t_endexp20_abs < t2_anchor_abs < t_endexp21_abs):
+                p_endexp2, y_endexp2_fit0, _, sig_endexp2 = fit_anchored_exp_through_exact_anchor_endpoint(
+                    t2_fit_abs - t_endexp20_abs,
+                    y2_fit,
+                    t2_anchor_abs - t_endexp20_abs,
+                    y2_anchor,
+                    seg_sign=float(np.sign(y2_end_target - float(V_model_plot[-1]))),
+                    y_end_target=y2_end_target,
+                )
+            else:
+                p_endexp2, y_endexp2_fit0, sig_endexp2 = fit_anchored_exp_through_endpoint_fast(
+                    t2_fit_abs - t_endexp20_abs, y2_fit, tau_max_mult=4.0, y_end_target=y2_end_target
+                )
             b_endexp2, tau_endexp2 = map(float, p_endexp2)
             tail2_model_abs = np.concatenate((tail2_abs, [t_endexp21_abs]))
             tail2_model_vals = exp_anchor_np(tail2_model_abs - t_endexp20_abs, b_endexp2, tau_endexp2, y_endexp2_fit0)
@@ -6344,6 +6407,8 @@ def main(csv_file=None, out_dir=None):
             print("Appended second end exponential fit:")
             print(f"  end_ns={float(_s_to_ns(t_endexp21_abs - new_t0_abs)):.3f}")
             print(f"  end_v ={float(y2_fit[-1]):.6f}")
+            if len(t2_weighted_anchor_abs) > 0:
+                print(f"  anchor_ns={tuple(float(_s_to_ns(tt - new_t0_abs)) for tt in t2_weighted_anchor_abs)}")
 
     if (shot_id in APPEND_QUADRATIC_TAIL_SHOTS) and len(t_model_abs) >= 1:
         t_quad0_abs = float(t_model_abs[-1])
@@ -6489,6 +6554,18 @@ def main(csv_file=None, out_dir=None):
             ))
             two_exp_tail_active = True
 
+    if shot_id == 27294 and len(V_model_plot) > 2:
+        valley_idx_model = int(np.argmin(V_model_plot))
+        zero_hits_model = np.where(V_model_plot[valley_idx_model:] >= 0.0)[0]
+        if len(zero_hits_model) > 0:
+            end_idx_model = int(valley_idx_model + zero_hits_model[0])
+            t_model_abs = t_model_abs[:end_idx_model + 1]
+            t_model_ns = t_model_ns[:end_idx_model + 1]
+            V_model_plot = V_model_plot[:end_idx_model + 1].copy()
+            V_lo_plot = V_lo_plot[:end_idx_model + 1]
+            V_hi_plot = V_hi_plot[:end_idx_model + 1]
+            V_model_plot[-1] = 0.0
+
     mci = np.isfinite(V_lo_plot) & np.isfinite(V_hi_plot)
     plot_modeled_only_labels = (shot_id in PLOT_MODELED_ONLY_LABEL_SHOTS)
     hide_conf_band = (not SHOW_CONF_BAND) or (shot_id in PLOT_HIDE_CONF_BAND_SHOTS)
@@ -6578,9 +6655,19 @@ def main(csv_file=None, out_dir=None):
     # EXPORT current pulse TXT (2 cols): time(s) current(A)
     # I(t)=K_T*t + K_V*V(t)
     # =============================
-    t_out = (t_model_abs - new_t0_abs) + TIME_SHIFT_S
+    t_out = (t_model_abs - new_t0_abs) * TIME_SCALE_S + TIME_SHIFT_S
     V_out = V_model_plot
     I_out = K_T * t_out + K_V * V_out
+
+    if shot_id == 27294 and len(V_out) > 2:
+        valley_idx_out = int(np.argmin(V_out))
+        zero_hits = np.where(V_out[valley_idx_out:] >= 0.0)[0]
+        if len(zero_hits) > 0:
+            end_idx = int(valley_idx_out + zero_hits[0])
+            t_out = t_out[:end_idx + 1]
+            V_out = V_out[:end_idx + 1]
+            I_out = I_out[:end_idx + 1].copy()
+            I_out[-1] = 0.0
 
     export_i_txt = os.path.join(out_dir, "export_current_pulse.txt")
     with open(export_i_txt, "w") as f:
@@ -7051,6 +7138,12 @@ def main(csv_file=None, out_dir=None):
         print(f"    V(t) = {y2a_end:.9e} + ({y2a_0:.9e} - {y2a_end:.9e}) * exp(-((t - {t1_boundary:.9e}) / {tau2a:.9e})^{k2a:.9e})")
         print(f"  if {t2b_boundary:.9e} < t <= {t_model_end:.9e}:")
         print(f"    V(t) = dip-rebound bi-exponential from {y2b_0:.9e} with A={A2b:.9e}, tau_fast={tf2b:.9e}, tau_slow={ts2b:.9e}, endpoint pinned to diode")
+    elif 'exp2_mode' in locals() and exp2_mode == "two_stage_stretched" and ('split2_idx' in locals()):
+        t2b_boundary = float(t_diode[split2_idx])
+        print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
+        print(f"    V(t) = {y2a_end:.9e} + ({y2a_0:.9e} - {y2a_end:.9e}) * exp(-((t - {t1_boundary:.9e}) / {tau2a:.9e})^{k2a:.9e})")
+        print(f"  if {t2b_boundary:.9e} < t <= {t_model_end:.9e}:")
+        print(f"    V(t) = {y2b_end:.9e} + ({y2b_0:.9e} - {y2b_end:.9e}) * exp(-((t - {t2b_boundary:.9e}) / {tau2b:.9e})^{k2b:.9e})")
     elif 'exp2_mode' in locals() and exp2_mode == "two_stage_exp_tail" and ('t2b_boundary' in locals()):
         print(f"  if {t1_boundary:.9e} < t <= {t2b_boundary:.9e}:")
         print(f"    V(t) = {y2a_end:.9e} + ({y2a_0:.9e} - {y2a_end:.9e}) * exp(-((t - {t1_boundary:.9e}) / {tau2a:.9e})^{k2a:.9e})")
@@ -7061,6 +7154,8 @@ def main(csv_file=None, out_dir=None):
         if ('alpha2' in locals()) and ('y2_end' in locals()) and ('exp2_mode' in locals()) and exp2_mode == "accel_endpoint":
             print(f"    V(t) = {y2_0:.9e} + ({y2_end:.9e} - {y2_0:.9e}) * "
                   f"((exp({alpha2:.9e} * (t - {t1_boundary:.9e}) / ({t_model_end:.9e} - {t1_boundary:.9e})) - 1) / (exp({alpha2:.9e}) - 1))")
+        elif ('exp2_mode' in locals()) and exp2_mode == "stretched_endpoint":
+            print(f"    V(t) = {y2_end:.9e} + ({y2_0:.9e} - {y2_end:.9e}) * exp(-((t - {t1_boundary:.9e}) / {tau2:.9e})^{k2:.9e})")
         else:
             print(f"    V(t) = {b2:.9e} + ({y2_0:.9e} - {b2:.9e}) * exp(-(t - {t1_boundary:.9e}) / {tau2:.9e})")
 
