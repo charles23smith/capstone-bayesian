@@ -58,8 +58,9 @@ T0_SHIFT_NS  = 100.0
 T0_SHIFT_NS_BY_SHOT = {}
 MODEL_LEADIN_START_SHIFT_NS_BY_SHOT = {}
 MODEL_NO_LEADIN_SHOTS = set()
-EXP1_LINEAR_ONLY_LEADIN_SHOTS = {27301, 27302}
-EXP1_LINEAR_ONLY_END_ABS_NS_BY_SHOT = {27301: 365.0, 27302: 200.0}
+EXP1_LINEAR_ONLY_LEADIN_SHOTS = {27300, 27301, 27302}
+EXP1_LINEAR_ONLY_END_ABS_NS_BY_SHOT = {27300: 75.0, 27301: 365.0, 27302: 200.0}
+EXP1_LINEAR_RAMP_LEADIN_SHOTS = {27300}
 EXP1_LINEAR_TO_POSITIVE_EXP_SHOTS = set()
 EXP1_LINEAR_TO_POSITIVE_V_BY_SHOT = {27301: 0.0}
 EXP1_LINEAR_TO_POSITIVE_SMOOTH_NS_BY_SHOT = {27301: 6.0}
@@ -83,20 +84,33 @@ APPEND_LINEAR_THEN_SIGMOID_ANCHOR_ABS_NS_BY_SHOT = {
 APPEND_LINEAR_THEN_SIGMOID_K_MAX_FRAC_BY_SHOT = {27304: 0.20, 27305: 0.24}
 APPEND_LINEAR_SIGMOID_LINEAR_SHOTS = {27304, 27305}
 APPEND_LINEAR_SIGMOID_LINEAR_MID_ABS_NS_BY_SHOT = {27304: (1010.0, 1290.0), 27305: (1380.0, 1500.0)}
-APPEND_END_EXP_TAIL_SHOTS = {27276, 27288, 27289, 27299, 27302}
-APPEND_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27276: 293.174, 27288: 180.0, 27289: 258.901, 27299: 144.272, 27302: 600.0}
+APPEND_END_EXP_TAIL_SHOTS = {27274, 27276, 27288, 27289, 27297, 27299, 27300, 27302}
+APPEND_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27274: 256.3, 27276: 293.174, 27288: 180.0, 27289: 258.901, 27297: 184.326, 27299: 144.272, 27300: 107.0, 27302: 600.0}
 APPEND_END_EXP_TAIL_TARGET_V_BY_SHOT = {}
 APPEND_END_EXP_TAIL_ANCHOR_ABS_NS_BY_SHOT = {}
 APPEND_END_EXP_TAIL_TARGET_V_ANCHORS_BY_SHOT = {27299: (0.5, 0.75, 1.25)}
 APPEND_END_EXP_TAIL_ANCHOR_MIN_WINDOW_NS_BY_SHOT = {}
-APPEND_END_EXP_TAIL_FIT_RAW_SHOTS = {27276, 27288, 27289, 27299}
-APPEND_SECOND_END_EXP_TAIL_SHOTS = {27276, 27299}
-APPEND_SECOND_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27276: 343.174, 27299: 210.0}
+APPEND_END_EXP_TAIL_FIT_RAW_SHOTS = {27274, 27276, 27288, 27289, 27297, 27299, 27300}
+APPEND_SECOND_END_EXP_TAIL_SHOTS = {27274, 27276, 27299, 27300}
+APPEND_SECOND_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27274: 271.8, 27276: 343.174, 27299: 210.0, 27300: 127.0}
 APPEND_SECOND_END_EXP_TAIL_TARGET_V_BY_SHOT = {27276: -1.5}
 APPEND_SECOND_END_EXP_TAIL_ANCHOR_ABS_NS_BY_SHOT = {}
 APPEND_SECOND_END_EXP_TAIL_ANCHOR_V_BY_SHOT = {}
 APPEND_SECOND_END_EXP_TAIL_WEIGHTED_ANCHORS_ABS_NS_BY_SHOT = {}
-APPEND_SECOND_END_EXP_TAIL_FIT_RAW_SHOTS = {27276, 27299}
+APPEND_SECOND_END_EXP_TAIL_FIT_RAW_SHOTS = {27274, 27276, 27299, 27300}
+APPEND_END_LINEAR_TAIL_SHOTS = {27297, 27300}
+APPEND_END_LINEAR_TAIL_END_ABS_NS_BY_SHOT = {27297: 224.326, 27300: 267.0}
+APPEND_END_LINEAR_TAIL_FIT_RAW_SHOTS = {27297, 27300}
+APPEND_SECOND_END_LINEAR_TAIL_SHOTS = {27297}
+APPEND_SECOND_END_LINEAR_TAIL_END_ABS_NS_BY_SHOT = {27297: 236.326}
+APPEND_SECOND_END_LINEAR_TAIL_FIT_RAW_SHOTS = {27297}
+APPEND_THIRD_END_EXP_TAIL_SHOTS = {27299, 27300}
+APPEND_THIRD_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27299: 250.0, 27300: 450.0}
+APPEND_THIRD_END_EXP_TAIL_WEIGHTED_ANCHORS_ABS_NS_BY_SHOT = {27300: (300.0, 340.0, 390.0, 430.0)}
+APPEND_THIRD_END_EXP_TAIL_FIT_RAW_SHOTS = {27299, 27300}
+APPEND_FOURTH_END_EXP_TAIL_SHOTS = {27299, 27300}
+APPEND_FOURTH_END_EXP_TAIL_END_ABS_NS_BY_SHOT = {27299: 274.41263, 27300: 500.0}
+APPEND_FOURTH_END_EXP_TAIL_FIT_RAW_SHOTS = {27299, 27300}
 APPEND_QUADRATIC_TAIL_SHOTS = {27288, 27298}
 APPEND_QUADRATIC_TAIL_END_ABS_NS_BY_SHOT = {27288: 268.0, 27298: 285.0}
 APPEND_QUADRATIC_TAIL_ANCHOR_ABS_NS_BY_SHOT = {27288: (230.0, 268.0), 27298: (255.0, 270.0, 285.0)}
@@ -125,6 +139,7 @@ ONSET_ZERO_DROP_DELTA_V_BY_SHOT.update({27286: 0.18})
 ONSET_FIRST_RISE_ABOVE_V_BY_SHOT = {27275: 0.0}
 ONSET_FIRST_RISE_ABOVE_SMOOTH_NS_BY_SHOT = {27275: 6.0}
 ONSET_FIRST_RISE_ABOVE_SUSTAIN_N_BY_SHOT = {27275: 4}
+ONSET_FORCE_ABS_NS_BY_SHOT = {27300: 75.0}
 
 # --- peak selection ---
 PEAK_SEARCH_NS = 1000.0
@@ -135,7 +150,7 @@ PEAK_ABS_WINDOW_NS_BY_SHOT = {27297: (140.0, 150.0)}
 PEAK_SMOOTH_SIGMOID_NS = 0.0
 FOUR_EXP_SHOTS = set()
 FORCE_TWO_SEG_SIGMOID_SHOTS = set()
-FORCE_TWO_SEG_EXP_SHOTS = {27298, 27304, 27305}
+FORCE_TWO_SEG_EXP_SHOTS = {27298, 27300, 27304, 27305}
 START_AT_PCD_CROSS_SHOTS = {27298}
 
 # --- stop selection (next oscillation start) ---
@@ -241,8 +256,8 @@ SPLIT1_DISABLE_PEAK_ANCHOR_SHOTS = {27282, 27283}
 SPLIT1_FORCE_AT_PEAK_SHOTS = {27287, 27289, 27290, 27291, 27295, 27296, 27297, 27298, 27302, 27304, 27305}
 SPLIT1_SKIP_STRICT_FALLBACK_SHOTS = {27287}
 SPLIT1_POS_TO_NEG_SLOPE_SHOTS = set()
-SPLIT1_SHIFT_LEFT_NS_BY_SHOT = {27277: -20.0, 27278: -20.0, 27300: 12.0, 27304: 40.0, 27307: -70.0}
-SPLIT1_FORCE_ABS_NS_BY_SHOT = {27277: 200.0, 27278: 190.0, 27279: 175.0, 27280: 200.0, 27282: 201.0, 27298: 100.2, 27299: 80.0}
+SPLIT1_SHIFT_LEFT_NS_BY_SHOT = {27277: -20.0, 27278: -20.0, 27304: 40.0, 27307: -70.0}
+SPLIT1_FORCE_ABS_NS_BY_SHOT = {27277: 200.0, 27278: 190.0, 27279: 175.0, 27280: 200.0, 27282: 201.0, 27298: 100.2, 27299: 80.0, 27300: 87.0}
 SPLIT1_FORCE_ABS_MIN_SHOTS = {27296}
 ONSET_FLUCT_START_WINDOWS_NS_BY_SHOT = {27297: (80.0, 130.0), 27299: (0.0, 180.0)}
 ONSET_SHIFT_NS_BY_SHOT = {27282: 10.0, 27299: 0.0, 27304: -1.0}
@@ -264,9 +279,9 @@ EXP1_ENDPOINT_CONSTRAINED_SHOTS = {27278, 27279, 27280, 27282, 27283, 27286, 272
 EXP1_ENDPOINT_TAU_MAX_MULT_BY_SHOT = {27286: 0.9, 27287: 1.0, 27289: 1.2, 27296: 1.0, 27299: 1.1}
 EXP1_ENDPOINT_RAW_TARGET_SHOTS = {27278, 27279, 27280, 27287, 27289, 27296}
 EXP1_START_SHIFT_NS_BY_SHOT = {27282: 50.0, 27298: -13.0}
+EXP1_START_ABS_NS_BY_SHOT = {27299: 210.0}
 EXP1_START_BELOW_ZERO_V_BY_SHOT = {27299: -0.05, 27305: -0.05}
 EXP1_START_BELOW_ZERO_SMOOTH_NS_BY_SHOT = {27299: 8.0, 27305: 8.0}
-EXP1_START_ABS_NS_BY_SHOT = {27299: 210.0}
 EXP1_TWO_EXP_LEADIN_SHOTS = set()
 EXP1_ONE_EXP_LEADIN_SHOTS = set()
 EXP1_DISCONNECTED_START_SHOTS = set()
@@ -278,8 +293,8 @@ EXP1_START_V_BY_SHOT = {}
 EXP1_ENDPOINT_Y_OFFSET_BY_SHOT = {27278: 0.0, 27279: 0.0}
 EXP1_MIN_ANCHOR_V_BY_SHOT = {27279: -2.1}
 EXP1_LEVEL_ANCHOR_V_BY_SHOT = {27282: -3.4}
-EXP1_ONLY_SHOTS = {27299}
-TRIM_MODEL_AFTER_EXP1_SHOTS = {27276, 27288, 27299}
+EXP1_ONLY_SHOTS = {27299, 27300}
+TRIM_MODEL_AFTER_EXP1_SHOTS = {27276, 27288, 27299, 27300}
 EXP1_LINEAR_THEN_EXP_SHOTS = {27279}
 EXP1_LINEAR_END_ABS_NS_BY_SHOT = {27279: 205.0}
 EXP1_EXP2_END_ABS_NS_BY_SHOT = {27279: 340.0}
@@ -327,7 +342,7 @@ EXP2_TWO_STAGE_TARGET_SHIFT_SAMPLES_BY_SHOT = {27283: -2}
 EXP2_SIGMOID_ONLY_SHOTS = set()
 EXP2_SIGMOID_PURE_SHOTS = set()
 EXP2_SIGMOID_ANCHOR_SHOTS = set()
-STOP_SHIFT_NS_BY_SHOT = {}
+STOP_SHIFT_NS_BY_SHOT = {27274: -48.0}
 SIGMOID_ONLY_FORCE_SPLIT1_NEAR_ONSET_SHOTS = set()
 EXP2_LINEAR_THEN_EXP_SHOTS = {27298, 27300, 27306, 27307}
 EXP2_LINEAR_SPLIT_ABS_NS_BY_SHOT = {27298: 124.7, 27300: 240.0, 27306: -25000.0, 27307: 36000.0}
@@ -3582,6 +3597,10 @@ def main(csv_file=None, out_dir=None):
     if shot_id in ONSET_FORCE_T0_SHOTS:
         onset_idx = int(np.argmin(np.abs(t_rel_ns - 0.0)))
         onset_mode = "forced_t0"
+    if shot_id in ONSET_FORCE_ABS_NS_BY_SHOT:
+        t_force_ns = float(ONSET_FORCE_ABS_NS_BY_SHOT[shot_id])
+        onset_idx = int(np.argmin(np.abs(t_rel_ns - t_force_ns)))
+        onset_mode = "forced_abs_ns"
     if shot_id in ONSET_FIRST_RISE_ABOVE_V_BY_SHOT:
         v_thr = float(ONSET_FIRST_RISE_ABOVE_V_BY_SHOT[shot_id])
         sm_ns = float(ONSET_FIRST_RISE_ABOVE_SMOOTH_NS_BY_SHOT.get(shot_id, max(6.0, fit_smooth_ns)))
@@ -5708,12 +5727,20 @@ def main(csv_file=None, out_dir=None):
                 t_fit_start_abs,
             ))
             flat_abs = prefix_abs[prefix_abs < t_exp1_start_abs]
+            if shot_id in EXP1_LINEAR_RAMP_LEADIN_SHOTS:
+                fit_start_v = float(V_model[0]) if len(V_model) > 0 else 0.0
+                dt_ramp = max(t_exp1_start_abs - model_leadin_start_abs, 1e-18)
+                flat_vals = fit_start_v * ((flat_abs - model_leadin_start_abs) / dt_ramp)
+                end_val = fit_start_v
+            else:
+                flat_vals = np.zeros(len(flat_abs), dtype=float)
+                end_val = 0.0
             t_model_abs = np.concatenate(([model_leadin_start_abs], flat_abs, [t_exp1_start_abs], t_seg_abs))
             t_model_ns = _s_to_ns(t_model_abs - new_t0_abs)
             V_model_plot = np.concatenate((
                 np.array([0.0], dtype=float),
-                np.zeros(len(flat_abs), dtype=float),
-                np.array([0.0], dtype=float),
+                np.asarray(flat_vals, dtype=float),
+                np.array([end_val], dtype=float),
                 V_model,
             ))
             n_pre = 2 + len(flat_abs)
@@ -6409,6 +6436,152 @@ def main(csv_file=None, out_dir=None):
             print(f"  end_v ={float(y2_fit[-1]):.6f}")
             if len(t2_weighted_anchor_abs) > 0:
                 print(f"  anchor_ns={tuple(float(_s_to_ns(tt - new_t0_abs)) for tt in t2_weighted_anchor_abs)}")
+
+    append_end_linear_tail_active = False
+    t_endlin0_abs = None
+    t_endlin1_abs = None
+    if (shot_id in APPEND_END_LINEAR_TAIL_SHOTS) and len(t_model_abs) >= 1:
+        t_endlin0_abs = float(t_model_abs[-1])
+        t_endlin1_abs = float(new_t0_abs + _ns_to_s(APPEND_END_LINEAR_TAIL_END_ABS_NS_BY_SHOT[shot_id]))
+        if t_endlin1_abs > t_endlin0_abs + 1e-12:
+            y_lin_src = v_diode if shot_id in APPEND_END_LINEAR_TAIL_FIT_RAW_SHOTS else v_fit
+            y_endlin0 = float(V_model_plot[-1])
+            y_endlin1 = float(np.interp(t_endlin1_abs, t_diode, y_lin_src))
+            tail_lin_abs = t_diode[(t_diode > t_endlin0_abs) & (t_diode <= t_endlin1_abs)]
+            if (len(tail_lin_abs) == 0) or (tail_lin_abs[-1] < t_endlin1_abs - 1e-12):
+                tail_lin_abs = np.concatenate((tail_lin_abs, np.array([t_endlin1_abs], dtype=float)))
+            dt_lin = max(t_endlin1_abs - t_endlin0_abs, 1e-18)
+            tail_lin_vals = y_endlin0 + (y_endlin1 - y_endlin0) * ((tail_lin_abs - t_endlin0_abs) / dt_lin)
+            y_fit_lin_abs = np.concatenate((np.array([t_endlin0_abs], dtype=float), tail_lin_abs))
+            y_fit_lin = np.concatenate((np.array([y_endlin0], dtype=float), np.interp(tail_lin_abs, t_diode, y_lin_src)))
+            sig_lin = float(np.std(y_fit_lin[1:] - tail_lin_vals) + 1e-9) if len(tail_lin_vals) > 0 else 1e-9
+            t_model_abs = np.concatenate((t_model_abs, tail_lin_abs))
+            t_model_ns = _s_to_ns(t_model_abs - new_t0_abs)
+            V_model_plot = np.concatenate((V_model_plot, tail_lin_vals))
+            V_lo_plot = np.concatenate((V_lo_plot, tail_lin_vals - RECOVERY_BAND_SIGMA * sig_lin))
+            V_hi_plot = np.concatenate((V_hi_plot, tail_lin_vals + RECOVERY_BAND_SIGMA * sig_lin))
+            append_end_linear_tail_active = True
+            print("Appended end linear tail fit:")
+            print(f"  start_ns={float(_s_to_ns(t_endlin0_abs - new_t0_abs)):.3f}, start_v={y_endlin0:.6f}")
+            print(f"  end_ns  ={float(_s_to_ns(t_endlin1_abs - new_t0_abs)):.3f}, end_v={y_endlin1:.6f}")
+
+    append_second_end_linear_tail_active = False
+    t_endlin20_abs = None
+    t_endlin21_abs = None
+    if (shot_id in APPEND_SECOND_END_LINEAR_TAIL_SHOTS) and len(t_model_abs) >= 1:
+        t_endlin20_abs = float(t_model_abs[-1])
+        t_endlin21_abs = float(new_t0_abs + _ns_to_s(APPEND_SECOND_END_LINEAR_TAIL_END_ABS_NS_BY_SHOT[shot_id]))
+        if t_endlin21_abs > t_endlin20_abs + 1e-12:
+            y_lin2_src = v_diode if shot_id in APPEND_SECOND_END_LINEAR_TAIL_FIT_RAW_SHOTS else v_fit
+            y_endlin20 = float(V_model_plot[-1])
+            y_endlin21 = float(np.interp(t_endlin21_abs, t_diode, y_lin2_src))
+            tail_lin2_abs = t_diode[(t_diode > t_endlin20_abs) & (t_diode <= t_endlin21_abs)]
+            if (len(tail_lin2_abs) == 0) or (tail_lin2_abs[-1] < t_endlin21_abs - 1e-12):
+                tail_lin2_abs = np.concatenate((tail_lin2_abs, np.array([t_endlin21_abs], dtype=float)))
+            dt_lin2 = max(t_endlin21_abs - t_endlin20_abs, 1e-18)
+            tail_lin2_vals = y_endlin20 + (y_endlin21 - y_endlin20) * ((tail_lin2_abs - t_endlin20_abs) / dt_lin2)
+            y_fit_lin2 = np.interp(tail_lin2_abs, t_diode, y_lin2_src) if len(tail_lin2_abs) > 0 else np.array([], dtype=float)
+            sig_lin2 = float(np.std(y_fit_lin2 - tail_lin2_vals) + 1e-9) if len(tail_lin2_vals) > 0 else 1e-9
+            t_model_abs = np.concatenate((t_model_abs, tail_lin2_abs))
+            t_model_ns = _s_to_ns(t_model_abs - new_t0_abs)
+            V_model_plot = np.concatenate((V_model_plot, tail_lin2_vals))
+            V_lo_plot = np.concatenate((V_lo_plot, tail_lin2_vals - RECOVERY_BAND_SIGMA * sig_lin2))
+            V_hi_plot = np.concatenate((V_hi_plot, tail_lin2_vals + RECOVERY_BAND_SIGMA * sig_lin2))
+            append_second_end_linear_tail_active = True
+            print("Appended second end linear tail fit:")
+            print(f"  start_ns={float(_s_to_ns(t_endlin20_abs - new_t0_abs)):.3f}, start_v={y_endlin20:.6f}")
+            print(f"  end_ns  ={float(_s_to_ns(t_endlin21_abs - new_t0_abs)):.3f}, end_v={y_endlin21:.6f}")
+
+    append_third_end_exp_tail_active = False
+    t_endexp30_abs = None
+    t_endexp31_abs = None
+    if (shot_id in APPEND_THIRD_END_EXP_TAIL_SHOTS) and len(t_model_abs) >= 1:
+        t_endexp30_abs = float(t_model_abs[-1])
+        t_endexp31_abs = float(new_t0_abs + _ns_to_s(APPEND_THIRD_END_EXP_TAIL_END_ABS_NS_BY_SHOT[shot_id]))
+        if t_endexp31_abs > t_endexp30_abs + 1e-12:
+            tail3_mask = (t_diode > t_endexp30_abs) & (t_diode < t_endexp31_abs)
+            tail3_abs = t_diode[tail3_mask]
+            t3_fit_abs = np.concatenate(([t_endexp30_abs], tail3_abs, [t_endexp31_abs]))
+            y3_fit_src = v_diode if shot_id in APPEND_THIRD_END_EXP_TAIL_FIT_RAW_SHOTS else v_fit
+            y3_fit = np.interp(t3_fit_abs, t_diode, y3_fit_src)
+            y3_fit[0] = float(V_model_plot[-1])
+            y3_end_target = float(np.interp(t_endexp31_abs, t_diode, y3_fit_src))
+            y3_fit[-1] = y3_end_target
+            t3_weighted_anchor_ns = APPEND_THIRD_END_EXP_TAIL_WEIGHTED_ANCHORS_ABS_NS_BY_SHOT.get(shot_id, ())
+            if len(t3_weighted_anchor_ns) > 0:
+                t3_weighted_anchor_abs = np.array(
+                    [float(new_t0_abs + _ns_to_s(float(tt))) for tt in t3_weighted_anchor_ns],
+                    dtype=float,
+                )
+                t3_weighted_anchor_abs = t3_weighted_anchor_abs[
+                    (t3_weighted_anchor_abs > t_endexp30_abs + 1e-12) & (t3_weighted_anchor_abs < t_endexp31_abs - 1e-12)
+                ]
+                y3_weighted_anchor = np.interp(t3_weighted_anchor_abs, t_diode, y3_fit_src) if len(t3_weighted_anchor_abs) > 0 else np.array([], dtype=float)
+            else:
+                t3_weighted_anchor_abs = np.array([], dtype=float)
+                y3_weighted_anchor = np.array([], dtype=float)
+            if len(t3_weighted_anchor_abs) > 0:
+                p_endexp3, y_endexp3_fit0, _, sig_endexp3 = fit_anchored_exp_through_weighted_anchors_endpoint_fast(
+                    t3_fit_abs - t_endexp30_abs,
+                    y3_fit,
+                    t3_weighted_anchor_abs - t_endexp30_abs,
+                    y3_weighted_anchor,
+                    seg_sign=float(np.sign(y3_end_target - float(V_model_plot[-1]))),
+                    tau_max_mult=4.0,
+                    y_end_target=y3_end_target,
+                    anchor_weight=10.0,
+                )
+            else:
+                p_endexp3, y_endexp3_fit0, sig_endexp3 = fit_anchored_exp_through_endpoint_fast(
+                    t3_fit_abs - t_endexp30_abs, y3_fit, tau_max_mult=4.0, y_end_target=y3_end_target
+                )
+            b_endexp3, tau_endexp3 = map(float, p_endexp3)
+            tail3_model_abs = np.concatenate((tail3_abs, [t_endexp31_abs]))
+            tail3_model_vals = exp_anchor_np(tail3_model_abs - t_endexp30_abs, b_endexp3, tau_endexp3, y_endexp3_fit0)
+
+            t_model_abs = np.concatenate((t_model_abs, tail3_model_abs))
+            t_model_ns = _s_to_ns(t_model_abs - new_t0_abs)
+            V_model_plot = np.concatenate((V_model_plot, tail3_model_vals))
+            V_lo_plot = np.concatenate((V_lo_plot, tail3_model_vals - RECOVERY_BAND_SIGMA * sig_endexp3))
+            V_hi_plot = np.concatenate((V_hi_plot, tail3_model_vals + RECOVERY_BAND_SIGMA * sig_endexp3))
+            append_third_end_exp_tail_active = True
+            print("Appended third end exponential fit:")
+            print(f"  start_ns={float(_s_to_ns(t_endexp30_abs - new_t0_abs)):.3f}, start_v={float(y3_fit[0]):.6f}")
+            print(f"  end_ns  ={float(_s_to_ns(t_endexp31_abs - new_t0_abs)):.3f}, end_v={float(y3_end_target):.6f}")
+            if len(t3_weighted_anchor_abs) > 0:
+                print(f"  anchor_ns={tuple(float(_s_to_ns(tt - new_t0_abs)) for tt in t3_weighted_anchor_abs)}")
+
+    append_fourth_end_exp_tail_active = False
+    t_endexp40_abs = None
+    t_endexp41_abs = None
+    if (shot_id in APPEND_FOURTH_END_EXP_TAIL_SHOTS) and len(t_model_abs) >= 1:
+        t_endexp40_abs = float(t_model_abs[-1])
+        t_endexp41_abs = float(new_t0_abs + _ns_to_s(APPEND_FOURTH_END_EXP_TAIL_END_ABS_NS_BY_SHOT[shot_id]))
+        if t_endexp41_abs > t_endexp40_abs + 1e-12:
+            tail4_mask = (t_diode > t_endexp40_abs) & (t_diode < t_endexp41_abs)
+            tail4_abs = t_diode[tail4_mask]
+            t4_fit_abs = np.concatenate(([t_endexp40_abs], tail4_abs, [t_endexp41_abs]))
+            y4_fit_src = v_diode if shot_id in APPEND_FOURTH_END_EXP_TAIL_FIT_RAW_SHOTS else v_fit
+            y4_fit = np.interp(t4_fit_abs, t_diode, y4_fit_src)
+            y4_fit[0] = float(V_model_plot[-1])
+            y4_end_target = float(np.interp(t_endexp41_abs, t_diode, y4_fit_src))
+            y4_fit[-1] = y4_end_target
+            p_endexp4, y_endexp4_fit0, sig_endexp4 = fit_anchored_exp_through_endpoint_fast(
+                t4_fit_abs - t_endexp40_abs, y4_fit, tau_max_mult=4.0, y_end_target=y4_end_target
+            )
+            b_endexp4, tau_endexp4 = map(float, p_endexp4)
+            tail4_model_abs = np.concatenate((tail4_abs, [t_endexp41_abs]))
+            tail4_model_vals = exp_anchor_np(tail4_model_abs - t_endexp40_abs, b_endexp4, tau_endexp4, y_endexp4_fit0)
+
+            t_model_abs = np.concatenate((t_model_abs, tail4_model_abs))
+            t_model_ns = _s_to_ns(t_model_abs - new_t0_abs)
+            V_model_plot = np.concatenate((V_model_plot, tail4_model_vals))
+            V_lo_plot = np.concatenate((V_lo_plot, tail4_model_vals - RECOVERY_BAND_SIGMA * sig_endexp4))
+            V_hi_plot = np.concatenate((V_hi_plot, tail4_model_vals + RECOVERY_BAND_SIGMA * sig_endexp4))
+            append_fourth_end_exp_tail_active = True
+            print("Appended fourth end exponential fit:")
+            print(f"  start_ns={float(_s_to_ns(t_endexp40_abs - new_t0_abs)):.3f}, start_v={float(y4_fit[0]):.6f}")
+            print(f"  end_ns  ={float(_s_to_ns(t_endexp41_abs - new_t0_abs)):.3f}, end_v={float(y4_end_target):.6f}")
 
     if (shot_id in APPEND_QUADRATIC_TAIL_SHOTS) and len(t_model_abs) >= 1:
         t_quad0_abs = float(t_model_abs[-1])
