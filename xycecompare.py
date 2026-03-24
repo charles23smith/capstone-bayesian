@@ -5,14 +5,23 @@ from matplotlib.ticker import EngFormatter, MaxNLocator
 from pathlib import Path
 
 DATA_DIR = Path(r"E:\CapstoneXyce")
-SIM_FILE = DATA_DIR / "shot27294.cir.prn"
-EXP_FILE = DATA_DIR / "LFXR_Lovejoy_Sept2021_27294.csv"
+SIM_FILE = DATA_DIR / "shot27296.cir.prn"
+EXP_FILE = DATA_DIR / "LFXR_Lovejoy_Sept2021_27296.csv"
+
+
+def infer_shot_label() -> str:
+    for path in (SIM_FILE, EXP_FILE):
+        digits = "".join(ch for ch in path.stem if ch.isdigit())
+        if digits:
+            return digits
+    return "unknown"
 
 # =========================
 # Load Xyce simulation
 # =========================
 
 def main():
+    shot_label = infer_shot_label()
     sim = pd.read_csv(
         SIM_FILE,
         sep=r"\s+",
@@ -53,27 +62,30 @@ def main():
     print(f"RMSE = {rmse:.6e}")
 
     # =========================
-    # Plot overlay
+    # Plot single overlay
     # =========================
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(8.5, 6.0))
 
-    ax.plot(t_exp, v_exp, label="Experiment", alpha=0.6)
-    ax.plot(t_sim, v_sim, label="Simulation", linewidth=2)
+    ax.plot(t_exp, v_exp, color="#bfbfbf", linewidth=1.8, label="Experiment")
+    ax.plot(t_sim, v_sim, color="#1b9e77", linewidth=2.0, label="Simulation")
 
-    ax.set_title("Shot 27294: Experiment vs Simulation")
     ax.set_xlabel("Time (s)")
-    ax.set_ylabel("Voltage (V)")
-    ax.legend()
-    ax.grid(True)
+    ax.set_ylabel("Voltage across diode (V)")
+    ax.legend(loc="upper right", frameon=False)
+    ax.grid(True, alpha=0.25)
 
     ax.xaxis.set_major_formatter(EngFormatter(unit="s"))
     ax.yaxis.set_major_formatter(EngFormatter(unit="V"))
-    ax.xaxis.set_major_locator(MaxNLocator(6))
-    ax.yaxis.set_major_locator(MaxNLocator(6))
+    ax.xaxis.set_major_locator(MaxNLocator(7))
+    ax.yaxis.set_major_locator(MaxNLocator(8))
+    ax.set_xlim(0.0, 3.0e-6)
+    ax.set_ylim(0.0, 2.0)
 
     plt.tight_layout()
-    plt.savefig("shot27294_overlay.png", dpi=300)
-    print("Overlay plot saved as shot27294_overlay.png")
+    out_path = f"shot{shot_label}_overlay.png"
+    plt.savefig(out_path, dpi=300)
+    print(f"Overlay plot saved as {out_path}")
+    plt.close(fig)
 
 
 if __name__ == "__main__":
