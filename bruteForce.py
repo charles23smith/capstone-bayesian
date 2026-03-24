@@ -38,6 +38,7 @@ from scipy.optimize import curve_fit
 CSV_FILE = "data/27271_data.csv"
 OUT_DIR  = "diode_fit_outputs"
 SEED = 42
+SHOT_SCALES_CSV = "shot_scales.csv"
 
 # Optional shot-family mapping (from test log) for model selection.
 SHOT_FAMILY_MAP = {
@@ -440,10 +441,6 @@ RECOVERY_BAND_SIGMA = 1.96  # approx 95% band from fit residuals
 SHOW_CONF_BAND = False
 
 # --- current export (doc-style) ---
-K_T = 0.112
-K_V = -0.060
-TIME_SCALE_S  = 0.64
-TIME_SHIFT_S  = 2.6e-7
 
 # plot zoom window padding (ns)
 ZOOM_LEFT_PAD_NS  = 200.0
@@ -465,6 +462,25 @@ def _s_to_ns(s: float) -> float:
 
 def _interp_to(x_src, y_src, x_new):
     return np.interp(x_new, x_src, y_src)
+
+def load_shot_scales(shot_id: int, csv_path: str = SHOT_SCALES_CSV):
+    df = pd.read_csv(csv_path)
+    required_cols = {"testname", "time_scale", "voltage_scale", "time_shift", "peak_scale"}
+    missing = required_cols.difference(df.columns)
+    if missing:
+        raise ValueError(f"{csv_path} is missing required columns: {sorted(missing)}")
+
+    rows = df.loc[pd.to_numeric(df["testname"], errors="coerce") == int(shot_id)]
+    if rows.empty:
+        raise ValueError(f"No shot scale entry found for shot {shot_id} in {csv_path}")
+
+    row = rows.iloc[0]
+    return (
+        float(row["time_scale"]),
+        float(row["voltage_scale"]),
+        float(row["time_shift"]),
+        float(row["peak_scale"]),
+    )
 
 def exp_anchor_np(t, baseline, tau, y0):
     """Single exponential anchored at y0 (t=0), relaxing toward baseline."""
@@ -3517,6 +3533,7 @@ def main(csv_file=None, out_dir=None):
     series = load_wide_csv(csv_file)
     t_diode, v_diode = series["Diode"]
     shot_id, family = infer_shot_and_family(csv_file)
+    time_scale, voltage_scale, time_shift, peak_scale = load_shot_scales(shot_id)
 
     # PCD avg on diode time
     pcd_avg, pcd_used = build_pcd_avg(series, t_diode)
@@ -6727,7 +6744,12 @@ def main(csv_file=None, out_dir=None):
             ))
             two_exp_tail_active = True
 
-    if shot_id == 27294 and len(V_model_plot) > 2:
+    if shot_id == 27296 and len(V_model_plot) > 0:
+        V_model_plot = np.minimum(V_model_plot, 0.0)
+        V_lo_plot = np.minimum(V_lo_plot, 0.0)
+        V_hi_plot = np.minimum(V_hi_plot, 0.0)
+
+    if shot_id in {27294, 27296} and len(V_model_plot) > 2:
         valley_idx_model = int(np.argmin(V_model_plot))
         zero_hits_model = np.where(V_model_plot[valley_idx_model:] >= 0.0)[0]
         if len(zero_hits_model) > 0:
@@ -6826,13 +6848,23 @@ def main(csv_file=None, out_dir=None):
 
     # =============================
     # EXPORT current pulse TXT (2 cols): time(s) current(A)
-    # I(t)=K_T*t + K_V*V(t)
+    # t_export = time_scale * t_rel + time_shift
+    # I(t_export) = voltage_scale * V(t_export), with peak_scale on the initial pulse
     # =============================
-    t_out = (t_model_abs - new_t0_abs) * TIME_SCALE_S + TIME_SHIFT_S
+    t_out = ((t_model_abs - new_t0_abs) * time_scale) + time_shift
     V_out = V_model_plot
-    I_out = K_T * t_out + K_V * V_out
+    I_out = voltage_scale * V_out
+    if len(I_out) > 3 and peak_scale != 1.0:
+        pulse_abs = np.abs(I_out)
+        pulse_max = float(np.max(pulse_abs))
+        if pulse_max > 0.0:
+            active_idx = np.where(pulse_abs >= 0.05 * pulse_max)[0]
+            if len(active_idx) > 0:
+                pulse_start = int(active_idx[0])
+                pulse_peak = int(pulse_start + np.argmax(pulse_abs[pulse_start:]))
+                I_out[pulse_start:pulse_peak + 1] *= peak_scale
 
-    if shot_id == 27294 and len(V_out) > 2:
+    if shot_id in {27294, 27296} and len(V_out) > 2:
         valley_idx_out = int(np.argmin(V_out))
         zero_hits = np.where(V_out[valley_idx_out:] >= 0.0)[0]
         if len(zero_hits) > 0:
@@ -7344,8 +7376,10 @@ def main(csv_file=None, out_dir=None):
         else:
             print(f"    V(t) = {b_endexp:.9e} + ({y_endexp_fit0:.9e} - {b_endexp:.9e}) * exp(-(t - {t_endexp0_abs:.9e}) / {tau_endexp:.9e})")
 
-    print("\nNumeric I(t) model:")
-    print(f"  I(t) = {K_T:.9e} * t + {K_V:.9e} * V(t)")
+    print("\nNumeric export model:")
+    print(f"  t_export = {time_scale:.9e} * t_rel + {time_shift:.9e}")
+    print(f"  I(t_export) = {voltage_scale:.9e} * V(t_export)")
+    print(f"  early peak scale = {peak_scale:.9e}")
 
     print("\nDONE.")
     print("Check:")
