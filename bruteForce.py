@@ -39,6 +39,7 @@ CSV_FILE = "data/27271_data.csv"
 OUT_DIR  = "diode_fit_outputs"
 SEED = 42
 SHOT_SCALES_CSV = "shot_scales.csv"
+TAIL_OFFSET_LINEAR_HANDOFF_SHOTS = {27295}
 
 # Optional shot-family mapping (from test log) for model selection.
 SHOT_FAMILY_MAP = {
@@ -470,6 +471,9 @@ def load_shot_scales(shot_id: int, csv_path: str = SHOT_SCALES_CSV):
     if missing:
         raise ValueError(f"{csv_path} is missing required columns: {sorted(missing)}")
 
+    if "tail_offset" not in df.columns:
+        df["tail_offset"] = 0.0
+
     rows = df.loc[pd.to_numeric(df["testname"], errors="coerce") == int(shot_id)]
     if rows.empty:
         raise ValueError(f"No shot scale entry found for shot {shot_id} in {csv_path}")
@@ -480,6 +484,7 @@ def load_shot_scales(shot_id: int, csv_path: str = SHOT_SCALES_CSV):
         float(row["voltage_scale"]),
         float(row["time_shift"]),
         float(row["peak_scale"]),
+        float(row["tail_offset"]),
     )
 
 def exp_anchor_np(t, baseline, tau, y0):
@@ -3533,7 +3538,7 @@ def main(csv_file=None, out_dir=None):
     series = load_wide_csv(csv_file)
     t_diode, v_diode = series["Diode"]
     shot_id, family = infer_shot_and_family(csv_file)
-    time_scale, voltage_scale, time_shift, peak_scale = load_shot_scales(shot_id)
+    time_scale, voltage_scale, time_shift, peak_scale, tail_offset = load_shot_scales(shot_id)
 
     # PCD avg on diode time
     pcd_avg, pcd_used = build_pcd_avg(series, t_diode)
@@ -6744,12 +6749,12 @@ def main(csv_file=None, out_dir=None):
             ))
             two_exp_tail_active = True
 
-    if shot_id == 27296 and len(V_model_plot) > 0:
+    if shot_id in {27295, 27296} and len(V_model_plot) > 0:
         V_model_plot = np.minimum(V_model_plot, 0.0)
         V_lo_plot = np.minimum(V_lo_plot, 0.0)
         V_hi_plot = np.minimum(V_hi_plot, 0.0)
 
-    if shot_id in {27294, 27296} and len(V_model_plot) > 2:
+    if shot_id in {27291, 27294, 27296} and len(V_model_plot) > 2:
         valley_idx_model = int(np.argmin(V_model_plot))
         zero_hits_model = np.where(V_model_plot[valley_idx_model:] >= 0.0)[0]
         if len(zero_hits_model) > 0:
@@ -6863,8 +6868,24 @@ def main(csv_file=None, out_dir=None):
                 pulse_start = int(active_idx[0])
                 pulse_peak = int(pulse_start + np.argmax(pulse_abs[pulse_start:]))
                 I_out[pulse_start:pulse_peak + 1] *= peak_scale
+    if len(I_out) > 3 and tail_offset != 0.0:
+        pulse_abs = np.abs(I_out)
+        pulse_max = float(np.max(pulse_abs))
+        if pulse_max > 0.0:
+            active_idx = np.where(pulse_abs >= 0.05 * pulse_max)[0]
+            if len(active_idx) > 1:
+                tail_start = int(active_idx[0] + np.argmax(pulse_abs[active_idx[0]:]))
+                denom = max(len(I_out) - 1 - tail_start, 1)
+                tail_w = np.zeros(len(I_out), dtype=float)
+                tail_u = (np.arange(tail_start, len(I_out)) - tail_start) / denom
+                if shot_id in TAIL_OFFSET_LINEAR_HANDOFF_SHOTS:
+                    tail_w[tail_start:] = tail_u
+                else:
+                    # Smoothstep removes the visible shoulder at the tail handoff.
+                    tail_w[tail_start:] = tail_u * tail_u * (3.0 - 2.0 * tail_u)
+                I_out = I_out + tail_offset * tail_w
 
-    if shot_id in {27294, 27296} and len(V_out) > 2:
+    if shot_id in {27291, 27294, 27296} and len(V_out) > 2:
         valley_idx_out = int(np.argmin(V_out))
         zero_hits = np.where(V_out[valley_idx_out:] >= 0.0)[0]
         if len(zero_hits) > 0:
@@ -7380,6 +7401,7 @@ def main(csv_file=None, out_dir=None):
     print(f"  t_export = {time_scale:.9e} * t_rel + {time_shift:.9e}")
     print(f"  I(t_export) = {voltage_scale:.9e} * V(t_export)")
     print(f"  early peak scale = {peak_scale:.9e}")
+    print(f"  tail offset = {tail_offset:.9e}")
 
     print("\nDONE.")
     print("Check:")
