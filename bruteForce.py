@@ -464,7 +464,7 @@ def _s_to_ns(s: float) -> float:
 def _interp_to(x_src, y_src, x_new):
     return np.interp(x_new, x_src, y_src)
 
-def load_shot_scales(shot_id: int, csv_path: str = SHOT_SCALES_CSV):
+def load_shot_scales(shot_id: int, csv_path: str = SHOT_SCALES_CSV, scale_testname: str | None = None):
     df = pd.read_csv(csv_path)
     required_cols = {"testname", "time_scale", "voltage_scale", "time_shift", "peak_scale"}
     missing = required_cols.difference(df.columns)
@@ -474,9 +474,11 @@ def load_shot_scales(shot_id: int, csv_path: str = SHOT_SCALES_CSV):
     if "tail_offset" not in df.columns:
         df["tail_offset"] = 0.0
 
-    rows = df.loc[pd.to_numeric(df["testname"], errors="coerce") == int(shot_id)]
+    lookup_key = str(scale_testname) if scale_testname is not None else str(int(shot_id))
+    testnames = df["testname"].astype(str).str.strip()
+    rows = df.loc[testnames == lookup_key]
     if rows.empty:
-        raise ValueError(f"No shot scale entry found for shot {shot_id} in {csv_path}")
+        raise ValueError(f"No shot scale entry found for testname {lookup_key} in {csv_path}")
 
     row = rows.iloc[0]
     return (
@@ -3529,7 +3531,7 @@ def find_sigmoid_mismatch_idx(t_abs_seg, v_seg, v_sig_seg, rec_sign):
 # =============================
 # Main
 # =============================
-def main(csv_file=None, out_dir=None):
+def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
     csv_file = csv_file or CSV_FILE
     out_dir = out_dir or OUT_DIR
     os.makedirs(out_dir, exist_ok=True)
@@ -3538,7 +3540,10 @@ def main(csv_file=None, out_dir=None):
     series = load_wide_csv(csv_file)
     t_diode, v_diode = series["Diode"]
     shot_id, family = infer_shot_and_family(csv_file)
-    time_scale, voltage_scale, time_shift, peak_scale, tail_offset = load_shot_scales(shot_id)
+    scale_testname = f"{shot_id}*" if use_zero_impedance_scale else str(shot_id)
+    time_scale, voltage_scale, time_shift, peak_scale, tail_offset = load_shot_scales(
+        shot_id, scale_testname=scale_testname
+    )
 
     # PCD avg on diode time
     pcd_avg, pcd_used = build_pcd_avg(series, t_diode)
@@ -3574,7 +3579,7 @@ def main(csv_file=None, out_dir=None):
         print(f"PCD never crossed {PCD_TARGET_V:.3f}V; using nearest level time: t = {t_cross:.9e} s (PCD={pcd_pick_v:.6f} V)")
     print(f"NEW t0 = crossing - {t0_shift_ns:.1f}ns -> {new_t0_abs:.9e} s")
     print(f"NEGATE auto = {NEGATE}")
-    print(f"\nShot/family: shot={shot_id}, family={family}, model={model_name}")
+    print(f"\nShot/family: shot={shot_id}, family={family}, model={model_name}, scales={scale_testname}")
     if fit_mode == "smooth":
         print(f"Fit waveform smoothing: mode=savgol, pre-noise={pre_noise_v:.4f} V, window={fit_smooth_ns:.2f} ns")
 
@@ -7415,5 +7420,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Single-file diode waveform model fit.")
     parser.add_argument("--csv", default=CSV_FILE, help="Input CSV path (single file).")
     parser.add_argument("--out", default=OUT_DIR, help="Output directory.")
+    parser.add_argument(
+        "--zero-impedance",
+        action="store_true",
+        help="Use the starred shot_scales entry for this shot, e.g. 27291* instead of 27291.",
+    )
     args = parser.parse_args()
-    main(csv_file=args.csv, out_dir=args.out)
+    main(csv_file=args.csv, out_dir=args.out, use_zero_impedance_scale=args.zero_impedance)
