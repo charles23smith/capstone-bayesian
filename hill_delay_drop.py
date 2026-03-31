@@ -34,6 +34,8 @@ FULL_SHOT_WINDOWS_NS = {
     shot_id: (75.0, end_ns)
     for shot_id, (_, end_ns) in SHOT_WINDOWS_NS.items()
 }
+# The regression step uses only the nearest few training shots in parameter space
+# so one unusual waveform does not dominate the holdout prediction.
 NEIGHBOR_COUNT = 3
 EXCLUDED_TRAIN_SHOT_IDS = set()
 
@@ -62,11 +64,15 @@ def parse_holdout():
 
 def load_windowed_shot_local(shot_id: int, windows_ns):
     start_ns, end_ns = windows_ns[shot_id]
+    # `compute_new_t0_info` aligns each shot to a common physical reference:
+    # the time where the averaged PCD reaches 0.5 V, shifted earlier by 100 ns.
     info = compute_new_t0_info(DATA_DIR / f"{shot_id}_data.csv", shot_id)
     t_diode_abs_s = info["t_diode_abs_s"]
     v_diode = info["v_diode"]
     new_t0_abs_s = float(info["new_t0_abs_s"])
 
+    # The fit window is defined relative to the shifted `new_t0`, not the raw CSV
+    # start time, so every shot is evaluated on the same post-trigger region.
     window_start_abs_s = float(new_t0_abs_s + ns_to_s(start_ns))
     window_end_abs_s = float(new_t0_abs_s + ns_to_s(end_ns))
     mask = (t_diode_abs_s >= window_start_abs_s) & (t_diode_abs_s <= window_end_abs_s)
@@ -80,8 +86,13 @@ def load_windowed_shot_local(shot_id: int, windows_ns):
     if sign_flipped:
         v_win = -v_win
 
+    # These windows are chosen to emphasize the recovery after the main peak and
+    # the later return toward baseline, which is the region this model targets.
     tail_n = max(8, min(64, len(v_win) // 5))
     baseline = float(np.median(v_win[-tail_n:]))
+
+    # Shift local fit time so the window begins at 0 ns, then keep only the
+    # positive-time samples used by the log-time model.
     t_fit_ns = t_win - float(t_win[0])
     keep = np.isfinite(t_fit_ns) & np.isfinite(v_diode[mask]) & (t_fit_ns > 0.0)
     if np.count_nonzero(keep) < 8:
@@ -113,6 +124,8 @@ def select_shape_neighbors(train_fit_rows, holdout_log_dose: float, holdout_v_st
     if len(train_fit_rows) <= NEIGHBOR_COUNT:
         return train_fit_rows
 
+    # First estimate where the holdout should land from dose-only regressions,
+    # then keep the training shots whose fitted shapes are closest to that target.
     _, _, pred_t_half = regress_parameter(train_fit_rows, "t_half", holdout_log_dose)
     _, _, pred_n = regress_parameter(train_fit_rows, "n", holdout_log_dose)
     _, _, pred_t_drop = regress_parameter(train_fit_rows, "t_drop", holdout_log_dose)
@@ -142,6 +155,8 @@ def main():
     shot_data = {}
 
     for shot_id in shot_ids:
+        # Load each shot on the shifted `t0` time base and keep only the chosen
+        # recovery window used for fitting and holdout evaluation.
         loaded = load_windowed_shot_local(shot_id, windows_ns)
         loaded["log_dose"] = float(np.log(SHOT_DOSES[shot_id]))
         shot_data[shot_id] = loaded
@@ -159,6 +174,8 @@ def main():
     print(f"\nLOO holdout: {holdout_shot_id} | train on {train_shot_ids}")
     print("Method: bayesian_recovery hill+delay-drop hybrid LOO")
 
+    # Fit the training shots directly, then choose the few most shape-compatible
+    # neighbors to stabilize the parameter regressions used for the holdout shot.
     train_fit_rows = [direct_fit_windowed_shot(shot_id, shot_data) for shot_id in train_shot_ids]
     holdout_v_start_anchor = float(shot_data[holdout_shot_id]["v_obs_raw"][0])
     selected_rows = select_shape_neighbors(train_fit_rows, shot_data[holdout_shot_id]["log_dose"], holdout_v_start_anchor)
@@ -167,6 +184,8 @@ def main():
     summary_df.to_csv(OUT_SUMMARY_CSV, index=False)
 
     log_dose = shot_data[holdout_shot_id]["log_dose"]
+    # Anchor the holdout at its observed starting value, then regress the shape
+    # parameters from the selected training shots as functions of log-dose.
     v_start_hat = holdout_v_start_anchor
     _, _, amp_rise_hat = regress_parameter(selected_rows, "amp_rise", log_dose)
     _, _, t_half_hat = regress_parameter(selected_rows, "t_half", log_dose)
@@ -227,6 +246,8 @@ def main():
     window_rows = []
     window_source = FULL_SHOT_WINDOWS_NS if use_full_windows else SHOT_WINDOWS_NS
     for shot_id, (start_ns, end_ns) in window_source.items():
+        # Save both the relative window and the absolute timestamps so the fitted
+        # region can be traced back to the original waveform files.
         info = compute_new_t0_info(DATA_DIR / f"{shot_id}_data.csv", shot_id)
         new_t0_abs_s = float(info["new_t0_abs_s"])
         window_rows.append(
