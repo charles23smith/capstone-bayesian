@@ -1,1 +1,0 @@
-pip install pandas arviz numpy pymc
