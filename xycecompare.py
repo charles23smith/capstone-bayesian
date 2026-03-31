@@ -5,9 +5,34 @@ from matplotlib.ticker import EngFormatter, MaxNLocator
 from pathlib import Path
 import argparse
 
+<<<<<<< HEAD
 DATA_DIR = Path(r"C:\CapstoneXyce")
 SIM_FILE = DATA_DIR / "shot27291.cir.prn"
 EXP_FILE = DATA_DIR / "LFXR_Lovejoy_Sept2021_27291.csv"
+=======
+DATA_DIR = Path(r"E:\CapstoneXyce")
+SIM_FILE = DATA_DIR / "shot27306.cir.prn"
+EXP_FILE = DATA_DIR / "LFXR_Lovejoy_Sept2021_27306.csv"
+
+ZOOM_LEFT_PAD_NS = 200.0
+ZOOM_RIGHT_PAD_NS = 600.0
+
+PLOT_PRESETS_NS = {
+    "27272": {
+        "full_xlim": (-250.0, 5000.0),
+        "zoom_xlim": (-175.0, 1200.0),
+        "ylim": (-5.05, 0.22),
+    },
+    "27273": {
+        "ylim": (-1.2, 15.0),
+    },
+    "27306": {
+        "full_xlim": (-1000.0, 60000.0),
+        "zoom_xlim": (-1000.0, 60000.0),
+        "ylim": (-3.05, 3.05),
+    },
+}
+>>>>>>> 2d51a42 (Bayesian updates and local files)
 
 
 def parse_args():
@@ -55,6 +80,32 @@ def base_shot_label(shot_label: str) -> str:
 def safe_shot_label_for_filename(shot_label: str) -> str:
     return shot_label.replace("*", "_star")
 
+<<<<<<< HEAD
+=======
+
+def plot_preset_for_shot(base_label: str):
+    return PLOT_PRESETS_NS.get(base_label, None)
+
+
+def auto_window_from_sim_ns(t_sim_ns: np.ndarray, v_sim: np.ndarray):
+    if len(t_sim_ns) == 0:
+        return None
+
+    baseline_n = max(5, min(len(v_sim) // 10, 50))
+    baseline = float(np.median(v_sim[:baseline_n]))
+    v_span = float(np.nanmax(v_sim) - np.nanmin(v_sim))
+    threshold = max(0.2, 0.05 * v_span)
+
+    active_idx = np.flatnonzero(np.abs(v_sim - baseline) >= threshold)
+    onset_idx = int(active_idx[0]) if len(active_idx) else 0
+    stop_idx = len(t_sim_ns) - 1
+
+    return (
+        float(t_sim_ns[onset_idx] - ZOOM_LEFT_PAD_NS),
+        float(t_sim_ns[stop_idx] + ZOOM_RIGHT_PAD_NS),
+    )
+
+>>>>>>> 2d51a42 (Bayesian updates and local files)
 # =========================
 # Load Xyce simulation
 # =========================
@@ -76,15 +127,25 @@ def main():
     sim = sim.dropna(subset=["TIME", "V(TRIG)"])
 
     t_sim = sim["TIME"].to_numpy()
+<<<<<<< HEAD
     v_sim = sim["V(TRIG)"].to_numpy()
 
+=======
+    v_sim = -sim["V(TRIG)"].to_numpy()
+
+    preset = plot_preset_for_shot(base_label)
+>>>>>>> 2d51a42 (Bayesian updates and local files)
     # =========================
     # Load experimental data
     # =========================
     exp = pd.read_csv(args.exp_file)
 
     t_exp = exp["time1"].to_numpy()
+<<<<<<< HEAD
     v_exp = exp["Diode"].to_numpy() * -1
+=======
+    v_exp = exp["Diode"].to_numpy()
+>>>>>>> 2d51a42 (Bayesian updates and local files)
 
     # Shift experimental time so it starts at 0 (like you did for pulse generation)
     t_exp = t_exp - np.min(t_exp)
@@ -106,6 +167,7 @@ def main():
     # =========================
     # Plot single overlay
     # =========================
+<<<<<<< HEAD
     fig, ax = plt.subplots(figsize=(8.5, 6.0))
 
     ax.plot(t_exp, v_exp, color="#bfbfbf", linewidth=1.8, label="Experiment")
@@ -122,6 +184,57 @@ def main():
     ax.yaxis.set_major_locator(MaxNLocator(8))
     ax.set_xlim(0.0, 3.0e-6)
     ax.set_ylim(0.0, 2.0)
+=======
+    if preset is not None:
+        t_exp_plot = (t_exp * 1e9).astype(float)
+        t_sim_plot = (t_sim * 1e9).astype(float)
+        auto_window = auto_window_from_sim_ns(t_sim_plot, v_sim)
+        exp_color = "#404040"
+        sim_color = "red"
+        xlabel = "Time"
+        ylabel = "Volts"
+        exp_label = "Diode (actual)"
+        sim_label = "Simulation"
+        title = "Modeled Waveform Overlay"
+    else:
+        t_exp_plot = t_exp
+        t_sim_plot = t_sim
+        auto_window = None
+        exp_color = "#bfbfbf"
+        sim_color = "#1b9e77"
+        xlabel = "Time (s)"
+        ylabel = "Voltage across diode (V)"
+        exp_label = "Experiment"
+        sim_label = "Simulation"
+        title = "Xyce vs Experiment Overlay"
+
+    fig, ax = plt.subplots(figsize=(12.8, 5.6) if preset is not None else (8.5, 6.0))
+
+    ax.plot(t_exp_plot, v_exp, color=exp_color, linewidth=1.6 if preset is not None else 1.8, label=exp_label)
+    ax.plot(t_sim_plot, v_sim, color=sim_color, linewidth=2.4 if preset is not None else 2.0, label=sim_label)
+    if preset is not None:
+        ax.axvline(0.0, color="red", linestyle="--", linewidth=2.0, label="t0 (PCD 0.5 V - 100ns)")
+
+    ax.set_title(title, fontweight="bold")
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.legend(loc="upper right", frameon=True if preset is not None else False)
+    ax.grid(True, alpha=0.25)
+
+    if preset is None:
+        ax.xaxis.set_major_formatter(EngFormatter(unit="s"))
+        ax.yaxis.set_major_formatter(EngFormatter(unit="V"))
+    ax.xaxis.set_major_locator(MaxNLocator(7))
+    ax.yaxis.set_major_locator(MaxNLocator(8))
+    if preset is not None:
+        full_xlim = preset.get("full_xlim", auto_window)
+        if full_xlim is not None:
+            ax.set_xlim(*full_xlim)
+        ax.set_ylim(*preset["ylim"])
+    else:
+        ax.set_xlim(0.0, 3.0e-6)
+        ax.set_ylim(0.0, 2.0)
+>>>>>>> 2d51a42 (Bayesian updates and local files)
 
     plt.tight_layout()
     out_path = f"shot{file_label}_overlay.png"
@@ -129,6 +242,7 @@ def main():
     print(f"Overlay plot saved as {out_path}")
     plt.close(fig)
 
+<<<<<<< HEAD
     fig_zoom, ax_zoom = plt.subplots(figsize=(8.5, 6.0))
     ax_zoom.plot(t_exp, v_exp, color="#bfbfbf", linewidth=1.8, label="Experiment")
     ax_zoom.plot(t_sim, v_sim, color="#1b9e77", linewidth=2.0, label="Simulation")
@@ -144,6 +258,33 @@ def main():
     ax_zoom.yaxis.set_major_locator(MaxNLocator(8))
     ax_zoom.set_xlim(0.0, 1.5e-6)
     ax_zoom.set_ylim(0.0, 2.0)
+=======
+    fig_zoom, ax_zoom = plt.subplots(figsize=(13.0, 5.6) if preset is not None else (8.5, 6.0))
+    ax_zoom.plot(t_exp_plot, v_exp, color=exp_color, linewidth=1.6 if preset is not None else 1.8, label=exp_label)
+    ax_zoom.plot(t_sim_plot, v_sim, color=sim_color, linewidth=2.4 if preset is not None else 2.0, label=sim_label)
+    if preset is not None:
+        ax_zoom.axvline(0.0, color="red", linestyle="--", linewidth=2.0, label="t0 (PCD 0.5 V - 100ns)")
+
+    ax_zoom.set_title(title, fontweight="bold")
+    ax_zoom.set_xlabel(xlabel)
+    ax_zoom.set_ylabel(ylabel)
+    ax_zoom.legend(loc="upper right", frameon=True if preset is not None else False)
+    ax_zoom.grid(True, alpha=0.25)
+
+    if preset is None:
+        ax_zoom.xaxis.set_major_formatter(EngFormatter(unit="s"))
+        ax_zoom.yaxis.set_major_formatter(EngFormatter(unit="V"))
+    ax_zoom.xaxis.set_major_locator(MaxNLocator(7))
+    ax_zoom.yaxis.set_major_locator(MaxNLocator(8))
+    if preset is not None:
+        zoom_xlim = preset.get("zoom_xlim", auto_window)
+        if zoom_xlim is not None:
+            ax_zoom.set_xlim(*zoom_xlim)
+        ax_zoom.set_ylim(*preset["ylim"])
+    else:
+        ax_zoom.set_xlim(0.0, 1.5e-6)
+        ax_zoom.set_ylim(0.0, 2.0)
+>>>>>>> 2d51a42 (Bayesian updates and local files)
 
     plt.tight_layout()
     zoom_out_path = f"shot{file_label}_overlay_zoom_0_1p5us.png"
