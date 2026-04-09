@@ -1,5 +1,5 @@
 testname,time_scale,voltage_scale,time_shift,peak_scale,active_offset,tail_offset,bottom_offset,late_peak_scale,notes
-27271,1,-1.35,3.25e-6,1,0,0,0,1,"3.57e-6 end, -1.35 vol default, likely needs Xyce circuit changes to bring tail up"
+27271,1,-1,0,1,0,0,0,1,
 27272,1,-2.75,2.6e-7,1,0,0,0,1,"incredibly annoying - had to change wave on bruteForce"
 27273,1,-0.012,0.5e-7,1,0,0,0,1,"2.66e-7 end"
 27274,1,1,0,1,0,0,0,1,
@@ -18,7 +18,7 @@ testname,time_scale,voltage_scale,time_shift,peak_scale,active_offset,tail_offse
 27288,1,1,0,1,0,0,0,1,
 27289,1,1,0,1,0,0,0,1,
 27290,0.6,-0.05,0,1,0,0,0,1,
-27291,0.65,-0.003,2.575e-7,1,0,0,0,1,"needs xyce circuit change as well like 27271"
+27291,1,1.1,2.15e-7,1,0,0,0,1,
 27294,0.5,-0.052,3.1e-7,1,0,0,0,1,
 27295,0.92,-0.101,2.2e-7,1.3,0,-50e-3,0,1,"end at 4.65e-7"
 27296,0.88,-0.0225,2.20e-7,7.5,0,0,0,1,

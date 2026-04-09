@@ -30,7 +30,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from scipy.signal import savgol_filter, find_peaks
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit, fsolve
 
 # =============================
 # USER SETTINGS
@@ -42,6 +42,23 @@ SHOT_SCALES_CSV = "shot_scales.csv"
 TAIL_OFFSET_LINEAR_HANDOFF_SHOTS = {27295}
 EXPORT_SMOOTH_NS_BY_SHOT = {27306: 0.5}
 EXPORT_ONSET_RAMP_NS_BY_SHOT = {27306: 80.0}
+XYCE_DIODE_EXPORT_PARAMS_BY_FAMILY = {
+    # MMSZ5268BT1G Xyce subcircuit includes a forward diode with series
+    # resistance plus charge storage terms. Convert target voltage into source
+    # current using the same forward branch parameters so this remains reusable
+    # for other shots that use the same diode family.
+    "MMSZ5226BT1G": {
+        "is": 6.57933e-10,
+        "n": 1.84949,
+        "vt": 0.025852,
+        "rs": 2.0,
+        "cjo": 3.5e-11,
+        "tt": 2.0e-9,
+        "rload": 1.0e6,
+        "forward_from_negative_voltage": True,
+    },
+}
+XYCE_DIODE_EXPORT_ENABLED_SHOTS = {27291}
 
 # Optional shot-family mapping (from test log) for model selection.
 SHOT_FAMILY_MAP = {
@@ -567,6 +584,72 @@ def apply_export_onset_ramp(t_s, y, ramp_ns: float):
     w = u * u * (3.0 - 2.0 * u)
     y[start_idx:end_idx + 1] = y_end * w
     return y
+
+
+def diode_current_from_target_voltage(
+    t_s: np.ndarray,
+    v_target: np.ndarray,
+    isat: float,
+    ideality: float,
+    thermal_v: float,
+    series_r: float = 0.0,
+    rload: float | None = None,
+    cjo: float = 0.0,
+    tt: float = 0.0,
+):
+    """
+    Convert a target diode-voltage waveform into the source current needed by
+    the Xyce circuit.
+
+    I_source ~= I_forward_static + V/Rload + Cjo*dV/dt + Tt*d(I_forward)/dt
+    """
+    t_s = np.asarray(t_s, dtype=float)
+    v_target = np.maximum(np.asarray(v_target, dtype=float), 0.0)
+    out = np.zeros_like(v_target)
+    nv = max(float(ideality) * float(thermal_v), 1e-12)
+    isat = max(float(isat), 1e-30)
+    rs = max(float(series_r), 0.0)
+    cjo = max(float(cjo), 0.0)
+    tt = max(float(tt), 0.0)
+    use_rload = (rload is not None) and np.isfinite(float(rload)) and (float(rload) > 0.0)
+    rload = float(rload) if use_rload else None
+
+    def solve_one(v_mag: float):
+        if v_mag <= 0.0:
+            return 0.0
+
+        guess = isat * (np.exp(np.clip(v_mag / nv, 0.0, 80.0)) - 1.0)
+        guess = max(float(guess), 0.0)
+        if rs <= 0.0:
+            return guess
+
+        def resid(i_arr):
+            i = max(float(np.atleast_1d(i_arr)[0]), 0.0)
+            return i * rs + nv * np.log1p(i / isat) - v_mag
+
+        try:
+            return max(
+                float(fsolve(resid, x0=max(guess, 1e-18), xtol=1e-12, maxfev=200)[0]),
+                0.0,
+            )
+        except Exception:
+            return guess
+
+    i_static = np.array([solve_one(float(v_mag)) for v_mag in v_target], dtype=float)
+    i_total = i_static.copy()
+
+    if use_rload:
+        i_total = i_total + (v_target / rload)
+
+    if len(v_target) > 1:
+        dv_dt = np.gradient(v_target, t_s, edge_order=1)
+        if cjo > 0.0:
+            i_total = i_total + cjo * dv_dt
+        if tt > 0.0:
+            di_dt = np.gradient(i_static, t_s, edge_order=1)
+            i_total = i_total + tt * di_dt
+
+    return i_total
 
 
 def load_shot_scales(shot_id: int, csv_path: str = SHOT_SCALES_CSV, scale_testname: str | None = None):
@@ -7246,7 +7329,7 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
             V_lo_plot = V_lo_plot + lift_vals
             V_hi_plot = V_hi_plot + lift_vals
 
-    if shot_id in {27290, 27291, 27294, 27296} and len(V_model_plot) > 2:
+    if shot_id in {27290, 27291, 27294, 27296} and shot_id not in XYCE_DIODE_EXPORT_ENABLED_SHOTS and len(V_model_plot) > 2:
         valley_idx_model = int(np.argmin(V_model_plot))
         zero_hits_model = np.where(V_model_plot[valley_idx_model:] >= 0.0)[0]
         if len(zero_hits_model) > 0:
@@ -7368,7 +7451,28 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
     # =============================
     t_out = ((t_model_abs - new_t0_abs) * time_scale) + time_shift
     V_out = V_model_plot
-    I_out = voltage_scale * V_out
+    diode_export_params = None
+    if shot_id in XYCE_DIODE_EXPORT_ENABLED_SHOTS:
+        diode_export_params = XYCE_DIODE_EXPORT_PARAMS_BY_FAMILY.get(SHOT_FAMILY_MAP.get(shot_id))
+    if diode_export_params is not None:
+        V_export = voltage_scale * V_out
+        if diode_export_params.get("forward_from_negative_voltage", False):
+            v_target_mag = np.maximum(-V_export, 0.0)
+        else:
+            v_target_mag = np.maximum(V_export, 0.0)
+        I_out = diode_current_from_target_voltage(
+            t_out,
+            v_target_mag,
+            isat=diode_export_params["is"],
+            ideality=diode_export_params["n"],
+            thermal_v=diode_export_params["vt"],
+            series_r=diode_export_params.get("rs", 0.0),
+            rload=diode_export_params.get("rload"),
+            cjo=diode_export_params.get("cjo", 0.0),
+            tt=diode_export_params.get("tt", 0.0),
+        )
+    else:
+        I_out = voltage_scale * V_out
     if len(I_out) > 3:
         pulse_abs = np.abs(I_out)
         pulse_max = float(np.max(pulse_abs))
@@ -7440,7 +7544,7 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
             u = np.clip((t_rel_ns_export - float(t_rel_ns_export[start_idx])) / ramp_ns, 0.0, 1.0)
             bottom_w = u * u * (3.0 - 2.0 * u)
             I_out = I_out + bottom_offset * bottom_w
-    if shot_id in {27290, 27291, 27294, 27296} and len(V_out) > 2:
+    if shot_id in {27290, 27291, 27294, 27296} and shot_id not in XYCE_DIODE_EXPORT_ENABLED_SHOTS and len(V_out) > 2:
         valley_idx_out = int(np.argmin(V_out))
         zero_hits = np.where(V_out[valley_idx_out:] >= 0.0)[0]
         if len(zero_hits) > 0:
