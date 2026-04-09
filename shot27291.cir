@@ -1,0 +1,47 @@
+* Small trigger circuit
+
+               
+                                          
+*                                          The semiconductor components are:
+*| Designator | Manufacturer's part Number | Sandia Part Number 
+*| :--------: | :------------------------- | :----------------- 
+*|     D1     |    SMAJ400A                |    2A2217-000      
+*|     D2     |    MMSZ5268BT1G            |    N/A             
+*|     D3     |    MMSD4148T1G             |    2A2213-000      
+*|     D4     |    MMSZ5242BT1G            |    2A2218-100      
+*|     Q3     |    C3M0065090J             |    N/A           
+
+
+* 
+* select library for type of simulation
+* normal    - for normal environment
+*
+.lib VendorModels.lib normal
+
+XD1 TRIG 0 MMSZ5268BT1G  
+
+RLOAD TRIG 0 1e6
+RTAIL TRIG NTAIL 3.3k
+CTAIL NTAIL 0 C=470p
+
+IDR 0 TRIG PWL FILE "export_current_pulse.txt"
+
+.tran 1e-9 4.65e-7
+
+.print tran V(TRIG) I(IDR)
+
+.options timeint method=gear ;reltol=1e-4
+
+.end
+
+
+
+
+
+
+
+
+
+
+
+
