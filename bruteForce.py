@@ -43,6 +43,17 @@ TAIL_OFFSET_LINEAR_HANDOFF_SHOTS = {27295}
 EXPORT_SMOOTH_NS_BY_SHOT = {27306: 0.5}
 EXPORT_ONSET_RAMP_NS_BY_SHOT = {27306: 80.0}
 XYCE_DIODE_EXPORT_PARAMS_BY_FAMILY = {
+    # VendorModels.lib / SMAJ400A / DFOR forward branch.
+    "SMAJ400A": {
+        "is": 3.589e-10,
+        "n": 2.906,
+        "vt": 0.025852,
+        "rs": 0.5194,
+        "cjo": 5.013e-11,
+        "tt": 5.634e-9,
+        "rload": 1.0e6,
+        "forward_from_negative_voltage": True,
+    },
     # MMSZ5268BT1G Xyce subcircuit includes a forward diode with series
     # resistance plus charge storage terms. Convert target voltage into source
     # current using the same forward branch parameters so this remains reusable
@@ -57,8 +68,136 @@ XYCE_DIODE_EXPORT_PARAMS_BY_FAMILY = {
         "rload": 1.0e6,
         "forward_from_negative_voltage": True,
     },
+    # VendorModels.lib / CSD01060E equivalent / .MODEL CSD01060 D
+    "CSD01060E": {
+        "is": 22.008e-18,
+        "n": 1.0313,
+        "vt": 0.025852,
+        "rs": 0.34849,
+        "cjo": 118.40e-12,
+        "tt": 21.668e-12,
+        "rload": 50.0,
+        "forward_from_negative_voltage": True,
+    },
 }
-XYCE_DIODE_EXPORT_ENABLED_SHOTS = {27291}
+XYCE_DIODE_EXPORT_PARAMS_BY_SHOT = {
+    27271: {
+        "rload": 1.0e6,
+    },
+    27272: {
+        "rload": 81.3,
+    },
+    27273: {
+        "rload": 81.3,
+    },
+    27274: {
+        "rload": 1.0e6,
+    },
+    27275: {
+        "rload": 81.3,
+    },
+    27276: {
+        "rload": 81.3,
+    },
+    27277: {
+        "rload": 81.3,
+    },
+    27278: {
+        "rload": 81.3,
+    },
+    27279: {
+        "rload": 81.3,
+    },
+    27280: {
+        "rload": 1.0e6,
+    },
+    27282: {
+        "rload": 1.0e6,
+    },
+    27283: {
+        "rload": 1.0e6,
+    },
+    27284: {
+        "rload": 81.3,
+    },
+    27285: {
+        "rload": 1.0e6,
+    },
+    27286: {
+        "rload": 81.3,
+    },
+    27287: {
+        "rload": 1.0e6,
+    },
+    27288: {
+        "rload": 81.3,
+    },
+    27289: {
+        "rload": 1.0e6,
+    },
+    27290: {
+        "rload": 81.3,
+    },
+    27294: {
+        "rload": 81.3,
+    },
+    27296: {
+        "rload": 50.0,
+    },
+    27298: {
+        "rload": 50.0,
+    },
+    27299: {
+        "rload": 50.0,
+    },
+    27300: {
+        "rload": 50.0,
+    },
+    27301: {
+        "rload": 50.0,
+    },
+    27302: {
+        "rload": 50.0,
+    },
+    27307: {
+        "rload": 50.0,
+    },
+    27306: {
+        "rload": 50.0,
+    },
+}
+XYCE_DIODE_EXPORT_ENABLED_SHOTS = {
+    27271,
+    27272,
+    27273,
+    27274,
+    27275,
+    27276,
+    27277,
+    27278,
+    27279,
+    27280,
+    27282,
+    27283,
+    27284,
+    27285,
+    27286,
+    27287,
+    27288,
+    27289,
+    27290,
+    27291,
+    27294,
+    27296,
+    27298,
+    27299,
+    27300,
+    27301,
+    27302,
+    27306,
+    27307,
+}
+XYCE_DIODE_EXPORT_KEEP_POSITIVE_LINEAR_SHOTS = {27298, 27299, 27300, 27301, 27302}
 
 # Optional shot-family mapping (from test log) for model selection.
 SHOT_FAMILY_MAP = {
@@ -353,8 +492,8 @@ EXP1_EXP2_END_ABS_NS_BY_SHOT = {27279: 340.0}
 EXP2_ENDPOINT_TARGET_STOP_SHOTS = {27275, 27283, 27286, 27290, 27304}
 EXP2_CLASSIC_ENDPOINT_SHOTS = {27287, 27297, 27299}
 EXP2_FIT_RAW_SHOTS = {27297, 27304}
-EXP2_ENDPOINT_Y_OFFSET_BY_SHOT = {27286: -0.25, 27290: -0.01}
-EXP2_ENDPOINT_ABS_TARGET_V_BY_SHOT = {}
+EXP2_ENDPOINT_Y_OFFSET_BY_SHOT = {27286: -0.25}
+EXP2_ENDPOINT_ABS_TARGET_V_BY_SHOT = {27290: 0.0}
 EXP2_SHAPE_PRESERVE_END_TARGET_V_BY_SHOT = {}
 EXP2_SHAPE_PRESERVE_END_LIFT_POWER_BY_SHOT = {}
 EXP2_STEEP_LINEAR_SHOTS = set()
@@ -367,15 +506,22 @@ EXP2_EARLY_ACCEL_POWER_BY_SHOT = {}
 EXP2_LATE_TAU_SCALE_BY_SHOT = {}
 EXP2_LATE_START_FRAC_BY_SHOT = {}
 EXP12_VERTICAL_LIFT_BY_SHOT = {}
-EXP2_ENDPOINT_SLOPE_SHOTS = {27275, 27290, 27304}
+EXP2_ENDPOINT_SLOPE_SHOTS = {27275, 27304}
 EXP2_FOUR_POINT_FIT_SHOTS = set()
-EXP2_MIDPOINT_ANCHOR_SHOTS = {27275, 27290, 27304}
+EXP2_MIDPOINT_ANCHOR_SHOTS = {27275, 27304}
 EXP2_INTERIOR_ANCHOR_ABS_NS_BY_SHOT = {27275: 210.0, 27304: 150.0}
+EXP2_LATE_TAIL_ANCHOR_ABS_NS_BY_SHOT = {}
+EXP2_LATE_TAIL_START_FRAC_BY_SHOT = {}
+EXP2_END_CURVE_TO_ZERO_ABS_NS_BY_SHOT = {}
+EXP2_PREAPPEND_ENDPOINT_ABS_V_BY_SHOT = {}
+EXP2_PREAPPEND_STOP_ABS_NS_BY_SHOT = {}
 EXP2_APPEND_TO_ZERO_SHOTS = set()
-EXP2_APPEND_TARGET_V_BY_SHOT = {27290: -0.1}
-EXP2_APPEND_ZERO_SMOOTH_NS_BY_SHOT = {27290: 8.0}
+EXP2_APPEND_TARGET_V_BY_SHOT = {}
+EXP2_APPEND_ZERO_SMOOTH_NS_BY_SHOT = {}
+EXP2_APPEND_STOP_ABS_NS_BY_SHOT = {}
+EXP2_APPEND_TAIL_ENDPOINT_ABS_V_BY_SHOT = {}
 EXP2_PIN_ENDPOINT_TO_DIODE_SHOTS = set()
-STRETCHED_ENDPOINT_SHOTS = {27286, 27287, 27289, 27295}
+STRETCHED_ENDPOINT_SHOTS = {27286, 27287, 27289, 27290, 27295}
 EXP1_STRETCHED_ONLY_SHOTS = {27296, 27298, 27299}
 STOP_AFTER_SPLIT_LOCAL_MAX_WINDOWS_NS = {27283: (70.0, 95.0)}
 STOP_AFTER_SPLIT_RAW_MAX_WINDOWS_NS = {27283: (60.0, 85.0), 27290: (70.0, 120.0)}
@@ -456,7 +602,7 @@ EXP2_SIG_TARGET_V_BY_SHOT = {27296: -0.75}
 EXP2_SIG_TARGET_V_TOL_BY_SHOT = {27296: 0.06}
 EXP2_SIG_END_TARGET_V_BY_SHOT = {}
 EXP2_SIG_DURATION_AFTER_SPLIT_NS_BY_SHOT = {}
-STOP_FORCE_ABS_NS_BY_SHOT = {27277: 500.0, 27278: 500.0, 27279: 500.0, 27283: 330.0, 27286: 400.0, 27289: 208.5, 27298: 241.1, 27304: 1500.0, 27305: 2000.0}
+STOP_FORCE_ABS_NS_BY_SHOT = {27277: 500.0, 27278: 500.0, 27279: 500.0, 27283: 330.0, 27286: 400.0, 27289: 208.5, 27290: 245.0, 27298: 241.1, 27304: 1500.0, 27305: 2000.0}
 STOP_FORCE_NEAREST_ABS_NS_SHOTS = {27286, 27304}
 EXP2_SIG_SPLIT_SMOOTH_NS_BY_SHOT = {27301: 10.0, 27302: 10.0}
 
@@ -4261,11 +4407,16 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
     if (not use_three_exp) and (shot_id in EXP2_APPEND_TO_ZERO_SHOTS):
         i0 = max(stop_idx_before_forced + 2, split1_idx + 8)
         if i0 < len(v_diode) - 2:
-            z_smooth_ns = float(EXP2_APPEND_ZERO_SMOOTH_NS_BY_SHOT.get(shot_id, 8.0))
-            vz, _ = smooth_by_ns(t_diode, v_diode, z_smooth_ns)
-            target_v = float(EXP2_APPEND_TARGET_V_BY_SHOT.get(shot_id, -0.1))
-            stop_idx = int(i0 + int(np.argmin(np.abs(vz[i0:] - target_v))))
-            stop_mode = "stop_append_target_v_after_exp2"
+            if shot_id in EXP2_APPEND_STOP_ABS_NS_BY_SHOT:
+                target_stop_ns = float(EXP2_APPEND_STOP_ABS_NS_BY_SHOT[shot_id])
+                stop_idx = int(i0 + int(np.argmin(np.abs(t_rel_ns[i0:] - target_stop_ns))))
+                stop_mode = "stop_append_abs_after_exp2"
+            else:
+                z_smooth_ns = float(EXP2_APPEND_ZERO_SMOOTH_NS_BY_SHOT.get(shot_id, 8.0))
+                vz, _ = smooth_by_ns(t_diode, v_diode, z_smooth_ns)
+                target_v = float(EXP2_APPEND_TARGET_V_BY_SHOT.get(shot_id, -0.1))
+                stop_idx = int(i0 + int(np.argmin(np.abs(vz[i0:] - target_v))))
+                stop_mode = "stop_append_target_v_after_exp2"
             stop_t_ns = float(t_rel_ns[stop_idx])
             print("\nStop adjusted after split:")
             print(f"  stop_mode = {stop_mode}")
@@ -5878,6 +6029,10 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
                 )
                 exp2_stop_idx = int(stop_idx_before_forced) if use_append_tail else int(stop_idx)
                 if use_append_tail:
+                    if shot_id in EXP2_PREAPPEND_STOP_ABS_NS_BY_SHOT:
+                        preappend_stop_ns = float(EXP2_PREAPPEND_STOP_ABS_NS_BY_SHOT[shot_id])
+                        exp2_stop_idx = int(np.argmin(np.abs(t_rel_ns - preappend_stop_ns)))
+                        exp2_stop_idx = int(np.clip(exp2_stop_idx, split1_idx + 6, stop_idx - 4))
                     split2_idx = int(np.clip(exp2_stop_idx, split1_idx + 4, stop_idx - 4))
                 t2_abs = t_diode[split1_idx:exp2_stop_idx+1]
                 if shot_id in EXP2_FIT_RAW_SHOTS:
@@ -5891,7 +6046,10 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
                     idx2 = np.linspace(0, len(t2)-1, min(SUBSAMPLE_RECOVERY_N, len(t2)), dtype=int)
                 exp2_mode = "anchored_exp"
                 if (shot_id in STRETCHED_ENDPOINT_SHOTS):
-                    y_end_target = float(v_diode[exp2_stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
+                    if shot_id in EXP2_ENDPOINT_ABS_TARGET_V_BY_SHOT:
+                        y_end_target = float(EXP2_ENDPOINT_ABS_TARGET_V_BY_SHOT[shot_id])
+                    else:
+                        y_end_target = float(v_diode[exp2_stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
                     p2s, y2_0, y2_end, sig2 = fit_stretched_exp_endpoint_fast(
                         t2[idx2], v2[idx2], seg_sign=rec_sign, tau_max_mult=2.5, y_end_target=y_end_target
                     )
@@ -5914,6 +6072,8 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
                         y_end_target = float(EXP2_ENDPOINT_ABS_TARGET_V_BY_SHOT[shot_id])
                     else:
                         y_end_target = float(v_diode[exp2_stop_idx]) + float(EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0))
+                    if use_append_tail and (shot_id in EXP2_PREAPPEND_ENDPOINT_ABS_V_BY_SHOT):
+                        y_end_target = float(EXP2_PREAPPEND_ENDPOINT_ABS_V_BY_SHOT[shot_id])
                     if shot_id in EXP2_ENDPOINT_SLOPE_SHOTS:
                         p2, y2_0, y2_end, slope2_est, sig2 = fit_anchored_exp_endpoint_slope_fast(
                             t2[idx2], v2[idx2], seg_sign=rec_sign, tau_max_mult=3.5, y_end_target=y_end_target, slope_weight=0.60
@@ -5947,6 +6107,61 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
                             V2_model[0] = float(y2_0)
                             V2_model[-1] = float(y_end_target)
                             print(f"  midpoint anchor: t={t_anchor*1e9:.3f} ns, y={y_anchor:.6f}")
+                            if (shot_id in EXP2_LATE_TAIL_ANCHOR_ABS_NS_BY_SHOT) and (not use_append_tail):
+                                t_tail_anchor_abs = float(new_t0_abs + _ns_to_s(EXP2_LATE_TAIL_ANCHOR_ABS_NS_BY_SHOT[shot_id]))
+                                i_tail_anchor = int(np.argmin(np.abs(t2_abs - t_tail_anchor_abs)))
+                                i_tail_anchor = int(np.clip(i_tail_anchor, 2, len(t2) - 2))
+                                tail_start_frac = float(EXP2_LATE_TAIL_START_FRAC_BY_SHOT.get(shot_id, 0.75))
+                                i_tail_start = int(np.clip(round(tail_start_frac * (len(t2) - 1)), 1, i_tail_anchor - 1))
+                                y_tail_anchor = float(v2[i_tail_anchor])
+                                delta_tail = y_tail_anchor - float(V2_model[i_tail_anchor])
+                                if abs(delta_tail) > 1e-9:
+                                    tail_corr = np.interp(
+                                        t2,
+                                        np.array(
+                                            [float(t2[i_tail_start]), float(t2[i_tail_anchor]), float(t2[-1])],
+                                            dtype=float,
+                                        ),
+                                        np.array([0.0, delta_tail, 0.0], dtype=float),
+                                    )
+                                    V2_model = V2_model + tail_corr
+                                    V2_model[0] = float(y2_0)
+                                    V2_model[-1] = float(y_end_target)
+                                    print(
+                                        f"  late tail anchor: t={float(t2[i_tail_anchor])*1e9:.3f} ns, "
+                                        f"y={y_tail_anchor:.6f}"
+                                    )
+                            if shot_id in EXP2_END_CURVE_TO_ZERO_ABS_NS_BY_SHOT and abs(float(y_end_target)) <= 1e-12:
+                                t_curve_abs = float(new_t0_abs + _ns_to_s(EXP2_END_CURVE_TO_ZERO_ABS_NS_BY_SHOT[shot_id]))
+                                i_curve0 = int(np.argmin(np.abs(t2_abs - t_curve_abs)))
+                                i_curve0 = int(np.clip(i_curve0, 1, len(t2) - 2))
+                                t_curve = t2[i_curve0:] - float(t2[i_curve0])
+                                if len(t_curve) >= 2 and float(t_curve[-1]) > 0.0:
+                                    dv_tail = np.gradient(V2_model, t2)
+                                    y_curve0 = float(V2_model[i_curve0])
+                                    s_curve0 = float(dv_tail[i_curve0])
+                                    if y_end_target >= y_curve0:
+                                        s_curve0 = max(s_curve0, 0.0)
+                                    else:
+                                        s_curve0 = min(s_curve0, 0.0)
+                                    V_curve = cubic_hermite_tail_np(
+                                        t_curve,
+                                        y_curve0,
+                                        float(y_end_target),
+                                        s_curve0,
+                                        0.0,
+                                    )
+                                    if y_end_target >= y_curve0:
+                                        V_curve = np.minimum(np.maximum.accumulate(V_curve), float(y_end_target))
+                                    else:
+                                        V_curve = np.maximum(np.minimum.accumulate(V_curve), float(y_end_target))
+                                    V_curve[0] = y_curve0
+                                    V_curve[-1] = float(y_end_target)
+                                    V2_model[i_curve0:] = V_curve
+                                    print(
+                                        f"  end curve-to-zero: start_t={float(t2[i_curve0])*1e9:.3f} ns, "
+                                        f"start_v={y_curve0:.6f}"
+                                    )
                         exp2_mode = "anchored_exp_slope"
                     else:
                         p2a, y2_0, y2_end, sig2 = fit_exp2_accel_endpoint_fast(
@@ -6002,8 +6217,13 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
                             EXP2_ENDPOINT_Y_OFFSET_BY_SHOT.get(shot_id, 0.0)
                         )
                     )
+                    if shot_id in EXP2_APPEND_TAIL_ENDPOINT_ABS_V_BY_SHOT:
+                        y2b_end_target = float(EXP2_APPEND_TAIL_ENDPOINT_ABS_V_BY_SHOT[shot_id])
                     if shot_id in EXP2_APPEND_TO_ZERO_SHOTS:
-                        v2b_sm, _ = smooth_by_ns(t2b_abs, v2b, max(5.0, fit_smooth_ns))
+                        if len(t2b) >= 9:
+                            v2b_sm, _ = smooth_by_ns(t2b_abs, v2b, max(5.0, fit_smooth_ns))
+                        else:
+                            v2b_sm = np.asarray(v2b, dtype=float)
                         i_anchor = int(np.clip(len(t2b) // 2, 1, len(t2b) - 2))
                         t2b_anchor = float(t2b[i_anchor])
                         y2b_anchor = float(v2b_sm[i_anchor])
@@ -6018,6 +6238,14 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
                             f"t_anchor={t2b_anchor*1e9:.3f} ns, y_anchor={y2b_anchor:.6f}"
                         )
                         V2b_model = exp2_accel_endpoint_np(t2b, alpha2b, y2b_0, y2b_end, float(t2b[-1]))
+                        if y2b_0 <= y2b_end_target:
+                            V2b_model = np.maximum.accumulate(V2b_model)
+                            V2b_model = np.minimum(V2b_model, float(y2b_end_target))
+                        else:
+                            V2b_model = np.minimum.accumulate(V2b_model)
+                            V2b_model = np.maximum(V2b_model, float(y2b_end_target))
+                        V2b_model[0] = float(y2b_0)
+                        V2b_model[-1] = float(y2b_end_target)
                     else:
                         p2b, y2b_0, sig2b = fit_anchored_exp_through_endpoint_fast(
                             t2b[idx2b], v2b[idx2b], seg_sign=rec_sign, tau_max_mult=3.5, y_end_target=y2b_end_target
@@ -6027,7 +6255,7 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
                         print(f"  baseline2b={b2b:.6f}, tau2b={tau2b*1e9:.3f} ns, y2b_0={y2b_0:.6f}, y2b_end(target)={y2b_end_target:.6f}")
                         V2b_model = exp_anchor_np(t2b, b2b, tau2b, y2b_0)
                     if len(V2b_model) > 0:
-                        V2b_model[-1] = float(v_diode[stop_idx])
+                        V2b_model[-1] = float(y2b_end_target if shot_id in EXP2_APPEND_TAIL_ENDPOINT_ABS_V_BY_SHOT else v_diode[stop_idx])
 
                     i2a = n1 - 1
                     V_model[i2a:i2a+len(V2_model)] = V2_model
@@ -7451,28 +7679,43 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
     # =============================
     t_out = ((t_model_abs - new_t0_abs) * time_scale) + time_shift
     V_out = V_model_plot
-    diode_export_params = None
-    if shot_id in XYCE_DIODE_EXPORT_ENABLED_SHOTS:
-        diode_export_params = XYCE_DIODE_EXPORT_PARAMS_BY_FAMILY.get(SHOT_FAMILY_MAP.get(shot_id))
-    if diode_export_params is not None:
-        V_export = voltage_scale * V_out
-        if diode_export_params.get("forward_from_negative_voltage", False):
-            v_target_mag = np.maximum(-V_export, 0.0)
-        else:
-            v_target_mag = np.maximum(V_export, 0.0)
-        I_out = diode_current_from_target_voltage(
-            t_out,
-            v_target_mag,
-            isat=diode_export_params["is"],
-            ideality=diode_export_params["n"],
-            thermal_v=diode_export_params["vt"],
-            series_r=diode_export_params.get("rs", 0.0),
-            rload=diode_export_params.get("rload"),
-            cjo=diode_export_params.get("cjo", 0.0),
-            tt=diode_export_params.get("tt", 0.0),
-        )
-    else:
+    if shot_id == 27271:
         I_out = voltage_scale * V_out
+        diode_export_params = None
+    else:
+        diode_export_params = None
+        if shot_id in XYCE_DIODE_EXPORT_ENABLED_SHOTS:
+            diode_export_params = dict(XYCE_DIODE_EXPORT_PARAMS_BY_FAMILY.get(SHOT_FAMILY_MAP.get(shot_id), {}))
+            diode_export_params.update(XYCE_DIODE_EXPORT_PARAMS_BY_SHOT.get(shot_id, {}))
+        if diode_export_params is not None:
+            V_export = abs(voltage_scale) * V_out
+            if diode_export_params.get("forward_from_negative_voltage", False):
+                v_target_mag = np.maximum(-V_export, 0.0)
+            else:
+                v_target_mag = np.maximum(V_export, 0.0)
+            rload_export = diode_export_params.get("rload")
+            I_out = diode_current_from_target_voltage(
+                t_out,
+                v_target_mag,
+                isat=diode_export_params["is"],
+                ideality=diode_export_params["n"],
+                thermal_v=diode_export_params["vt"],
+                series_r=diode_export_params.get("rs", 0.0),
+                rload=rload_export,
+                cjo=diode_export_params.get("cjo", 0.0),
+                tt=diode_export_params.get("tt", 0.0),
+            )
+            if shot_id in XYCE_DIODE_EXPORT_KEEP_POSITIVE_LINEAR_SHOTS:
+                pos_mask = V_export > 0.0
+                if np.any(pos_mask):
+                    # Preserve the measured positive lobe instead of clipping it
+                    # through the forward-only diode-current inversion.
+                    # `xycecompare.py` already plots the simulated result as
+                    # `-V(TRIG)`, so this branch should preserve the measured
+                    # lobe directly rather than flipping it again here.
+                    I_out[pos_mask] = voltage_scale * V_out[pos_mask]
+        else:
+            I_out = voltage_scale * V_out
     if len(I_out) > 3:
         pulse_abs = np.abs(I_out)
         pulse_max = float(np.max(pulse_abs))
@@ -7574,6 +7817,15 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
         for ti, ii in zip(t_out, I_out):
             f.write(f"{ti:.9e} {ii:.9e}\n")
     print(f"Saved: {export_i_txt}")
+
+    # Export a direct voltage-drive waveform for Xyce "match mode".
+    # The compare script uses -V(TRIG), so drive the node with the
+    # opposite polarity to reproduce the modeled diode waveform as-is.
+    export_v_txt = os.path.join(out_dir, "export_voltage_pulse.txt")
+    with open(export_v_txt, "w") as f:
+        for ti, vi in zip(t_out, -V_out):
+            f.write(f"{ti:.9e} {vi:.9e}\n")
+    print(f"Saved: {export_v_txt}")
 
     # =============================
     # Print piecewise formulas
@@ -8080,7 +8332,17 @@ def main(csv_file=None, out_dir=None, use_zero_impedance_scale=False):
 
     print("\nNumeric export model:")
     print(f"  t_export = {time_scale:.9e} * t_rel + {time_shift:.9e}")
-    print(f"  I(t_export) = {voltage_scale:.9e} * V(t_export)")
+    if diode_export_params is not None:
+        rload_desc = diode_export_params.get("rload")
+        if rload_desc is not None and np.isfinite(float(rload_desc)) and float(rload_desc) > 0.0:
+            print(
+                f"  I(t_export) = diode_current_from_target_voltage({voltage_scale:.9e} * V(t_export))"
+                f" with rload={float(rload_desc):.9e}"
+            )
+        else:
+            print(f"  I(t_export) = diode_current_from_target_voltage({voltage_scale:.9e} * V(t_export))")
+    else:
+        print(f"  I(t_export) = {voltage_scale:.9e} * V(t_export)")
     print(f"  early peak scale = {peak_scale:.9e}")
     print(f"  late peak scale = {late_peak_scale:.9e}")
     print(f"  active offset = {active_offset:.9e}")
