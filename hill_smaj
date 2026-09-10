@@ -1,0 +1,205 @@
+import argparse
+import csv
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+import hill_smaj as base
+
+
+OUTPUT_DIR = Path("loo_png_outputs") / "hill_smaj_ta_compact"
+
+
+def load_shots(use_full_windows: bool):
+    """Load all SMAJ shots after t0 alignment, windowing, and smoothing."""
+    windows = base.FULL_SHOT_WINDOWS_NS if use_full_windows else base.SHOT_WINDOWS_NS
+    shot_data = {}
+
+    for shot_id in base.ACTIVE_SHOT_IDS:
+        trace = base.load_windowed_shot_local(shot_id, windows)
+        trace["log_dose"] = float(np.log(base.SHOT_DOSES[shot_id]))
+        shot_data[shot_id] = trace
+
+    return shot_data
+
+
+def fit_training_shots(holdout_shot_id: int, shot_data: dict):
+    """Fit the hill+drop curve directly to every non-holdout shot."""
+    rows = []
+    for shot_id in base.ACTIVE_SHOT_IDS:
+        if shot_id == holdout_shot_id:
+            continue
+        rows.append(base.direct_fit_windowed_shot_local(shot_id, shot_data))
+    return rows
+
+
+def predict_holdout_from_neighbors(holdout_shot_id: int, train_rows: list, shot_data: dict):
+    """Predict one held-out shot by borrowing parameters from similar shots."""
+    holdout = shot_data[holdout_shot_id]
+    holdout_start_v = float(holdout["v_obs_fit"][0])
+    holdout_family = base.NEIGHBOR_FAMILY_BY_SHOT[holdout_shot_id]
+
+    # All SMAJ shots currently share one family, but this keeps the idea clear:
+    # compare the holdout only to shots from the same diode/behavior group.
+    same_family_rows = [
+        row for row in train_rows if row["neighbor_family"] == holdout_family
+    ] or train_rows
+
+    # Neighbor selection starts with shots whose starting voltage is closest to
+    # the holdout, then assigns weights based on overall fitted shape similarity.
+    neighbors = base.select_shape_neighbors(same_family_rows, holdout_start_v)
+    weighted_rows = base.build_bayesian_family_rows(
+        same_family_rows,
+        neighbors,
+        holdout_start_v,
+    )
+
+    # The holdout's first smoothed voltage is allowed to anchor the prediction.
+    # The rest of the curve shape comes from the weighted training neighbors.
+    start_scale = max(abs(holdout_start_v), 1e-4)
+    params = {
+        "v_start": holdout_start_v,
+        "amp_rise": start_scale * base.weighted_average_parameter(weighted_rows, "amp_rise_rel_start"),
+        "t_half": base.weighted_average_parameter(weighted_rows, "t_half"),
+        "n": base.weighted_average_parameter(weighted_rows, "n"),
+        "amp_drop": start_scale * base.weighted_average_parameter(weighted_rows, "amp_drop_rel_start"),
+        "t_drop": base.weighted_average_parameter(weighted_rows, "t_drop"),
+        "k_drop": base.weighted_average_parameter(weighted_rows, "k_drop"),
+    }
+
+    # Keep the generated curve inside basic physical/model bounds.
+    params["amp_rise"] = max(1e-4, params["amp_rise"])
+    params["t_half"] = max(1e-3, params["t_half"])
+    params["n"] = max(0.05, params["n"])
+    params["amp_drop"] = max(0.0, params["amp_drop"])
+    params["t_drop"] = max(5.0, params["t_drop"])
+    params["k_drop"] = max(0.5, params["k_drop"])
+
+    y_hat = base.rise_then_drop_recovery_logtime_np(
+        holdout["log10_t_ns"],
+        params["v_start"],
+        params["amp_rise"],
+        params["t_half"],
+        params["n"],
+        params["amp_drop"],
+        params["t_drop"],
+        params["k_drop"],
+    )
+    y_hat, endpoint_scale = base.scale_shape_to_zero_endpoint(y_hat, params["v_start"])
+    params["amp_rise"] *= endpoint_scale
+    params["amp_drop"] *= endpoint_scale
+
+    return y_hat, params, neighbors
+
+
+def score_prediction(observed: np.ndarray, predicted: np.ndarray):
+    """Return RMSE and R-squared for the held-out prediction."""
+    rmse = float(np.sqrt(np.mean((predicted - observed) ** 2)))
+    ss_total = float(np.sum((observed - np.mean(observed)) ** 2))
+    r_squared = (
+        float(1.0 - np.sum((observed - predicted) ** 2) / ss_total)
+        if ss_total > 0.0
+        else float("nan")
+    )
+    return rmse, r_squared
+
+
+def save_plot(holdout_shot_id: int, shot_data: dict, y_hat: np.ndarray, output_dir: Path):
+    """Save the plot your TA will care about: observed waveform vs prediction."""
+    trace = shot_data[holdout_shot_id]
+    output_dir.mkdir(parents=True, exist_ok=True)
+    out_png = output_dir / f"compact_smaj_holdout_{holdout_shot_id}.png"
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(trace["t_window_rel_ns"], trace["v_obs_raw"], color="0.75", label="raw observed")
+    plt.plot(trace["t_window_rel_ns"], trace["v_obs_fit"], color="black", label="smoothed observed")
+    plt.plot(trace["t_window_rel_ns"], y_hat, color="red", linewidth=2.0, label="LOO prediction")
+    plt.xlabel("Time after shifted t0 (ns)")
+    plt.ylabel("Diode voltage (V)")
+    plt.title(f"SMAJ400A leave-one-out prediction: shot {holdout_shot_id}")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(out_png, dpi=150)
+    plt.close()
+
+    return out_png
+
+
+def run_one_holdout(holdout_shot_id: int, shot_data: dict, output_dir: Path):
+    """Run the complete leave-one-out process for one shot."""
+    train_rows = fit_training_shots(holdout_shot_id, shot_data)
+    y_hat, params, neighbors = predict_holdout_from_neighbors(
+        holdout_shot_id,
+        train_rows,
+        shot_data,
+    )
+
+    observed = shot_data[holdout_shot_id]["v_obs_fit"]
+    rmse, r_squared = score_prediction(observed, y_hat)
+    out_png = save_plot(holdout_shot_id, shot_data, y_hat, output_dir)
+
+    print(
+        f"holdout={holdout_shot_id} "
+        f"neighbors={[row['shot_id'] for row in neighbors]} "
+        f"RMSE={rmse:.6f} R^2={r_squared:.6f} "
+        f"plot={out_png}"
+    )
+
+    return {
+        "shot_id": int(holdout_shot_id),
+        "neighbors": " ".join(str(row["shot_id"]) for row in neighbors),
+        "rmse": rmse,
+        "r_squared": r_squared,
+        "output_png": str(out_png),
+        **params,
+    }
+
+
+def write_summary(rows: list, output_dir: Path):
+    """Write a compact CSV summary when running all holdouts."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    out_csv = output_dir / "compact_smaj_metrics.csv"
+    fieldnames = [
+        "shot_id",
+        "neighbors",
+        "rmse",
+        "r_squared",
+        "v_start",
+        "amp_rise",
+        "t_half",
+        "n",
+        "amp_drop",
+        "t_drop",
+        "k_drop",
+        "output_png",
+    ]
+    with out_csv.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"summary={out_csv}")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Compact SMAJ leave-one-out demo.")
+    parser.add_argument("holdout_shot_id", nargs="?", type=int)
+    parser.add_argument("--all", action="store_true", help="Run every SMAJ shot as a holdout.")
+    parser.add_argument("--full", action="store_true", help="Use the broader windows from hill_smaj.py.")
+    parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    holdouts = base.ACTIVE_SHOT_IDS if args.all else [args.holdout_shot_id or base.ACTIVE_SHOT_IDS[0]]
+    shot_data = load_shots(use_full_windows=args.full)
+
+    rows = [run_one_holdout(shot_id, shot_data, args.output_dir) for shot_id in holdouts]
+    if len(rows) > 1:
+        write_summary(rows, args.output_dir)
+
+
+if __name__ == "__main__":
+    main()
