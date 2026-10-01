@@ -23,14 +23,13 @@
 - **Bias voltage:** applied bias in volts.
 - **PCD FWHM:** reference pulse width in nanoseconds.
 - Includes dose/bias and load interactions. Shot ID is only an identifier; scope scale is upstream calibration metadata.
-- Exact inputs for each shot: [`documented_v2_results/conditions_used.csv`](documented_v2_results/conditions_used.csv).
 
 ## Run
 
 From the repository root:
 
 ```powershell
-.venv\Scripts\python.exe research\dense_waveform_experiment.py 10 --documented
+.venv\Scripts\python.exe research\simease_ridge.py 10 --documented
 ```
 
 - This single command generates a held-out prediction for **each shot**. The script has no single-shot option.
@@ -45,4 +44,3 @@ From the repository root:
 - [`research_notes.md`](research_notes.md): Siamese pair equivalence and waveform experiments.
 - [`v2_notes.md`](v2_notes.md): underlying ridge implementation.
 - [`metadata_audit.md`](../data/metadata_audit.md): experimental calibration evidence.
-- Results are development validation; independent new shots are needed to establish prospective accuracy.
