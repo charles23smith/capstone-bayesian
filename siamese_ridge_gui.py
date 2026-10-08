@@ -50,18 +50,51 @@ class RidgeApp:
         style.map('Accent.TButton', background=[('disabled', '#a6b4c5'), ('active', '#174b85')])
         style.configure('TCombobox', padding=7, font=('Segoe UI', 11))
 
-        header = tk.Frame(root, background='#152e4d', padx=24, pady=16)
+        header = tk.Frame(root, background='#152e4d', padx=24, pady=10)
         header.pack(fill='x')
-        tk.Label(header, text='SMAJ waveform model', font=('Segoe UI', 22, 'bold'),
+        tk.Label(header, text='SMAJ waveform model', font=('Segoe UI', 18, 'bold'),
                  background='#152e4d', foreground='white').pack(anchor='w')
         tk.Label(header, text='Choose a test and compare its prediction with the measured signal.',
                  font=('Segoe UI', 10), background='#152e4d', foreground='#c9daed').pack(anchor='w', pady=(3, 0))
 
-        content = tk.Frame(root, background='#edf2f7', padx=16, pady=16)
+        content = tk.Frame(root, background='#edf2f7', padx=16, pady=10)
         content.pack(fill='both', expand=True)
-        sidebar = tk.Frame(content, background='white', width=260, padx=18, pady=20)
-        sidebar.pack(side='left', fill='y', padx=(0, 14))
-        sidebar.pack_propagate(False)
+        sidebar_panel = tk.Frame(content, background='white', width=260)
+        sidebar_panel.pack(side='left', fill='y', padx=(0, 14))
+        sidebar_panel.pack_propagate(False)
+        sidebar_canvas = tk.Canvas(sidebar_panel, background='white', highlightthickness=0, width=260)
+        sidebar_scroll = ttk.Scrollbar(sidebar_panel, orient='vertical', command=sidebar_canvas.yview)
+        sidebar_canvas.configure(yscrollcommand=sidebar_scroll.set)
+        sidebar_canvas.pack(side='left', fill='both', expand=True)
+        sidebar = tk.Frame(sidebar_canvas, background='white', padx=18, pady=12)
+        sidebar_window = sidebar_canvas.create_window(0, 0, window=sidebar, anchor='nw')
+
+        def fit_sidebar(event=None):
+            available = sidebar_canvas.winfo_width()
+            if available <= 1:
+                return
+            wraplength = max(1, available - 40)
+            rewrapped = False
+            for widget in sidebar.winfo_children():
+                if isinstance(widget, tk.Label) and int(widget.cget('wraplength')) != wraplength:
+                    widget.configure(wraplength=wraplength)
+                    rewrapped = True
+            if rewrapped:
+                root.after_idle(fit_sidebar)
+                return
+            needed = sidebar.winfo_reqheight()
+            height = sidebar_canvas.winfo_height()
+            sidebar_canvas.itemconfigure(sidebar_window, width=available, height=max(needed, height))
+            sidebar_canvas.configure(scrollregion=(0, 0, available, max(needed, height)))
+            if needed > height:
+                if not sidebar_scroll.winfo_manager():
+                    sidebar_scroll.pack(side='right', fill='y')
+            else:
+                sidebar_scroll.pack_forget()
+                sidebar_canvas.yview_moveto(0)
+
+        sidebar.bind('<Configure>', fit_sidebar)
+        sidebar_canvas.bind('<Configure>', fit_sidebar)
         tk.Label(sidebar, text='WHAT TEST DO YOU WANT TO MODEL?', font=('Segoe UI', 9, 'bold'),
                  background='white', foreground='#45607e', wraplength=220, justify='left').pack(anchor='w')
         self.selector = ttk.Combobox(sidebar, textvariable=self.shot, state='disabled', width=18)
@@ -72,20 +105,28 @@ class RidgeApp:
         self.count_label.pack(anchor='w')
         self.reload_button = ttk.Button(sidebar, text='Reload metadata', command=self.load_tests)
         self.reload_button.pack(fill='x', pady=(10, 0))
-        tk.Frame(sidebar, height=1, background='#e1e7ee').pack(fill='x', pady=20)
+        tk.Frame(sidebar, height=1, background='#e1e7ee').pack(fill='x', pady=12)
         tk.Label(sidebar, textvariable=self.details, font=('Segoe UI', 10), justify='left',
                  background='white', foreground='#233c57', wraplength=220).pack(anchor='w')
         self.run_button = ttk.Button(sidebar, text='Model selected test', style='Accent.TButton', command=self.run_selected)
-        self.run_button.pack(fill='x', pady=(24, 12))
-        tk.Label(sidebar, text='Each prediction is trained on the other SMAJ400A tests. '
-                              'The selected test is excluded from training.',
-                 font=('Segoe UI', 10), background='white', foreground='#45607e',
+        self.run_button.pack(fill='x', pady=(12, 8))
+        tk.Label(sidebar, text='Trained on the other SMAJ400A tests. '
+                              'The selected test is held out.',
+                 font=('Segoe UI', 9), background='white', foreground='#45607e',
                  wraplength=220, justify='left').pack(anchor='w')
         self.export_button = ttk.Button(sidebar, text='Save waveform CSV', command=self.save_csv, state='disabled')
         self.export_button.pack(side='bottom', fill='x', pady=(12, 0))
         tk.Label(sidebar, text='Use the plot toolbar to zoom, pan, or save an image.',
                  font=('Segoe UI', 9), background='white', foreground='#62758c',
                  wraplength=220, justify='left').pack(side='bottom', anchor='w')
+
+        def scroll_sidebar(event):
+            if sidebar_scroll.winfo_manager():
+                sidebar_canvas.yview_scroll(-1 if event.delta > 0 else 1, 'units')
+            return 'break'
+
+        for widget in (sidebar_canvas, sidebar, *sidebar.winfo_children()):
+            widget.bind('<MouseWheel>', scroll_sidebar)
 
         output = tk.Frame(content, background='#edf2f7')
         output.pack(side='left', fill='both', expand=True)
@@ -103,14 +144,14 @@ class RidgeApp:
         for title, value, r2 in [('Prompt RMSE', self.prompt_rmse, self.prompt_r2),
                                  ('Full waveform RMSE', self.full_rmse, self.full_r2),
                                  ('Training tests', self.training_count, None)]:
-            card = tk.Frame(cards, background='white', padx=15, pady=10)
+            card = tk.Frame(cards, background='white', padx=15, pady=6)
             card.pack(side='left', fill='x', expand=True, padx=(0, 6))
             tk.Label(card, text=title, background='white', foreground='#62758c', font=('Segoe UI', 9)).pack(anchor='w')
             tk.Label(card, textvariable=value, background='white', foreground='#152e4d',
-                     font=('Segoe UI', 18, 'bold')).pack(anchor='w')
+                     font=('Segoe UI', 15, 'bold')).pack(anchor='w')
             if r2 is not None:
                 tk.Label(card, textvariable=r2, background='white', foreground='#45607e',
-                         font=('Segoe UI', 11)).pack(anchor='w', pady=(3, 0))
+                         font=('Segoe UI', 9)).pack(anchor='w', pady=(1, 0))
         plot = tk.Frame(output, background='white')
         plot.pack(fill='both', expand=True)
         self.figure = Figure(figsize=(9, 6), dpi=100)
@@ -182,9 +223,9 @@ class RidgeApp:
         row = self.conditions.loc[self.conditions.shot_id.eq(int(self.shot.get()))].iloc[0]
         load = '1 MΩ' if row.load_ohm == 1e6 else f'{row.load_ohm:g} Ω'
         self.details.set(f'Test {int(row.shot_id)}\n\n'
-                         f'Dose rate     {row.dose_rate:.3g} rad/s\n\n'
-                         f'Bias              {row.bias_v:g} V\n\n'
-                         f'Load             {load}\n\n'
+                         f'Dose rate     {row.dose_rate:.3g} rad/s\n'
+                         f'Bias              {row.bias_v:g} V\n'
+                         f'Load             {load}\n'
                          f'Pulse width  {row.pcd_fwhm_ns:g} ns')
 
     def _clear_result(self, text):
@@ -248,7 +289,8 @@ class RidgeApp:
                     self.count_label.configure(text=f'{len(self.conditions)} tests · SMAJ400A only')
                     self._update_details()
                     ridge.draw_waveform(self.figure, payload['wave'], payload['predicted'],
-                                        payload['shot_id'], payload['diode_type'], payload['score'], payload['full'])
+                                        payload['shot_id'], payload['diode_type'], payload['score'], payload['full'],
+                                        compact=True)
                     self.toolbar.update()
                     self.canvas.draw_idle()
                     self.prompt_rmse.set(f"{payload['score']['rmse_v']:.3f} V")
