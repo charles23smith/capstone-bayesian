@@ -1,12 +1,13 @@
 from queue import Empty, Queue
 from threading import Thread
+from math import isfinite
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
-import simease_ridge as ridge
+from research import simease_ridge as ridge
 
 
 class RidgeApp:
@@ -15,6 +16,7 @@ class RidgeApp:
         self.events = Queue()
         self.conditions = None
         self.result = None
+        self.batch_stats = None
         self.busy = False
         self.closed = False
         self.poll_id = None
@@ -23,6 +25,8 @@ class RidgeApp:
         self.details = tk.StringVar(root)
         self.prompt_rmse = tk.StringVar(root, value='—')
         self.full_rmse = tk.StringVar(root, value='—')
+        self.prompt_r2 = tk.StringVar(root, value='R²: —')
+        self.full_r2 = tk.StringVar(root, value='R²: —')
         self.training_count = tk.StringVar(root, value='—')
         self._build()
         root.protocol('WM_DELETE_WINDOW', self.close)
@@ -85,15 +89,28 @@ class RidgeApp:
 
         output = tk.Frame(content, background='#edf2f7')
         output.pack(side='left', fill='both', expand=True)
+        actions = tk.Frame(output, background='#edf2f7')
+        actions.pack(fill='x', pady=(0, 10))
+        self.run_all_button = ttk.Button(actions, text='Run all tests', command=self.run_all_tests,
+                                         state='disabled')
+        self.run_all_button.pack(side='left')
+        self.batch_export_button = ttk.Button(actions, text='Download CSV', command=self.save_all_stats)
+        self.metrics_button = ttk.Button(actions, text='View waveform stats',
+                                         command=self.show_pulse_metrics, state='disabled')
+        self.metrics_button.pack(side='right')
         cards = tk.Frame(output, background='#edf2f7')
         cards.pack(fill='x', pady=(0, 12))
-        for title, value in [('Prompt RMSE', self.prompt_rmse), ('Full waveform RMSE', self.full_rmse),
-                             ('Training tests', self.training_count)]:
+        for title, value, r2 in [('Prompt RMSE', self.prompt_rmse, self.prompt_r2),
+                                 ('Full waveform RMSE', self.full_rmse, self.full_r2),
+                                 ('Training tests', self.training_count, None)]:
             card = tk.Frame(cards, background='white', padx=15, pady=10)
             card.pack(side='left', fill='x', expand=True, padx=(0, 6))
             tk.Label(card, text=title, background='white', foreground='#62758c', font=('Segoe UI', 9)).pack(anchor='w')
             tk.Label(card, textvariable=value, background='white', foreground='#152e4d',
                      font=('Segoe UI', 18, 'bold')).pack(anchor='w')
+            if r2 is not None:
+                tk.Label(card, textvariable=r2, background='white', foreground='#45607e',
+                         font=('Segoe UI', 11)).pack(anchor='w', pady=(3, 0))
         plot = tk.Frame(output, background='white')
         plot.pack(fill='both', expand=True)
         self.figure = Figure(figsize=(9, 6), dpi=100)
@@ -108,9 +125,9 @@ class RidgeApp:
         # Reserve the status strip before the expanding plot claims its space.
         footer.pack(side='bottom', fill='x', before=content)
         self.progress = ttk.Progressbar(footer, mode='indeterminate', length=140)
-        self.progress.pack(side='right', padx=(12, 0))
-        tk.Label(footer, textvariable=self.status, font=('Segoe UI', 9), background='#e1e9f2',
-                 foreground='#233c57', anchor='w').pack(side='left', fill='x', expand=True)
+        self.status_label = tk.Label(footer, textvariable=self.status, font=('Segoe UI', 9),
+                                     background='#e1e9f2', foreground='#233c57', anchor='w')
+        self.status_label.pack(side='left', fill='x', expand=True)
 
     def _set_busy(self, busy):
         self.busy = busy
@@ -118,13 +135,23 @@ class RidgeApp:
         self.run_button.configure(state='disabled' if busy else 'normal')
         self.reload_button.configure(state='disabled' if busy else 'normal')
         self.export_button.configure(state='normal' if self.result is not None and not busy else 'disabled')
-        if busy:
+        self.metrics_button.configure(state='normal' if self.result is not None and not busy else 'disabled')
+        self.run_all_button.configure(state='normal' if self.conditions is not None and not busy else 'disabled')
+        self.batch_export_button.configure(state='disabled' if busy else 'normal')
+        if not busy:
+            self._set_training(False)
+
+    def _set_training(self, training):
+        if training:
+            self.progress.pack(side='right', padx=(12, 0), before=self.status_label)
             self.progress.start(12)
         else:
             self.progress.stop()
+            self.progress.pack_forget()
 
     def _start_worker(self, operation, event):
         self._set_busy(True)
+        self._set_training(event in ('result', 'batch_result'))
 
         def work():
             try:
@@ -138,8 +165,10 @@ class RidgeApp:
         if self.busy:
             return
         self.conditions = None
-        self._clear_result('Reading simease_ridge_metadata.csv...')
-        self.status.set('Loading tests from simease_ridge_metadata.csv...')
+        self.batch_stats = None
+        self.batch_export_button.pack_forget()
+        self._clear_result('Reading siamese_ridge_metadata.csv...')
+        self.status.set('Loading tests from siamese_ridge_metadata.csv...')
         self._start_worker(ridge.load_smaj_conditions, 'loaded')
 
     def _selection_changed(self, event=None):
@@ -162,7 +191,10 @@ class RidgeApp:
         self.result = None
         for value in (self.prompt_rmse, self.full_rmse, self.training_count):
             value.set('—')
+        for value in (self.prompt_r2, self.full_r2):
+            value.set('R²: —')
         self.export_button.configure(state='disabled')
+        self.metrics_button.configure(state='disabled')
         self.figure.clear()
         axis = self.figure.add_subplot()
         axis.set_axis_off()
@@ -181,6 +213,15 @@ class RidgeApp:
         self.status.set(f'Preparing test {shot_id}...')
         self._start_worker(lambda: ridge.model_shot(
             shot_id, progress=lambda text: self.events.put(('progress', text))), 'result')
+
+    def run_all_tests(self):
+        if self.busy or self.conditions is None:
+            return
+        self.batch_stats = None
+        self.batch_export_button.pack_forget()
+        self.status.set('Running all tests with each test excluded from its own training...')
+        self._start_worker(lambda: ridge.all_test_stats(
+            progress=lambda text: self.events.put(('progress', text))), 'batch_result')
 
     def _poll(self):
         if self.closed:
@@ -212,10 +253,18 @@ class RidgeApp:
                     self.canvas.draw_idle()
                     self.prompt_rmse.set(f"{payload['score']['rmse_v']:.3f} V")
                     self.full_rmse.set(f"{payload['full']['rmse_v']:.3f} V")
+                    self.prompt_r2.set(f"R²: {ridge.format_r2(payload['score']['r2'])}")
+                    self.full_r2.set(f"R²: {ridge.format_r2(payload['full']['r2'])}")
                     self.training_count.set(str(len(payload['train_shot_ids'])))
                     self._set_busy(False)
                     self.status.set(f"Test {payload['shot_id']} complete. Prediction trained on the other "
                                     f"{len(payload['train_shot_ids'])} SMAJ400A tests.")
+                elif event == 'batch_result':
+                    self.batch_stats = payload
+                    self._set_busy(False)
+                    self.batch_export_button.pack(side='left', padx=(8, 0), after=self.run_all_button)
+                    self.status.set(f'All {len(payload)} tests complete. View the table or download CSV.')
+                    self.show_all_stats(payload)
                 elif event == 'error':
                     self._set_busy(False)
                     if self.conditions is None:
@@ -227,6 +276,112 @@ class RidgeApp:
             pass
         if not self.closed:
             self.poll_id = self.root.after(75, self._poll)
+
+    def show_pulse_metrics(self):
+        if self.result is None or self.busy:
+            return
+        try:
+            comparison = ridge.pulse_comparison(self.result['wave'], self.result['predicted'])
+        except ValueError as error:
+            messagebox.showerror('Unable to measure pulse', str(error), parent=self.root)
+            return
+        window = tk.Toplevel(self.root)
+        window.title(f"Test {self.result['shot_id']} · Pulse measurements")
+        window.transient(self.root)
+        window.geometry('900x380')
+        window.minsize(760, 340)
+        content = ttk.Frame(window, padding=16)
+        content.pack(fill='both', expand=True)
+        ttk.Label(content, text=f"Test {self.result['shot_id']}: measured vs. held-out prediction",
+                  font=('Segoe UI', 12, 'bold')).pack(anchor='w', pady=(0, 12))
+        columns = ('metric', 'unit', 'measured', 'predicted', 'absolute_error')
+        table = ttk.Treeview(content, columns=columns, show='headings', height=6)
+        for column, title, width in zip(columns,
+                ('Measurement', 'Unit', 'Measured', 'Predicted', 'RMSE (one test)'),
+                (300, 60, 125, 125, 145)):
+            table.heading(column, text=title)
+            table.column(column, width=width, minwidth=50,
+                         anchor='w' if column == 'metric' else 'e')
+        for row in comparison.to_dict('records'):
+            table.insert('', 'end', values=(row['metric'], row['unit'], *[
+                f'{row[key]:.3f}' if isfinite(row[key]) else 'N/A'
+                for key in ('measured', 'predicted', 'absolute_error')]))
+        table.pack(fill='both', expand=True)
+        ttk.Label(content, text='For one test, each scalar RMSE equals its absolute error.\n'
+                  'Peak magnitude and crossings use each waveform’s pre-pulse baseline. '
+                  'Time to peak is relative to the PCD reference (0 ns).\n'
+                  'Area is baseline-subtracted and signed over −60 to 1000 ns. '
+                  'N/A means a crossing or required coverage is unavailable.',
+                  wraplength=840, justify='left').pack(anchor='w', pady=(12, 0))
+        return window
+
+    def show_all_stats(self, data):
+        window = tk.Toplevel(self.root)
+        window.title(f'All {len(data)} tests · Waveform stats')
+        window.transient(self.root)
+        width = min(1180, self.root.winfo_screenwidth()-80)
+        height = min(620, self.root.winfo_screenheight()-120)
+        window.geometry(f'{width}x{height}')
+        content = ttk.Frame(window, padding=16)
+        content.pack(fill='both', expand=True)
+        header = ttk.Frame(content)
+        header.pack(fill='x', pady=(0, 12))
+        ttk.Button(header, text='Download CSV',
+                   command=lambda: self.save_all_stats(data, window)).pack(side='right')
+        ttk.Label(header, text=f'{len(data)} tests: model evaluation',
+                  font=('Segoe UI', 12, 'bold')).pack(side='left')
+        ttk.Label(content, text='Scroll horizontally for all six measurement RMSEs. '
+                  'Each test is predicted using the other tests.\n'
+                  'Errors are absolute differences (single-test scalar RMSE). '
+                  'N/A means unavailable crossings or coverage. CSV preserves full precision.\n'
+                  'Summary: waveform scores are per-test means; measurement RMSEs use √mean(error²) across valid tests.',
+                  wraplength=width-60, justify='left').pack(anchor='w', pady=(0, 12))
+        frame = ttk.Frame(content)
+        frame.pack(fill='both', expand=True)
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(0, weight=1)
+        columns = list(data.columns)
+        table = ttk.Treeview(frame, columns=columns, show='headings')
+        horizontal = ttk.Scrollbar(frame, orient='horizontal', command=table.xview)
+        vertical = ttk.Scrollbar(frame, orient='vertical', command=table.yview)
+        table.configure(xscrollcommand=horizontal.set, yscrollcommand=vertical.set)
+        table.grid(row=0, column=0, sticky='nsew')
+        vertical.grid(row=0, column=1, sticky='ns')
+        horizontal.grid(row=1, column=0, sticky='ew')
+        headings = dict(shot_id='Test', training_tests='Training tests',
+                        full_rmse_v='Full RMSE (V)', full_r2='Full R²',
+                        prompt_rmse_v='Prompt RMSE (V)', prompt_r2='Prompt R²')
+        for key, label, unit in ridge.PULSE_METRICS:
+            headings[f'rmse_{key}'] = f'{label} · RMSE ({unit})'
+        for column in columns:
+            title = headings[column]
+            table.heading(column, text=title)
+            table.column(column, width=max(150 if column == 'shot_id' else 100, len(title)*8), minwidth=90,
+                         stretch=False, anchor='e')
+        table.tag_configure('averages', background='#e1e9f2', font=('Segoe UI', 10, 'bold'))
+        for row in ridge.stats_with_totals(data).to_dict('records'):
+            summary = row['shot_id'] == 'Total averages'
+            table.insert('', 'end', tags=('averages',) if summary else (), values=[
+                str(row[column]) if column == 'shot_id' else
+                str(int(row[column])) if column == 'training_tests' and not summary else
+                (f'{row[column]:.3f}' if isfinite(row[column]) else 'N/A')
+                for column in columns])
+        return window
+
+    def save_all_stats(self, data=None, parent=None):
+        data = self.batch_stats if data is None else data
+        if data is None:
+            return
+        parent = self.root if parent is None else parent
+        path = filedialog.asksaveasfilename(parent=parent, title='Download all waveform stats',
+                                          defaultextension='.csv', filetypes=[('CSV files', '*.csv')],
+                                          initialfile='all_tests_waveform_stats.csv')
+        if path:
+            try:
+                ridge.stats_with_totals(data).to_csv(path, index=False, na_rep='N/A', encoding='utf-8-sig')
+                self.status.set(f'Saved waveform stats for {len(data)} tests.')
+            except OSError as error:
+                messagebox.showerror('Unable to save waveform stats', str(error), parent=parent)
 
     def save_csv(self):
         if self.result is None or self.busy:
