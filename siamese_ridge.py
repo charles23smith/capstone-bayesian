@@ -1,124 +1,6 @@
 from pathlib import Path
-
-import numpy as np
-import pandas as pd
-
-
-def read_metadata(path):
-    """Validate SMAJ conditions and resolve measurement paths relative to the CSV."""
-    path = Path(path).expanduser().resolve()
-    frame = pd.read_csv(path)
-    required = {'shot_id', 'diode_type', 'dose_rate', 'load_ohm', 'bias_v',
-                'pcd_fwhm_ns', 'scope_scale_factor', 'cached_scope_scale_factor',
-                'waveform_csv'}
-    missing = required-set(frame.columns)
-    if missing:
-        raise ValueError(f'Metadata {path.name} is missing columns: {", ".join(sorted(missing))}')
-    if frame.diode_type.isna().any():
-        raise ValueError('Every metadata row needs a diode_type for input filtering.')
-    frame['diode_type'] = frame.diode_type.astype(str).str.strip()
-    frame = frame.loc[frame.diode_type.eq('SMAJ400A')].copy()
-    if len(frame) < 4:
-        raise ValueError('Metadata must contain at least four SMAJ400A tests for held-out evaluation.')
-    numeric = ('shot_id', 'dose_rate', 'load_ohm', 'bias_v', 'pcd_fwhm_ns',
-               'scope_scale_factor', 'cached_scope_scale_factor')
-    if 'scope_attenuation_setting' in frame:
-        numeric += ('scope_attenuation_setting',)
-    for name in numeric:
-        values = pd.to_numeric(frame[name], errors='coerce')
-        invalid = ~np.isfinite(values)
-        if invalid.any():
-            raise ValueError(f'Metadata column {name} must contain finite numbers (CSV row {frame.index[invalid][0]+2}).')
-        if name != 'bias_v' and (values <= 0).any():
-            raise ValueError(f'Metadata column {name} must be positive.')
-        frame[name] = values
-    if (frame.shot_id != np.floor(frame.shot_id)).any():
-        raise ValueError('Metadata shot_id values must be integers.')
-    frame['shot_id'] = frame.shot_id.astype('int64')
-    if frame.shot_id.duplicated().any():
-        raise ValueError('Each SMAJ400A shot_id must appear exactly once in the metadata.')
-    if 'raw_csv' not in frame:
-        frame['raw_csv'] = ''  # Optional override for the legacy --raw-waveforms flag.
-    for column in ('waveform_csv', 'raw_csv'):
-        def resolve(value):
-            if pd.isna(value) or not str(value).strip():
-                return ''
-            source = Path(str(value).strip()).expanduser()
-            return str((path.parent/source).resolve())
-        frame[column] = frame[column].map(resolve)
-    if (frame.waveform_csv.eq('') & frame.raw_csv.eq('')).any():
-        raise ValueError('Each metadata row needs a waveform_csv or raw_csv path.')
-    return frame.reset_index(drop=True)
-
-
-def _scope_channel(raw, name):
-    """Use the channel's preceding time column and discard export zero padding."""
-    index = list(raw.columns).index(name)
-    if index == 0 or not raw.columns[index-1].startswith('time'):
-        raise ValueError(f'No timebase before channel {name}')
-    time = raw.iloc[:, index-1].to_numpy(float)
-    values = raw[name].to_numpy(float)
-    valid = np.isfinite(time) & np.isfinite(values)
-    end = len(time)
-    padded = (end > 1 and time[-1] == values[-1] == 0
-              and ((time[-2] == values[-2] == 0) or time[-2] > 0))
-    if padded:
-        while end and time[end-1] == values[end-1] == 0:
-            end -= 1
-    valid[end:] = False
-    time, values = time[valid], values[valid]
-    if len(time) < 5 or np.any(np.diff(time) <= 0):
-        raise ValueError(f'{name}: need at least five samples on a strictly increasing timebase')
-    return time, values
-
-
-def load_waveform(row, raw_waveforms=False):
-    """Read either processed voltages or original scope channels from the CSV."""
-    path = (getattr(row, 'raw_csv', '') if raw_waveforms else '') or row.waveform_csv
-    if not path:
-        raise ValueError(f'Test {row.shot_id} has no measurement path in the metadata.')
-    if not Path(path).is_file():
-        raise FileNotFoundError(f'Test {row.shot_id}: CSV not found: {path}\n'
-                                'Update the measurement path in simease_ridge_metadata.csv.')
-    header = list(pd.read_csv(path, nrows=0).columns)
-    if {'time_ns', 'actual_v'}.issubset(header):
-        wave = pd.read_csv(path, usecols=['time_ns', 'actual_v'])
-        # Cached observations have already been divided by their original scale.
-        # Undo that division before applying the editable calibration factor.
-        wave['actual_v'] *= row.cached_scope_scale_factor/row.scope_scale_factor
-    elif {'Diode', 'PCD3_B'}.issubset(header):
-        needed = set()
-        for channel in ('Diode', 'PCD3_B'):
-            index = header.index(channel)
-            if index == 0 or not header[index-1].startswith('time'):
-                raise ValueError(f'Test {row.shot_id}: no timebase before {channel}.')
-            needed.update((channel, header[index-1]))
-        raw = pd.read_csv(path, usecols=[name for name in header if name in needed])
-        time_s, voltage = _scope_channel(raw, 'Diode')
-        pcd_time, pcd = _scope_channel(raw, 'PCD3_B')
-        # Preserve the original v2 alignment, scaling, grid, and missing coverage.
-        reference = float(pcd_time[np.argmax(pcd)])
-        time_ns = (time_s-reference)*1e9
-        grid = np.arange(-150.0, 5000.1, 2.0)
-        actual = np.interp(grid, time_ns, voltage/row.scope_scale_factor,
-                           left=np.nan, right=np.nan)
-        wave = pd.DataFrame(dict(time_ns=grid, actual_v=actual))
-    else:
-        raise ValueError(f'Test {row.shot_id}: CSV needs time_ns/actual_v columns or '
-                         'Diode/PCD3_B channels with preceding time columns.')
-    time = wave.time_ns.to_numpy(float)
-    voltage = wave.actual_v.to_numpy(float)
-    if not np.isfinite(time).all() or (np.diff(time) <= 0).any():
-        raise ValueError(f'Test {row.shot_id}: measurement times must be finite and increasing.')
-    if np.isinf(voltage).any():
-        raise ValueError(f'Test {row.shot_id}: measured voltage contains infinity.')
-    return wave
-
-
-from pathlib import Path
 from html import escape
 import sys
-import argparse
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -126,18 +8,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter1d
 from scipy.interpolate import PchipInterpolator
-# Metadata helpers are included above.
 
 ROOT=Path(__file__).resolve().parent
-
-TRAINING_DIODE = "SMAJ400A"
-PREDICTOR_COLUMNS = ("dose_rate", "bias_v", "load_ohm", "pcd_fwhm_ns")
-
-
-def require_smaj(conditions: pd.DataFrame) -> None:
-    """Keep both training and evaluation within the supported diode family."""
-    if conditions.empty or not conditions.diode_type.eq(TRAINING_DIODE).all():
-        raise ValueError("simease_ridge supports SMAJ400A shots only.")
 
 # Local v2 calculation routines preserve equations and candidate ordering.
 GRID_NS = np.arange(-150.0, 5000.1, 2.0)
@@ -149,7 +21,6 @@ KNOTS_NS = np.array([-150, -100, -75, *range(-60, 81, 5),
 
 
 TARGETS = {f"knot_{i:02d}_v": "identity" for i in range(len(KNOTS_NS))}
-BASE_KNOTS_NS = KNOTS_NS.copy()
 
 
 PROMPT = (GRID_NS >= -60) & (GRID_NS <= 1000)
@@ -204,11 +75,7 @@ def waveform_parameters(time: np.ndarray, voltage: np.ndarray) -> dict:
 
 
 def encode(frame: pd.DataFrame) -> np.ndarray:
-    """Encode four numeric conditions and their interactions; no diode labels.
-
-    Fixed unit scaling avoids fitting preprocessing on validation shots.
-    """
-    frame = frame.loc[:, list(PREDICTOR_COLUMNS)]
+    """Fixed unit scaling avoids fitting preprocessing on validation shots."""
     dose = np.log10(frame.dose_rate.to_numpy(float)/1e10)
     bias = frame.bias_v.to_numpy(float)/5.25
     high = (frame.load_ohm.to_numpy(float) >= 1e5).astype(float)
@@ -219,24 +86,23 @@ def encode(frame: pd.DataFrame) -> np.ndarray:
 
 
 def _kernel(left: pd.DataFrame, right: pd.DataFrame, kind: str) -> np.ndarray:
-    """Condition-only covariance. Diode type is used solely at the input boundary."""
     x, y = encode(left), encode(right)
+    same = left.diode_type.to_numpy()[:, None] == right.diode_type.to_numpy()[None, :]
     if kind == "linear":
-        # Retain the existing single-diode scale so alpha has the same meaning.
-        return 1 + 2*(x@y.T)
-    name, length_text = kind.split(":")
-    if name not in ("rbf", "hybrid", "regime"):
-        raise ValueError(f"Unsupported condition kernel: {kind}")
-    length = float(length_text)
-    if not np.isfinite(length) or length <= 0:
-        raise ValueError("Kernel length must be finite and positive.")
+        return x@y.T + same*(1+x@y.T)
+    if kind.startswith("task:"):
+        _, length, sharing = kind.split(":")
+        length, sharing = float(length), float(sharing)
+        if length <= 0 or not 0 <= sharing <= 1:
+            raise ValueError("Task kernel requires positive length and sharing in [0, 1].")
+        weights = np.array([1, 2, 1.5, 2, 2], float)
+        distance = np.sum(((x[:, None, :5]-y[None, :, :5])*weights)**2, axis=2)
+        # PSD product of an RBF condition kernel and a task covariance matrix.
+        return np.exp(-distance/(2*length**2))*(sharing+(1-sharing)*same)
+    length = float(kind.split(":")[1])
     weights = np.array([1, 2, 1.5, 2, 2], float)
     distance = np.sum(((x[:, None, :5]-y[None, :, :5])*weights)**2, axis=2)
-    covariance = np.exp(-distance/(2*length**2))
-    if name in ("hybrid", "regime"):
-        features = [0, 1, 2, 3, 5, 6, 7, 8] if name == "hybrid" else [1, 2, 3, 7]
-        covariance += x[:, features]@y[:, features].T
-    return covariance
+    return np.exp(-(distance+4*(~same))/(2*length**2))
 
 
 def _solve(kernel: np.ndarray, targets: np.ndarray, alpha: float) -> tuple[list, np.ndarray]:
@@ -269,8 +135,42 @@ def _solve(kernel: np.ndarray, targets: np.ndarray, alpha: float) -> tuple[list,
     return models, errors
 
 
+def _solve_family_mean(kernel: np.ndarray, targets: np.ndarray, alpha: float,
+                       families: np.ndarray) -> tuple[list, np.ndarray]:
+    """Universal kernel ridge: unpenalized family mean plus kernel residual.
+
+    The block normal equations jointly fit means and residuals. Centering by
+    precomputed family averages would leak inner holdout labels into PRESS.
+    See Rasmussen & Williams (2006), section 2.7, for explicit mean functions.
+    """
+    models, errors = [], np.full_like(targets, np.nan)
+    patterns: dict[bytes, list[int]] = {}
+    for column in range(targets.shape[1]):
+        patterns.setdefault(np.isfinite(targets[:, column]).tobytes(), []).append(column)
+    for columns in patterns.values():
+        indices = np.flatnonzero(np.isfinite(targets[:, columns[0]]))
+        if not len(indices):
+            raise ValueError(f"No training coverage for knot {columns[0]}")
+        values = targets[np.ix_(indices, columns)]
+        names = sorted(set(families[indices]))
+        trend = (families[indices, None] == np.array(names)[None, :]).astype(float)
+        k = kernel[np.ix_(indices, indices)]
+        n, p = trend.shape
+        block = np.block([[k+alpha*np.eye(n), trend], [trend.T, np.zeros((p, p))]])
+        inverse = np.linalg.inv(block)
+        solution = inverse@np.vstack([values, np.zeros((p, values.shape[1]))])
+        design = np.column_stack([k, trend])
+        denominator = 1-np.diag(design@inverse[:, :n])
+        # Removing a family's sole observation makes its free mean unidentified.
+        # Such cases cannot contribute a PRESS score for this candidate.
+        good = denominator > 1e-8
+        errors[np.ix_(indices[good], columns)] = (values-design@solution)[good]/denominator[good, None]
+        models.append(dict(columns=columns, indices=indices, families=names,
+                           coefficient=solution[:n], trend=solution[n:]))
+    return models, errors
+
+
 def fit_model(conditions: pd.DataFrame, features: pd.DataFrame) -> dict:
-    require_smaj(conditions)
     if len(conditions) < 3:
         raise ValueError("Need at least three training shots.")
     labels = features.set_index("shot_id").loc[conditions.shot_id]
@@ -280,12 +180,17 @@ def fit_model(conditions: pd.DataFrame, features: pd.DataFrame) -> dict:
     times = KNOTS_NS[focus]
     weights = np.diff(np.r_[times[0], (times[:-1]+times[1:])/2, times[-1]])
     best, candidates = None, []
-    # A single unpenalized intercept suffices for the SMAJ-only dataset.
-    # Former task/sharing candidates reduce to these same RBF kernels.
-    for kind in ("linear", "rbf:0.5", "rbf:1.0", "rbf:2.0"):
+    candidates_spec = [(kind, False) for kind in ("linear", "rbf:0.5", "rbf:1.0", "rbf:2.0")]
+    # Freeze a small research menu before evaluation; all choices use inner LOO.
+    # Families with only one training shot cannot validate a free family mean.
+    if conditions.groupby("diode_type").size().min() >= 2:
+        candidates_spec += [(f"task:{length}:{sharing}", True)
+                            for length in (.5, 1.0, 2.0) for sharing in (0.0, .25, 1.0)]
+    for kind, family_mean in candidates_spec:
         kernel_matrix = kernel(conditions, conditions, kind)
         for alpha in (.01, .1, 1.0, 10.0):
-            models, errors = _solve(kernel_matrix, targets, alpha)
+            models, errors = (_solve_family_mean(kernel_matrix, targets, alpha, conditions.diode_type.to_numpy())
+                              if family_mean else _solve(kernel_matrix, targets, alpha))
             squared = (errors[:, focus]/peak[:, None])**2
             available = np.isfinite(squared)
             denom = np.sum(available*weights, axis=1)
@@ -293,10 +198,10 @@ def fit_model(conditions: pd.DataFrame, features: pd.DataFrame) -> dict:
             normalized_score = float(np.mean(per_shot[denom > 0]))
             # Align selection with the reported mean waveform RMSE in volts.
             score = float(np.mean(np.sqrt(per_shot[denom > 0])*peak[denom > 0]))
-            candidates.append(dict(kernel=kind, alpha=alpha,
+            candidates.append(dict(kernel=kind, alpha=alpha, family_mean=family_mean,
                                    inner_loo_rmse_v=score, inner_loo_normalized_mse=normalized_score))
             if best is None or score < best["inner_score"]:
-                best = dict(kernel=kind, alpha=alpha,
+                best = dict(kernel=kind, alpha=alpha, family_mean=family_mean,
                             inner_score=score, groups=models)
     best["conditions"] = conditions.reset_index(drop=True).copy()
     best["candidates"] = candidates
@@ -304,14 +209,19 @@ def fit_model(conditions: pd.DataFrame, features: pd.DataFrame) -> dict:
 
 
 def predict(model: dict, conditions: pd.DataFrame) -> pd.DataFrame:
-    require_smaj(model["conditions"])
-    require_smaj(conditions)
     kernel_matrix = kernel(conditions, model["conditions"], model["kernel"])
     targets = np.empty((len(conditions), len(TARGETS)))
     for group in model["groups"]:
         k = kernel_matrix[:, group["indices"]]
-        centered = k-group["column_mean"][None, :]-k.mean(axis=1)[:, None]+group["grand_mean"]
-        values = centered@group["coefficient"]+group["mean"]
+        if model.get("family_mean", False):
+            trend = (conditions.diode_type.to_numpy()[:, None] == np.array(group["families"])[None, :]).astype(float)
+            # No family coverage at a late knot: use the available means equally.
+            absent = trend.sum(axis=1) == 0
+            trend[absent] = 1/len(group["families"])
+            values = k@group["coefficient"]+trend@group["trend"]
+        else:
+            centered = k-group["column_mean"][None, :]-k.mean(axis=1)[:, None]+group["grand_mean"]
+            values = centered@group["coefficient"]+group["mean"]
         targets[:, group["columns"]] = values
     result = conditions[["shot_id"]].reset_index(drop=True).copy()
     result = pd.concat([result, pd.DataFrame(targets, columns=list(TARGETS))], axis=1)
@@ -327,11 +237,8 @@ def reconstruct(time: np.ndarray, parameters: dict) -> np.ndarray:
     return interpolator(np.clip(time, KNOTS_NS[0], KNOTS_NS[-1]))
 
 
-def _metrics(actual: np.ndarray, predicted: np.ndarray, mask: np.ndarray | None = None) -> dict:
-    """Score all observed waveform samples unless an explicit window is given."""
-    valid = np.isfinite(actual) & np.isfinite(predicted)
-    if mask is not None:
-        valid &= mask
+def _metrics(actual: np.ndarray, predicted: np.ndarray, mask: np.ndarray) -> dict:
+    valid = mask & np.isfinite(actual) & np.isfinite(predicted)
     if valid.sum() < 5:
         raise ValueError("Not enough observed samples to evaluate waveform")
     residual = actual[valid]-predicted[valid]
@@ -342,10 +249,9 @@ def _metrics(actual: np.ndarray, predicted: np.ndarray, mask: np.ndarray | None 
                 n_samples=int(valid.sum()))
 
 
-def draw_waveform(figure, wave, predicted, shot_id, diode_type, score, full):
-    """Draw the same comparison in saved plots and the desktop GUI."""
-    figure.clear()
-    axes = figure.subplots(2, 1)
+def plot_waveform(wave, predicted, shot_id, diode_type, score, full, output_dir):
+    """Save the held-out prediction alongside the original measured voltage."""
+    figure, axes = plt.subplots(2, 1, figsize=(11, 8))
     for axis in axes:
         axis.plot(wave.time_ns, wave.actual_v, label='Actual diode output', color='#426b9a')
         axis.plot(wave.time_ns, predicted, label='Predicted output (held-out shot)',
@@ -354,7 +260,7 @@ def draw_waveform(figure, wave, predicted, shot_id, diode_type, score, full):
         axis.set_ylabel('Diode output (V)')
         axis.grid(alpha=0.25)
         axis.legend()
-    axes[0].set_title(f'Full waveform | RMSE: {full["rmse_v"]:.3f} V')
+    axes[0].set_title(f'Full waveform | RMSE (time >= 0 ns): {full["rmse_v"]:.3f} V')
     axes[1].set_xlim(-60, 1000)
     prompt = wave.time_ns.between(-60, 1000).to_numpy()
     values = np.r_[wave.actual_v.to_numpy()[prompt], predicted[prompt]]
@@ -365,20 +271,11 @@ def draw_waveform(figure, wave, predicted, shot_id, diode_type, score, full):
     axes[1].set_title(f'Prompt window | RMSE: {score["rmse_v"]:.3f} V')
     figure.suptitle(f'Shot {shot_id} | {diode_type} | Leave-one-shot-out prediction')
     figure.tight_layout()
-
-
-def plot_waveform(wave, predicted, shot_id, diode_type, score, full, output_dir):
-    """Save the held-out prediction alongside the original measured voltage."""
-    figure = plt.figure(figsize=(11, 8))
-    draw_waveform(figure, wave, predicted, shot_id, diode_type, score, full)
     figure.savefig(output_dir / f'{shot_id}_predicted_vs_actual.png', dpi=160)
     plt.close(figure)
 
 
 def fit_expanded(conditions, features, extra=False, balanced=False, gains=None):
-    require_smaj(conditions)
-    if len(conditions) < 3:
-        raise ValueError("Need at least three training shots.")
     labels=features.set_index('shot_id').loc[conditions.shot_id]
     target=labels[list(TARGETS)].to_numpy(float)
     focus=(KNOTS_NS>=-60)&(KNOTS_NS<=1000)
@@ -388,10 +285,10 @@ def fit_expanded(conditions, features, extra=False, balanced=False, gains=None):
     for gain_mode in gain_modes:
       gain=gains if gain_mode else np.ones(len(conditions))
       y=target/gain[:,None]
-      for kind in ['linear','rbf:0.5','rbf:1.0','rbf:2.0']+(['hybrid:0.5','hybrid:1.0','hybrid:2.0','regime:0.5','regime:1.0','regime:2.0'] if extra else []):
+      for kind in ['linear','task:0.5:0.0','task:1.0:0.0','task:2.0:0.0']+(['hybrid:0.5','hybrid:1.0','hybrid:2.0','regime:0.5','regime:1.0','regime:2.0'] if extra else []):
         k=kernel(conditions,conditions,kind)
         for alpha in (.01,.1,1.,10.):
-            groups,errors=_solve(k,y,alpha)
+            groups,errors=_solve_family_mean(k,y,alpha,conditions.diode_type.to_numpy())
             errors=errors*gain[:,None]
             available=np.isfinite(errors[:,focus]);denom=(available*weights).sum(axis=1)
             error=np.sqrt(np.nansum(errors[:,focus]**2*weights,axis=1)/np.maximum(denom,1e-12))
@@ -403,97 +300,54 @@ def fit_expanded(conditions, features, extra=False, balanced=False, gains=None):
                 terr=np.sqrt(np.nansum(errors[:,tail]**2*tw,axis=1)/np.maximum(td,1e-12))
                 score=.5*(score+terr[td>0].mean())
             if best is None or score<best['inner_score']:
-                best=dict(kernel=kind,alpha=alpha,groups=groups,conditions=conditions.reset_index(drop=True).copy(),inner_score=score,gain_mode=gain_mode)
+                best=dict(kernel=kind,alpha=alpha,family_mean=True,groups=groups,conditions=conditions,inner_score=score,gain_mode=gain_mode)
     return best
 
 
 def kernel(left,right,kind):
-    # Keep filtering/audit metadata outside the predictive kernel interface.
-    predictors = list(PREDICTOR_COLUMNS)
-    return _kernel(left.loc[:, predictors], right.loc[:, predictors], kind)
+    if kind.startswith(('hybrid:','regime:')):
+        length=float(kind.split(':')[1]);x,y=encode(left),encode(right)
+        same=left.diode_type.to_numpy()[:,None]==right.diode_type.to_numpy()[None,:]
+        weights=np.array([1,2,1.5,2,2])
+        d=np.sum(((x[:,None,:5]-y[None,:,:5])*weights)**2,axis=2)
+        rb=np.exp(-d/(2*length**2))*same
+        features=[0,1,2,3,5,6,7,8] if kind.startswith('hybrid') else [1,2,3,7]
+        return rb+same*(x[:,features]@y[:,features].T)
+    return ORIGINAL_KERNEL(left,right,kind)
 
 
-def configure_knots(spacing=10, coarse_tail=False):
-    """Reset the experiment grid so successive runs do not accumulate knots."""
+ORIGINAL_KERNEL=_kernel
+
+
+def run(spacing=10, extra=False, balanced=False, gain=False, coarse_tail=False, raw_waveforms=False):
     global KNOTS_NS, TARGETS
-    if not np.isfinite(spacing) or spacing <= 0:
-        raise ValueError('Knot spacing must be positive.')
-    KNOTS_NS = np.unique(np.r_[BASE_KNOTS_NS, np.arange(-60, 1001, spacing),
-                              [] if coarse_tail else np.arange(1000, 5001, 25)])
-    TARGETS = {f'dense_{i:03d}_v': 'identity' for i in range(len(KNOTS_NS))}
-
-
-def load_smaj_conditions(metadata=None):
-    """Reload the editable metadata; cached result metadata is not consulted."""
-    return read_metadata(metadata if metadata is not None else ROOT/'simease_ridge_metadata.csv')
-
-
-def read_waveform(row, raw_waveforms=False):
-    return load_waveform(row, raw_waveforms)
-
-
-def waveform_features(wave, shot_id, peak_v=None):
-    good = wave.actual_v.notna()
-    time, voltage = wave.time_ns.to_numpy()[good], wave.actual_v.to_numpy()[good]
-    smooth = gaussian_filter1d(voltage, 1.5/2)
-    if peak_v is None:
-        peak_v = waveform_parameters(time, smooth)['peak_v']
-    values = np.interp(KNOTS_NS, time, smooth, left=np.nan, right=np.nan)
-    return dict(shot_id=shot_id, peak_v=peak_v, **dict(zip(TARGETS, values)))
-
-
-def model_shot(shot_id, *, raw_waveforms=False, progress=None, metadata=None):
-    """Fit one documented SMAJ holdout with the recommended hybrid/coarse setup.
-
-    Like the batch script this configures module-level knots; callers must run
-    fits sequentially. The GUI permits one worker at a time. Held-out waveform
-    labels are read only after fitting and prediction, for display and scoring.
-    """
-    report = progress if progress is not None else lambda message: None
-    conditions = load_smaj_conditions(metadata)
-    test = conditions.loc[conditions.shot_id.eq(shot_id)]
-    if len(test) != 1:
-        raise ValueError(f'Test {shot_id} is not an available SMAJ400A test.')
-    train = conditions.loc[conditions.shot_id.ne(shot_id)].reset_index(drop=True)
-    configure_knots(10, coarse_tail=True)
-    features = []
-    for index, row in enumerate(train.itertuples(), 1):
-        report(f'Loading training test {row.shot_id} ({index}/{len(train)})...')
-        wave = read_waveform(row, raw_waveforms)
-        features.append(waveform_features(wave, row.shot_id))
-    report(f'Fitting on {len(train)} SMAJ400A tests; test {shot_id} is held out...')
-    fitted = fit_expanded(train, pd.DataFrame(features), extra=True)
-    parameters = predict(fitted, test).iloc[0].to_dict()
-    report(f'Comparing the prediction with test {shot_id}...')
-    row = next(test.itertuples())
-    wave = read_waveform(row, raw_waveforms)
-    time = wave.time_ns.to_numpy()
-    predicted = reconstruct(time, parameters)
-    score = _metrics(wave.actual_v.to_numpy(), predicted, (time >= -60) & (time <= 1000))
-    full = _metrics(wave.actual_v.to_numpy(), predicted)
-    return dict(shot_id=int(shot_id), diode_type=TRAINING_DIODE, wave=wave[['time_ns', 'actual_v']].copy(),
-                predicted=predicted, score=score, full=full, train_shot_ids=train.shot_id.tolist(),
-                kernel=fitted['kernel'], alpha=fitted['alpha'], conditions=conditions)
-
-
-def run(spacing=10, extra=False, balanced=False, gain=False, coarse_tail=False, raw_waveforms=False, metadata=None):
     if spacing <= 0:
         raise ValueError('Knot spacing must be positive.')
     name='dense_'+str(spacing)+'ns'+('_hybrid' if extra else '')+('_balanced' if balanced else '')+('_gain' if gain else '')+('_coarse_tail' if coarse_tail else '')+('_documented' if '--documented' in sys.argv else '')
-    name += '_smaj400a'
     output_dir=ROOT/'research'/f'{name}_waveforms'
     output_dir.mkdir(parents=True, exist_ok=True)
-    c = load_smaj_conditions(metadata)
-    print(f'Using {len(c)} SMAJ400A shots from {metadata or ROOT/"simease_ridge_metadata.csv"}.', flush=True)
-    if gain and 'scope_attenuation_setting' not in c:
-        raise ValueError('--gain requires scope_attenuation_setting in the metadata CSV.')
-    c.to_csv(output_dir/'conditions_used.csv', index=False)
-    configure_knots(spacing, coarse_tail)
+    source=ROOT/('research/documented_v2_results' if '--documented' in sys.argv else 'simease_multiparams_v2_results')
+    c=pd.read_csv(source/'conditions_used.csv')
+    if gain: c=c.merge(pd.read_csv(ROOT/'research/scope_attenuation_settings.csv'),on='shot_id',validate='1:1')
+    old=pd.read_csv(source/'predictions.csv').set_index('shot_id')
+    KNOTS_NS=np.unique(np.r_[KNOTS_NS, np.arange(-60,1001,spacing), [] if coarse_tail else np.arange(1000,5001,25)])
+    TARGETS={f'dense_{i:03d}_v':'identity' for i in range(len(KNOTS_NS))}
     f=[]; waves={}
+    if raw_waveforms:
+        from models.simease_spline_v2 import extract_shot
     for row in c.itertuples():
-        w = read_waveform(row, raw_waveforms)
+        if raw_waveforms:
+            features, measured = extract_shot(ROOT/'data'/f'{row.shot_id}_data.csv', row.scope_scale_factor)
+            if not np.isclose(features['peak_v'], old.loc[row.shot_id, 'actual_peak_v'], rtol=1e-7, atol=1e-10):
+                raise ValueError(f'Shot {row.shot_id}: raw calibration does not match the selected dataset.')
+            w = pd.DataFrame(dict(time_ns=measured['time_ns'], actual_v=measured['voltage_v']))
+        else:
+            w=pd.read_csv(source/f'{row.shot_id}_waveform.csv')
         waves[row.shot_id]=w
-        f.append(waveform_features(w, row.shot_id))
+        good=w.actual_v.notna(); t=w.time_ns.to_numpy()[good]; v=w.actual_v.to_numpy()[good]
+        smooth=gaussian_filter1d(v,1.5/2)
+        values=np.interp(KNOTS_NS,t,smooth,left=np.nan,right=np.nan)
+        f.append(dict(shot_id=row.shot_id,peak_v=old.loc[row.shot_id,'actual_peak_v'],**dict(zip(TARGETS,values))))
         print(f'Loaded shot {row.shot_id} ({len(f)}/{len(c)})', flush=True)
     f=pd.DataFrame(f); rows=[]
     for row in c.itertuples():
@@ -503,10 +357,10 @@ def run(spacing=10, extra=False, balanced=False, gain=False, coarse_tail=False, 
         if fitted.get('gain_mode'): params.update({name:params[name]*float(test.scope_attenuation_setting.iloc[0]) for name in TARGETS})
         w=waves[row.shot_id]; pred=reconstruct(w.time_ns.to_numpy(),params)
         score=_metrics(w.actual_v.to_numpy(),pred,PROMPT)
-        full=_metrics(w.actual_v.to_numpy(),pred)
+        full=_metrics(w.actual_v.to_numpy(),pred,GRID_NS>=0)
         plot_waveform(w,pred,row.shot_id,row.diode_type,score,full,output_dir)
         pd.DataFrame(dict(time_ns=w.time_ns,actual_v=w.actual_v,predicted_v=pred)).to_csv(output_dir/f'{row.shot_id}_waveform.csv',index=False)
-        rows.append(dict(shot_id=row.shot_id,diode_type=row.diode_type,**score,full_rmse_v=full['rmse_v'],kernel=fitted['kernel'],alpha=fitted['alpha'],gain_mode=fitted.get('gain_mode',False),n_train=len(train),train_shot_ids=';'.join(map(str, train.shot_id))))
+        rows.append(dict(shot_id=row.shot_id,diode_type=row.diode_type,**score,full_rmse_v=full['rmse_v'],previous_rmse_v=old.loc[row.shot_id,'rmse_v'],kernel=fitted['kernel'],alpha=fitted['alpha'],gain_mode=fitted.get('gain_mode',False)))
         print(row.shot_id,score['rmse_v'],flush=True)
     result=pd.DataFrame(rows)
     result.to_csv(ROOT/'research'/f'{name}.csv',index=False)
@@ -531,22 +385,15 @@ def run(spacing=10, extra=False, balanced=False, gain=False, coarse_tail=False, 
         'figure{margin:0;padding:1rem;background:white;border-radius:8px}'
         'img{width:100%;height:auto}figcaption{padding-top:.5rem}'
         '</style><h1>Diode waveform predictions</h1>'
-        f'<p>{len(result)} SMAJ400A-only leave-one-shot-out predictions. Training and inner model selection use SMAJ400A shots only. Click an image to view full size.</p>'
+        f'<p>{len(result)} leave-one-shot-out predictions. Click an image to view full size.</p>'
         '<p><a href="metrics.csv">Download metrics</a></p>'
         + ''.join(cards) + '</html>', encoding='utf-8')
     print(f'Saved {len(result)} waveform PNGs and prediction CSVs to {output_dir}',flush=True)
-    print(result.groupby('diode_type')[['rmse_v','full_rmse_v']].mean().to_string())
-    print(result[['rmse_v','full_rmse_v']].mean().to_string())
+    print(result.groupby('diode_type')[['rmse_v','previous_rmse_v','full_rmse_v']].mean().to_string())
+    print(result[['rmse_v','previous_rmse_v','full_rmse_v']].mean().to_string())
 
 
 if __name__=='__main__':
-    parser = argparse.ArgumentParser(description='SMAJ400A ridge model driven by an editable metadata CSV.')
-    parser.add_argument('spacing', type=int, nargs='?', default=10)
-    parser.add_argument('--metadata', type=Path, default=ROOT/'simease_ridge_metadata.csv')
-    parser.add_argument('--documented', action='store_true', help='Keep the historical documented output-folder suffix; input paths come from metadata.')
-    for flag in ('extra', 'balanced', 'gain', 'coarse-tail', 'raw-waveforms'):
-        parser.add_argument('--'+flag, action='store_true')
-    args = parser.parse_args()
-    run(args.spacing, args.extra, args.balanced, args.gain, args.coarse_tail, args.raw_waveforms, args.metadata)
+    run(int(sys.argv[1]) if len(sys.argv)>1 else 10, '--extra' in sys.argv, '--balanced' in sys.argv, '--gain' in sys.argv, '--coarse-tail' in sys.argv, '--raw-waveforms' in sys.argv)
 
 
